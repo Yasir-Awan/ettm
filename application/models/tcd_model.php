@@ -49,6 +49,15 @@ class tcd_model extends MY_Model
 		
 		return $postload[0];
 	}
+	public function _list($tool){
+		$this->db->order_by('id','DESC');
+		if($tool){
+			$this->db->where('toolplaza_id', $tool);
+		}
+		$tcd = $this->db->get('tcd')->result_array();
+		
+		return $tcd; 
+	}
 	
 }
 		

@@ -1612,6 +1612,22 @@ class Admin extends CI_Controller
 					echo "<span class='text-danger'>Invalid Request</span>";
 				}
 			}
+			elseif($para1 == 'by_tollplaza'){
+				if($para2 != ''){
+					$select = 'id';$table = 'toolplaza'; $where = array('id' => $para2);
+					$toolplaza = $this->database_model->get_select($select, $table, $where)->result_array();
+					$tool = $toolplaza[0]['id'];
+					$dsr = $this->tcd_model->_list($tool);
+					$edit['dsr']  = $dsr;
+					$this->load->view('back/dsr_list', $edit);
+				}
+				else{
+					$tool = NULL;
+					$dsr = $this->tcd_model->_list($tool);	
+					$this->page_data['dsr']  = $dsr;
+					$this->load->view('back/dsr_list', $this->page_data);
+				}
+			}
 			else{
 				$this->page_data['page'] = 'tcd';
 				$this->load->view('back/tcd', $this->page_data);

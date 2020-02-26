@@ -81,10 +81,10 @@
     });
   });
   	$('body').on('change', '#toll_plaza', function (){
-	var tollplaza = this.value;
-    //if(tollplaza){
+		var tollplaza = this.value;
+		//if(tollplaza){
         $.ajax({ 
-            url: "<?php echo base_url();?>admin/tcd/by_tollplaza/"+tollplaza,
+            url: "<?php echo base_url();?>admin/tcd/by_tollplaza/"+ tollplaza,
             cache       : false,
             contentType : false,
             processData : false,
@@ -93,7 +93,6 @@
                 $('#list').html('<div style="text-align:center;width:100%;position:relative;top:'+top+'px; min-height:300px;"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>'); // change submit button text
             },
             success: function(data) {
-                
                $('#list').html(data);
                $('#dataTable3').DataTable();
                   $("[data-toggle='toggle']").bootstrapToggle('destroy')                 
@@ -104,9 +103,9 @@
                 console.log(e)
             }
         });
-   // }
+		// }
     
-  });
+  	});
   	$(document).ready(function(){
             $.ajax({ 
             url: "<?php echo base_url();?>admin/tcd/list",
