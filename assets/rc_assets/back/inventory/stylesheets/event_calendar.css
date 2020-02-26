@@ -1,0 +1,92 @@
+#request_container [class*="span"]{
+  margin-left: 0px;
+}
+
+.dashboard-events-border{
+  padding-top: 25px;
+  border: 1px solid #073763;
+  background-color: #efefef;
+  min-height: 100px;
+  width: 274px;
+}
+
+.events-box-width{
+  width: 181px!important;
+}
+
+.events-count-box{
+  min-height: 145px; 
+}
+
+.dashboard_events{
+  height: 120px;
+  width: 744px;
+  margin-left: -58px;
+  background-color: #efefef;
+  border: 1px solid #073763;
+}
+
+.requests li div.bullet {
+  display: inline;
+  max-width: 20px;
+  max-height: 20px;
+  margin-right: 10px;
+}
+
+.requests li div.bullet.checkin_due{
+  background-color: #cc0000;
+}
+
+.requests li div.bullet.reservation{
+  background-color: #a64d79;
+}
+
+.requests li div.bullet.checkin_request{
+  background-color: #00ff00;
+}
+
+ul.eventsCalendar-list.requests li{
+  margin: 0px;
+  list-style: none;
+  display: block;
+  border-bottom: solid 1px #ccc;
+  padding: 10px 10px 10px 5px;
+  clear: both;
+  font-size: 13px;
+}
+
+.events_selector{
+  width: 100%;
+  text-align: center;
+  padding-top: 4px;
+  padding-bottom: 3px;
+  color: #073763;
+  background-color: #3D4D73;
+  color: white;
+  font-weight: bold;
+}
+
+.dashboard-events-border span{
+  font-size: 300%;
+  color: #073763;
+  font-weight: bold;
+}
+
+.dashboard-events-border p{
+  color: #073763;
+}
+
+.calendar-event:after{
+  content: "";
+  position: absolute;
+  left: calc(100% - 0.5em);
+  top: 0;
+  border-left: 0.5em solid transparent;
+  border-top: 0.5em solid #e69138;
+}
+
+@media (max-width: 767px) {
+  .events_selector, .eventsCalendar-slider, .eventsCalendar-list-wrap, .dashboard-events-border p, .span3.dashboard-events-border{
+    width: auto!important;
+  }
+}

@@ -1,0 +1,169 @@
+
+table#import-map  {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+table#import-map  {
+    border: 1px solid #CCCCCC;
+    border-collapse: separate;
+}
+table#import-map,
+#import-map thead, 
+#import-map tfoot, 
+#import-map tbody, 
+#import-map tr, 
+#import-map th, 
+#import-map td {
+    margin: 0;
+    padding: 0;
+}
+#import-map tr {
+    border-bottom: 1px solid #CCCCCC;
+}
+#import-map th {
+    border-bottom: 1px solid #CCCCCC;
+    border-right: 1px solid #CCCCCC;
+}
+#import-map th:last-of-type, #import-map td:last-of-type {
+    border-right: 0 none;
+}
+#import-map td {
+    border-right: 1px solid #DDDDDD;
+    color: #555555;
+}
+#import-map th, #import-map td {
+    padding: 6px 10px;
+}
+table#import-map  tr td:last-child {
+    border: 0 none;
+}
+
+#import-map th {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background: none repeat scroll 0 0 #FAFAFA;
+    border-image: none;
+    border-style: none solid none none;
+    border-width: 0 1px 0 0;
+    border-color: #DDDDDD;
+    min-width: 150px;
+    text-align: center;
+    vertical-align: bottom;
+}
+
+#import-map td {
+    border-right: 1px solid #DDDDDD;
+    color: #555555;
+}
+
+#import-map th, td {
+    padding: 6px 10px;
+}
+
+#import-map .header-set {
+    margin: -5px -10px;
+    min-height: 70px;
+    padding-top: 15px;
+}
+#import-map .map-activecol {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: -moz-use-text-color #46BCD2;
+    border-image: none;
+    border-left: 1px solid #46BCD2!important;
+    border-right: 1px solid #46BCD2;
+    border-style: none solid;
+    border-width: medium 1px;
+    color: #333333;
+    text-align: left;
+}
+#import-map th.map-activecol {
+    background: none repeat scroll 0 0 #D1EBF1;
+    /*border-bottom: 1px solid #FFFFFF;*/
+    border-top: 1px solid #46BCD2;
+}
+#import-map .even td.map-activecol {
+    background: none repeat scroll 0 0 #FFFFFF;
+}
+#import-map .form-actions-importmap {
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+#import-map th strong {
+    color: #333333;
+}
+#import-map .header-name {
+    display: block;
+    font-size: 13px;
+}
+#import-map .unnamed strong {
+    color: #333333;
+    line-height: 14px;
+}
+#import-map .display-block {
+  display: block;
+}
+#import-map .display-none {
+  display: none;
+}
+#import-map .header-min-width {
+  min-width: 150px;
+}
+.column-mapping-scrollable {
+  overflow: auto;
+  width: 100%;
+}
+.field-type-label {
+    color: #666666;
+    font-weight: normal;
+}
+#import-map th .field-type-label, #import-map th a {
+    font-size: 12px;
+    font-weight: normal;
+}
+#import-map .actions-importmap {
+    margin: 2px auto;
+}
+#import-map .map-deleted {
+  background: none repeat scroll 0 0 #D3D3D3;
+  color: #D12F19;
+}
+
+.mark-unmapped-red{
+  background-color: #FBE3E4 !important;
+}
+
+#import-map .map-deleted .header-name {
+    text-decoration: line-through;
+}
+#import-map .map-deleted-cell {
+    background: none repeat scroll 0 0 #FFF7F8;
+    color: #796364;
+}
+#import-map.hide-skipped .map-deleted, #import-map.hide-skipped .map-deleted-cell {
+    display: none;
+}
+
+.odd, .even {
+    border-bottom: 1px solid #DDDDDD;
+}
+.even, .google-visualization-table-tr-odd, .google-visualization-table-tr-odd td {
+    background-color: #F7F7F7 !important;
+    color: #666666 !important;
+}
+.even-highlight {
+    background-color: #F7F4EC;
+    color: #333333;
+}
+.odd, .google-visualization-table-tr-even, .google-visualization-table-tr-even td {
+    background-color: #FFFFFF !important;
+    color: #666666 !important;
+}
+.odd-highlight {
+    background-color: #FDFCFA;
+    color: #333333;
+}

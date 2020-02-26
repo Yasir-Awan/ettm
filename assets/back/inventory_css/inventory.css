@@ -1,0 +1,13 @@
+
+input.checkbox
+{
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    right: 1px;
+    top: 1px;
+    outline: none;
+    z-index: 10;
+}
+
+
