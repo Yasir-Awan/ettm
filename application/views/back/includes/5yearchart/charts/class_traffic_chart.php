@@ -7,11 +7,6 @@
 
 </style>
 
-<!-- Resources -->
-<script src="<?php echo base_url(); ?>assets/amcharts4/core.js"></script>
-<script src="<?php echo base_url(); ?>assets/amcharts4/charts.js"></script>
-<script src="<?php echo base_url(); ?>assets/amcharts4/animated.js"></script>
-
 <!-- Chart code -->
 <script>
 am4core.ready(function() {

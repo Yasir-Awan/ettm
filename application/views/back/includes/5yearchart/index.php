@@ -1,4 +1,7 @@
 <div  id="5yearchart">
+	
+	
+
 	<?php if(empty(isset($message))){ ?>
 	<div class="row gutter-xs">
 		<?php include('upper_panel.php'); ?>

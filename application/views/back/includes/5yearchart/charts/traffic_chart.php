@@ -7,10 +7,7 @@
 
 </style>
 
-<!-- Resources -->
-<script src="<?php echo base_url(); ?>assets/amcharts4/core.js"></script>
-<script src="<?php echo base_url(); ?>assets/amcharts4/charts.js"></script>
-<script src="<?php echo base_url(); ?>assets/amcharts4/animated.js"></script>
+
 
 <!-- Chart code -->
 <script>
@@ -39,6 +36,7 @@ categoryAxis.renderer.minGridDistance = 30;
 var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
 valueAxis.title.text = "Traffic";
 valueAxis.min = 0;
+valueAxis.calculateTotals = true;
 valueAxis.renderer.labels.template.adapter.add("text", function(text) {
   return text ;
 });
@@ -47,6 +45,7 @@ valueAxis.renderer.labels.template.adapter.add("text", function(text) {
 var series = chart.series.push(new am4charts.ColumnSeries3D());
 series.dataFields.valueY = "traffic";
 series.dataFields.categoryX = "year";
+/*series.dataFields.valueYShow = "average";*/
 series.name = "Traffic";
 series.clustered = false;
 series.columns.template.tooltipText = "Traffic in {year}: [bold]{valueY}[/]";

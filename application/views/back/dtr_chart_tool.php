@@ -1,4 +1,4 @@
-<?php include('includes/dashboard/dash_header.php'); ?>
+<?php include('includes/header.php'); ?>
 <!-- plaza and month filter START -->
 <div class="row">
   <div class="search-box pull-left col-xl-3 col-md-6 mb-1 " style="">

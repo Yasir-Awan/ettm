@@ -6,24 +6,11 @@
 				</div>
                 <div class="row align-items-center" >
                     <div class="col-sm-8">
-					<div class="breadcrumbs-area clearfix"style='margin-top:12px;'>
+                        <div class="breadcrumbs-area clearfix"style='margin-top:12px;'>
                             <h4 class="page-title pull-left">Dashboard </h4>
                             <ul class="breadcrumbs pull-left">
-                                <li>
-                                <?php
-                                if($this->session->userdata('adminid'))
-                                {	
-                                ?>
-                                <a href="<?php echo base_url().'admin';?>">Home</a>
-                                <?php
-                                }
-                                if($this->session->userdata('omcid'))
-                                {	 
-                                ?>
-                                <a href="<?php echo base_url().'omc';?>">Home</a>
-                                <?php } ?>
-                                </li>
-                                <li><a href="<?php echo $page_url;?>"><?php echo $page;?></a></li>
+                                <li><a href="<?php echo base_url().'admin';?>">Home</a></li>
+                                <li><a href="<?php if(isset($page_url)) echo $page_url;?>"><?php  if(isset($page)) echo $page;?></a></li>
                             </ul>
                         </div>
                     </div>
@@ -33,55 +20,23 @@
 							<!-- Nav Item - User Information -->
 							<!-- admin button area START --> 
 							<li class="nav-item dropdown no-arrow pull-right">
-							<a class="nav-link dropdown-toggle" href="#" id="userDropdown" style='padding-right: unset; padding-left: unset;'  role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <?php 
-                if($this->session->userdata('omcid'))
-                {	
-                ?>
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small"> OMC</span>
-                <?php } ?>
-                <?php 
-                if($this->session->userdata('adminid'))
-                {	
-                ?>
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small"> Admin</span>
-                <?php } ?>
-                <img class="img-profile rounded-circle" style='width:20px; height:20px;' src="<?php echo base_url();?>assets/back/images/author/AdminLogo.png">
-    
-              </a>
+								<a class="nav-link dropdown-toggle" href="#" id="userDropdown" style='padding-right: unset; padding-left: unset;'  role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<span class="mr-2 d-none d-lg-inline text-gray-600 small"> Admin</span>
+									<img class="img-profile rounded-circle" style='width:20px; height:20px;' src="<?php echo base_url();?>assets/back/images/author/AdminLogo.png">
+								</a>
 								<!-- Dropdown - User Information -->
 								<div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                <?php if($this->session->userdata('adminid')){ ?>
-                <a class="dropdown-item" href="#">
-                  <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Profile
-                </a>
-                <a class="dropdown-item" href="<?php echo base_url()?>admin/settings">
-                  <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Settings
-                </a>
-                <?php } ?>
-                <div class="dropdown-divider"></div>
-                <?php
-                if($this->session->userdata('adminid'))
-                {	
-                ?>
-                <a class="dropdown-item" href="<?php echo base_url()?>admin/logout" >
-                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Logout
-                </a>
-                <?php } 
-                if($this->session->userdata('omcid'))
-                {	
-                ?>
-                <a class="dropdown-item" href="<?php echo base_url()?>omc/logout" >
-                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Logout
-                </a>
-                <?php } ?>
-                
-               
-              </div>
+									<a class="dropdown-item" href="#">
+										<i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>Profile
+									</a>
+									<a class="dropdown-item" href="<?php echo base_url()?>admin/settings">
+										<i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>Settings
+									</a>
+									<div class="dropdown-divider"></div>
+									<a class="dropdown-item" href="<?php echo base_url()?>admin/logout" >
+										<i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>Logout
+									</a>
+								</div>
 							</li><!-- admin button area END -->
 							<!-- Notifications area START -->
 							<li class="nav-item dropdown no-arrow mx-1 pull-right">
