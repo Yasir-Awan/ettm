@@ -11,74 +11,45 @@
                         <ul class="metismenu" id="menu">
                         <hr class="sidebar-divider" style="    border-top: 1px solid rgba(255,255,255,.15);" >
                             <li <?php if($page == 'Dashboard')echo "class='active'";?>>
-                            <?php
-                            if($this->session->userdata('omcid'))
-                            {	
-                            ?>
+                            <?php if($this->session->userdata('omcid')) { ?>
                                 <a style="color:#fff;" href="<?php echo base_url();?>omc" aria-expanded="true" ><i style="color:#fff;" class="ti-dashboard"></i><span>Dashboard</span></a>
-                            <?php  
-                            }
-                            if($this->session->userdata('adminid'))
-                            {	
-                            ?>
+                            <?php  } if($this->session->userdata('adminid')) {	 ?>
                                 <a style="color:#fff;" href="<?php echo base_url();?>admin" aria-expanded="true" ><i style="color:#fff;" class="ti-dashboard"></i><span>Dashboard</span></a>
-                            <?php  
-                            }
-                            ?>
+                            <?php  } ?>
                                 
                             </li>
                             <li <?php if($page == 'DTR Dashboard')echo "class='active'";?>>
-                            <?php
-                            if($this->session->userdata('omcid'))
-                            {	
-                            ?>
+                            <?php if($this->session->userdata('omcid')) {	 ?>
                         <!-- <a style="color:#fff;" href="<?php echo base_url();?>omc/dashboard_dtr" aria-expanded="true" ><i style="color:#fff;" class="ti-dashboard"></i><span> DTR Overall</span></a> -->
-                            <?php  
-                            }
-                            if($this->session->userdata('adminid'))
-                            {	
-                            ?>
+                            <?php   }  if($this->session->userdata('adminid')) { ?>
                         <a style="color:#fff;" href="<?php echo base_url();?>admin/dashboard_dtr" aria-expanded="true" ><i style="color:#fff;" class="ti-dashboard"></i><span> DTR Overall</span></a>
-                            <?php  
-                            }
-                            ?>
+                            <?php  } ?>
                                 
                             </li>
                             <li <?php if($page == 'Dashboard ST')echo "class='active'";?>>
-                            <?php
-                            if($this->session->userdata('omcid'))
-                            {	
-                            ?>
+                            <?php if($this->session->userdata('omcid')) {	 ?>
                             <a style="color:#fff;" href="<?php echo base_url();?>omc/dashboard" aria-expanded="true" ><i style="color:#fff;" class="ti-dashboard"></i><span> Dashboard ST</span></a>
-                            <?php  
-                            } 
-                            if($this->session->userdata('adminid'))
-                            {
-                             ?>
+                            <?php   }  if($this->session->userdata('adminid')) { ?>
                               <a style="color:#fff;" href="<?php echo base_url();?>admin/dashboard" aria-expanded="true" ><i style="color:#fff;" class="ti-dashboard"></i><span> Dashboard ST</span></a>
                              <?php } ?>
-                                
-                            </li>
-                            <?php
-                            if($this->session->userdata('adminid'))
-                            {	
-                            ?>
+							</li>
+                            <?php if($this->session->userdata('adminid')) {	 ?>
                             <li>
                                 <a style="color:#fff;" href="<?php echo base_url();?>admin" aria-expanded="true" ><i style="color:#fff;" class="ti-dashboard"></i><span>Graphs</span></a>
-                                <ul class="collapse <?php if($page == 'Daily Traffic Chart' || $page == 'Desired Chart'){echo 'in';}?>">
-                                  <li <?php if($page == 'Daily Traffic Chart')echo "class='active'";?>>
-                                    <a href="<?php echo base_url();?>admin/dtr_chart" aria-expanded="true" ><i style="color:#fff;" class="ti-dashboard"></i><span>Daily Chart</span></a>
-                                  </li>
-                                  <li <?php if($page == 'M Traffic Chart')echo "class='active'";?>>
-										<a style="color:#fff" href="<?php echo base_url();?>admin/dtr_chart_tool" aria-expanded="true" ><i style="color:#fff;" class="ti-dashboard"></i><span>Daily Chart All</span></a>
+                                <ul class="collapse <?php if(isset($page)) if( $page == 'Desired Chart' || $page == 'M Traffic Chart' || $page == 'Monthly DTR Chart' || $page == 'Five Years Chart'){echo 'in';}?>">
+									<li <?php if(isset($page)) if($page == 'Monthly DTR Chart')echo "class='active'";?>>
+										<a href="<?php echo base_url();?>admin/dtr_chart"><i style="color:#fff;" class="ti-dashboard"></i><span>Daily Chart</span></a>
 									</li>
-									<li <?php if(isset($page)) if($page == '5 Years Chart')echo "class='active'";?>>
-										<a href="<?php echo base_url();?>admin/get5yearchart" aria-expanded="true" ><i style="color:#fff;" class="ti-dashboard"></i><span>MTR 5 Year Charts</span></a>
+									<li <?php if(isset($page)) if($page == 'M Traffic Chart')echo "class='active'";?>>
+										<a href="<?php echo base_url();?>admin/dtr_chart_tool"><i style="color:#fff;" class="ti-dashboard"></i><span>Daily Chart All</span></a>
 									</li>
-                                  <li <?php if($page == 'Desired Chart')echo "class='active'";?>>
-                                    <a href="<?php echo base_url();?>admin/getdesiredchart" aria-expanded="true" ><i style="color:#fff;" class="ti-dashboard"></i><span>Three Months Graph</span></a>
-                                  </li>
-                                </ul>
+									<li <?php if(isset($page)) if($page == 'Five Years Chart')echo "class='active'";?>>
+										<a href="<?php echo base_url();?>admin/get5yearchart"><i style="color:#fff;" class="ti-dashboard"></i><span>MTR 5 Year Charts</span></a>
+									</li>
+									<li <?php if(isset($page)) if($page == 'Desired Chart')echo "class='active'";?>>
+										<a href="<?php echo base_url();?>admin/getdesiredchart"><i style="color:#fff;" class="ti-dashboard"></i><span>Three Months Graph</span></a>
+									</li>
+								</ul>
                             </li>
                             
                             
@@ -152,7 +123,13 @@
                             </li>
                             <li <?php if($page == 'inventory')echo "class='active'";?>><a style="color:#fff;" href="<?php echo base_url()?>inventory/first_page"><i style="color:#fff;" class="fas fa-boxes"></i> <span>Inventory</span></a></li>
                             <!-- <li <?php if($page == 'crash_data')echo "class='active'";?>><a style="color:#fff;" href="<?php echo base_url()?>admin_crash"><i style="color:#fff;" class="fas fa-road"></i> <span>Road Crash Data</span></a></li> -->
-                            <li <?php if($page == 'traffic_counting')echo "class='active'";?>><a style="color:#fff;" href="<?php echo base_url()?>admin/traffic_counting"><i style="color:#fff;" class="fas fa-calculator"></i> <span>Traffic counting</span></a></li>                       
+                             <li>
+								<a style="color:#fff;" href="<?php echo base_url();?>admin" aria-expanded="true" ><i style="color:#fff;" class="ti-dashboard"></i><span>Traffic Counting</span></a>
+                                <ul class="collapse <?php if(isset($page)) if( $page == 'traffic_counting' || $page == 'Sensors Traffic Counting'){echo 'in';}?>">
+									<li <?php if(isset($page)) if($page == 'Sensors Traffic Counting')echo "class='active'";?>><a href="<?php echo base_url()?>admin/tcd"><i style="color:#fff;" class="fas fa-file"></i> <span>Sensors Traffic Counting</span></a></li>
+									<li <?php if(isset($page)) if($page == 'traffic_counting')echo "class='active'";?>><a href="<?php echo base_url()?>admin/traffic_counting"><i style="color:#fff;" class="fas fa-file"></i> <span>Manual Traffic Counting</span></a></li>
+								 </ul>
+							</li>                   
                             <li <?php if($page == 'site settings')echo "class='active'";?>><a style="color:#fff;" href="<?php echo base_url()?>admin/site_settings"><i style="color:#fff;" class="fas fa-wrench"></i> <span>Site Settings</span></a></li>
                             <?php } ?> 
                         </ul>
