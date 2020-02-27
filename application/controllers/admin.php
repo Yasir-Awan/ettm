@@ -1475,6 +1475,7 @@ class Admin extends CI_Controller
 	
 	public function tcd($para1 = '', $para2 = ''){
 		//It is worth mentioning here that the data collection from traffic counters is based on 5 classes and not 10 as done in MTR and DTR section.
+		$this->page_data['page'] = 'Sensors Traffic Counting';
 		if(!$this->session->userdata('adminid')){	
 			return redirect('admin/login');
 		}
