@@ -42,11 +42,16 @@ class tcd_model extends MY_Model
 		$tool = $postload[0]['toolplaza_id']; $date = $postload[0]['datecreated'];
 		$toll = 'toolplaza'; $where = array('id' => $tool);
 		$postload[0]['plaza_name'] = $this->database_model->get_where($toll, $where)->row()->name;
+		$terrif = $this->calculation_model->terrif_value($tool, $date)->result_array();
+		$tarrif[0][0]['class_1_value'] = $terrif[0]['class_1_value'];
+		$tarrif[0][0]['class_2_value'] = $terrif[0]['class_2_value'];
+		$tarrif[0][0]['class_3_value'] = $terrif[0]['class_4_value'];
+		$tarrif[0][0]['class_4_value'] = $terrif[0]['class_3_value'];
+		$tarrif[0][0]['class_5_value'] = $terrif[0]['class_7_value'];
+		$postload[0]['terrif'] = $tarrif;
 		
-		$postload[0]['terrif'] = $terrif = $this->calculation_model->terrif($tool, $date)->result_array();
-		
-		$postload[0]['calculation'] = $this->calculation_model->revenue_tcd($tcd[0], $terrif[0]);
-		
+		$postload[0]['calculation'] = $this->calculation_model->revenue_tcd($tcd[0], $tarrif[0]);
+		/*?><pre> <?php echo print_r(array($tarrif));exit;*/
 		return $postload[0];
 	}
 	public function _list($tool){
