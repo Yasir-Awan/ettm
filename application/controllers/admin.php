@@ -3370,7 +3370,7 @@ class Admin extends CI_Controller
         	}else{
         		$data  = array();
 				$data['name'] 	= $this->input->post('omcname');
-				$data['user_name'] 	= $this->input->post('username');
+				$data['username'] 	= $this->input->post('username');
 				$data['site'] 	= $this->input->post('omcname');
 				$data['password'] 	= $this->input->post('Password');
         		$data['status'] = 0;
