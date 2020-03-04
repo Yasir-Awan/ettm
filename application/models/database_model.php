@@ -14,6 +14,9 @@ class database_model extends CI_Model
 	public function get_select($select, $table, $where){
 		return $this->db->select($select)->from($table)->where($where)->get();
 	}
+	public function select_from($select, $table){
+		return $this->db->select($select)->from($table)->get();
+	}
 	public function get_select_orderby($select, $table, $where, $column, $para){
 		return $this->db->select($select)->from($table)->where($where)->order_by($column, $para)->get();
 	}

@@ -1475,39 +1475,24 @@ class Admin extends CI_Controller
 	
 	public function tcd($para1 = '', $para2 = ''){
 		//It is worth mentioning here that the data collection from traffic counters is based on 5 classes and not 10 as done in MTR and DTR section.
-		
 		if(!$this->session->userdata('adminid')){	
 			return redirect('admin/login');
 		}
 		else{
 			/*?> <pre> <?php echo print_r($this->session->userdata);exit;*/
 			$this->load->model('tcd_model');
-			$select = array('id','name'); $table = 'toolplaza'; $where = array('status' => '1');
-			$this->page_data['toolplaza'] = $this->database_model->get_select($select, $table, $where)->result_array();
+			$select = array('id','name'); $table = 'toolplaza'; 
+			$this->page_data['toolplaza'] = $this->database_model->select_from($select, $table)->result_array();
 			$this->page_data['admin_name'] = $this->session->userdata['fname'].' '.$this->session->userdata['lname'];
 			if($para1 == 'list'){
 				$page = 'R';
-				$table = 'tcd';
-				$table_data = $this->tcd_model->get_table($table);
-				$i = 0;
-				foreach($table_data->result_array() as $row){
-					$select = 'name'; 
-					$table = 'toolplaza'; 
-					$where = array('status' => '1', 'id' => $row['toolplaza_id']);
-					$tcd_tool_name[$i] = $this->database_model->get_select($select, $table, $where)->result_array();
-
-					$i++;
-				}
-				if(isset($tcd_tool_name)){
-					$this->page_data['tool_name'] = $tcd_tool_name;
-				}
-				
-				$this->page_data['tcd'] = $table_data->result_array();
-
+				$data = $this->tcd_model->lisst();
+				$this->page_data['tcd'] = $data['tcd'];
+				$this->page_data['tool_name'] = $data['tool_name'];
 				$this->load->view('back/tcd_list', $this->page_data);
 			}
 			elseif($para1 == 'add'){
-				$page = 'C';			
+				$this->page_data['page'] = $page = 'C';			
 				$this->load->view('back/add_tcd', $this->page_data);
 			}
 			elseif($para1 == 'do_add'){
@@ -1515,6 +1500,7 @@ class Admin extends CI_Controller
 				$this->load->library('form_validation');
 				$this->form_validation->set_rules('toolplaza_id','Tollplaza','required|trim');
 				$this->form_validation->set_rules('datecreated','Date','required|trim');
+				//$this->form_validation->set_rules('survey_month','Survey Month','required|trim');
 				$this->form_validation->set_rules('description','Description','required|trim');
 				$this->form_validation->set_rules('notes','Notes','required|trim');
 				$this->form_validation->set_rules('class1','Car/Jeep passages','required|trim|is_natural');
@@ -1528,6 +1514,7 @@ class Admin extends CI_Controller
 				}else{
 
 					$tcd_data['toolplaza_id'] = $this->input->post('toolplaza_id');
+					//$tcd_data['survey_month'] = $this->input->post('survey_month');
 					$tcd_data['datecreated'] = $this->input->post('datecreated');
 					$tcd_data['admin_id'] = $this->session->userdata('adminid');
 					$tcd_data['class1'] = $this->input->post('class1');
@@ -1549,6 +1536,10 @@ class Admin extends CI_Controller
 					}
 
 				}
+			}
+			elseif($para1 == 'edit'){
+				$this->page_data['page'] = $page = 'U';			
+				$this->load->view('back/add_tcd', $this->page_data);
 			}
 			elseif($para1 == 'disapprove'){
 				$page = 'U';
@@ -1614,19 +1605,21 @@ class Admin extends CI_Controller
 				}
 			}
 			elseif($para1 == 'by_tollplaza'){
+				$page = 'R';
 				if($para2 != ''){
-					$select = 'id';$table = 'toolplaza'; $where = array('id' => $para2);
-					$toolplaza = $this->database_model->get_select($select, $table, $where)->result_array();
-					$tool = $toolplaza[0]['id'];
-					$dsr = $this->tcd_model->_list($tool);
-					$edit['dsr']  = $dsr;
-					$this->load->view('back/dsr_list', $edit);
+					$data = $this->tcd_model->_list($para2);
+					$this->page_data['tcd'] = $data['tcd'];
+					if(isset($data['tool_name'])){
+						$this->page_data['tool_name'] = $data['tool_name'];
+					}
+					$this->load->view('back/tcd_list', $this->page_data);
 				}
 				else{
-					$tool = NULL;
-					$dsr = $this->tcd_model->_list($tool);	
-					$this->page_data['dsr']  = $dsr;
-					$this->load->view('back/dsr_list', $this->page_data);
+					$para2 = NULL;
+					$data = $this->tcd_model->lisst();
+					$this->page_data['tcd'] = $data['tcd'];
+					$this->page_data['tool_name'] = $data['tool_name'];
+					$this->load->view('back/tcd_list', $this->page_data);
 				}
 			}
 			else{

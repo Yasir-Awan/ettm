@@ -54,14 +54,70 @@ class tcd_model extends MY_Model
 		/*?><pre> <?php echo print_r(array($tarrif));exit;*/
 		return $postload[0];
 	}
-	public function _list($tool){
-		$this->db->order_by('id','DESC');
-		if($tool){
-			$this->db->where('toolplaza_id', $tool);
+	public function _list($para2){
+		$select = array('id','name');$table = 'toolplaza'; 
+		if($para2){ 
+			$where = array('id' => $para2);
+			$toolplaza = $this->database_model->get_select($select, $table, $where)->result_array();
 		}
-		$tcd = $this->db->get('tcd')->result_array();
-		
-		return $tcd; 
+		else{
+			$toolplaza = $this->database_model->select_from($select,$table)->result_array();
+		}
+		$tool = $toolplaza[0]['id'];
+		$table = 'tcd';
+		if($para2){
+			$select = '*'; $where = array('toolplaza_id' => $para2);
+			$table_data = $this->database_model->get_select($select, $table, $where);
+		}
+		else{
+			$table_data = $this->tcd_model->get_table($table);
+		}
+		$i = 0;
+		foreach($table_data->result_array() as $row){
+			$select = 'name'; 
+			$table = 'toolplaza'; 
+			$where = array('id' => $row['toolplaza_id']);
+			$tcd_tool_name[$i] = $this->database_model->get_select($select, $table, $where)->result_array();
+			$i++;
+		}
+		if(isset($tcd_tool_name)){
+			$tool_name = $tcd_tool_name;
+		}
+		$table = 'tcd';
+		if($para2){
+			$where = array('toolplaza_id' => $para2);
+			$tcd = $table_data->result_array();
+			
+		}
+		else{
+			$tcd = $this->get_table($table)->result_array();
+			
+		}
+		if(isset($tool_name)){
+			return array('tcd' => $tcd, 'tool_name' => $tool_name);
+		}
+		else{
+			return array('tcd' => $tcd);
+		}
+	}
+	public function lisst(){
+		$table = 'tcd';
+		$table_data = $this->tcd_model->get_table($table);
+				$i = 0;
+				foreach($table_data->result_array() as $row){
+					$select = 'name'; 
+					$table = 'toolplaza'; 
+					$where = array('id' => $row['toolplaza_id']);
+					$tcd_tool_name[$i] = $this->database_model->get_select($select, $table, $where)->result_array();
+
+					$i++;
+				}
+				if(isset($tcd_tool_name)){
+					$tool_name = $tcd_tool_name;
+				}
+				
+				$tcd = $table_data->result_array();
+		return array('tool_name' => $tool_name, 'tcd' => $tcd);
 	}
 	
 }

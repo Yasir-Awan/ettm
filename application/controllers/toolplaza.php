@@ -1970,8 +1970,9 @@ class Toolplaza extends CI_Controller{
 					$table = 'dsr_updated';	$data = $dsr_updated_data; $order_by = 'id';
 					$data_dsr_updated = $this->dsr_model->insert_dsr($table, $data);				
 					$dsr_update_data = $this->dsr_model->retrieve_last($table, $order_by);
-
+					
 					$dsr_status_data = array();
+					$dsr_status_data['id'] = $dsr_update_data[0]['id'];
 					$dsr_status_data['status_lsdu'] = $this->input->post('site_lsdu');
 					$dsr_status_data['status_framegrabber'] = $this->input->post('frame');
 					$dsr_status_data['status_server'] = $this->input->post('serverstatus');
@@ -1995,6 +1996,7 @@ class Toolplaza extends CI_Controller{
 					$data_dsr_status = $this->dsr_model->insert_dsr($table, $data);
 
 
+					$dsr_doc_data['id'] = $dsr_update_data[0]['id'];
 					$dsr_doc_data['image_status'] = $this->input->post('image');
 					$dsr_doc_data['mtr_status'] = $this->input->post('mtrstatus');
 					$dsr_doc_data['mtr_pending'] = $this->input->post('apmtr');
@@ -2009,10 +2011,14 @@ class Toolplaza extends CI_Controller{
 					$data_dsr_doc = $this->dsr_model->insert_dsr($table, $data);
 
 					$dsr_generator_data = array(
-						'id' => $dsr_update_data[0]['id'], 'load_from' => $this->input->post('load-from'), 'load_to' => $this->input->post('load-to'), 'load_time' => $this->input->post('load-time'), 'generator_from' => $this->input->post('generator-from'), 'generator_to' => $this->input->post('generator-to'), 'generator_time' => $this->input->post('generator-time'), 'diesel_per_hour' => $this->input->post('diesel-per-hour'), 'diesel_consumed' => $this->input->post('diesel-consumed'), 'output_voltage' => $this->input->post('output-voltage'), 'fuel_level' => $this->input->post('fuel-level'), 'oil_level' => $this->input->post('oil-level'), 'oil_change' => $this->input->post('oil-change'), 'radiator_water_level' => $this->input->post('radiator-water-level'), 'battery_water_level' => $this->input->post('battery-water-level'), 'battery_terminal_condition' => $this->input->post('battery-terminal-condition')
+						'load_from' => $this->input->post('load-from'), 'load_to' => $this->input->post('load-to'), 'load_time' => $this->input->post('load-time'), 'generator_from' => $this->input->post('generator-from'), 'generator_to' => $this->input->post('generator-to'), 'generator_time' => $this->input->post('generator-time'), 'diesel_per_hour' => $this->input->post('diesel-per-hour'), 'diesel_consumed' => $this->input->post('diesel-consumed'), 'output_voltage' => $this->input->post('output-voltage'), 'fuel_level' => $this->input->post('fuel-level'), 'oil_level' => $this->input->post('oil-level'), 'oil_change' => $this->input->post('oil-change'), 'radiator_water_level' => $this->input->post('radiator-water-level'), 'battery_water_level' => $this->input->post('battery-water-level'), 'battery_terminal_condition' => $this->input->post('battery-terminal-condition')
 					);
-					$table = 'dsr_generator_log';	$data = $dsr_generator_data;
-					$data_dsr_doc = $this->dsr_model->insert_dsr($table, $data);
+					if(array_filter($dsr_generator_data)){
+						$dsr_generator_data['id'] = $dsr_update_data[0]['id'];
+						$table = 'dsr_generator_log';	$data = $dsr_generator_data;
+						$data_dsr_doc = $this->dsr_model->insert_dsr($table, $data);
+					}
+					
 
 					$section = 0;
 					foreach($edit['north'] as $north){
@@ -2177,7 +2183,7 @@ class Toolplaza extends CI_Controller{
 					$dsr_updated_data['toolplaza_id'] = $tool;
 					$dsr_updated_data['supervisor_id'] = $id;
 					date_default_timezone_set('Asia/Karachi');
-					$dsr_updated_data['datecreated'] = date('Y-m-d',strtotime($this->input->post('datecreated')));
+					$dsr_updated_data['datecreated'] =  date('Y-m-d',strtotime($this->input->post('datecreated')));
 					$dsr_updated_data['updated_at'] = time();				
 					$dsr_updated_data['omc'] = $this->input->post('omc');
 					$dsr_updated_data['daily_traffic'] = $this->input->post('site_dt');
@@ -2354,13 +2360,15 @@ class Toolplaza extends CI_Controller{
 		//data is loaded into dsr variable where new layout data is converted to old layout data so that it can be merged easily with older work 
 		$data = $this->dsr_model->dsr_data($id, $tool, $edit,$para1);
 		$edit['dsr'] = $data['dsr'];
-		$edit['dsr_staff'] = $data['dsr_staff'];		
+		$edit['dsr_staff'] = $data['dsr_staff'];
 		//Some data is loaded from dsr variable
 		$data = $this->dsr_model->sitereport_data_post($edit);	
-		$edit = $data; $edit['toolplaza_id'] = $tool; /*?> <pre><?php echo print_r($edit); exit;*/
+		$edit = $data; $edit['toolplaza_id'] = $tool; 
+		/*?> <pre><?php echo print_r($edit); exit;*/
 		
 		$this->load->view('front/toolplaza/sitereport', $edit);
 	}
+	
 	
 ////////////////////////////////////////////////////////////////
 ///////////////faulty equipment list///////////////////////////
