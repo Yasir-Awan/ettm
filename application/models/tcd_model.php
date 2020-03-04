@@ -119,6 +119,26 @@ class tcd_model extends MY_Model
 				$tcd = $table_data->result_array();
 		return array('tool_name' => $tool_name, 'tcd' => $tcd);
 	}
-	
+	public function specific_tcr($para2){
+		$where = array('id' => $para2);
+		return $this->db->get_where($this->table, $where)->result_array();
+	}
+	public function tcr_edit_data($para2, $tcd){
+		$table = 'toolplaza'; $where = array('id' => $tcd['toolplaza_id']);
+		$data['id'] = $para2;
+		$data['toolplaza_id'] = $tcd['toolplaza_id'];
+		$data['tool_name'] = $this->db->get_where($table, $where)->row()->name;
+		$table = 'admin'; $where = array('id' => $tcd['admin_id']);
+		$data['admin_name'] = $this->db->get_where($table, $where)->row()->fname.' '.$this->db->get_where($table, $where)->row()->lname;
+		for($i = 1; $i<6; $i++){
+			$data['class'.$i] = $tcd['class'.$i];
+		}
+		$data['total'] = $tcd['total'];
+		$data['survey_month'] = $tcd['survey_month'];
+		$data['datecreated'] = $tcd['datecreated'];
+		
+		
+		return $data;
+	}
 }
 		

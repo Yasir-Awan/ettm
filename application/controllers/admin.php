@@ -1500,7 +1500,7 @@ class Admin extends CI_Controller
 				$this->load->library('form_validation');
 				$this->form_validation->set_rules('toolplaza_id','Tollplaza','required|trim');
 				$this->form_validation->set_rules('datecreated','Date','required|trim');
-				//$this->form_validation->set_rules('survey_month','Survey Month','required|trim');
+				$this->form_validation->set_rules('survey_month','Survey Month','required|trim');
 				$this->form_validation->set_rules('description','Description','required|trim');
 				$this->form_validation->set_rules('notes','Notes','required|trim');
 				$this->form_validation->set_rules('class1','Car/Jeep passages','required|trim|is_natural');
@@ -1514,7 +1514,7 @@ class Admin extends CI_Controller
 				}else{
 
 					$tcd_data['toolplaza_id'] = $this->input->post('toolplaza_id');
-					//$tcd_data['survey_month'] = $this->input->post('survey_month');
+					$tcd_data['survey_month'] = $this->input->post('survey_month');
 					$tcd_data['datecreated'] = $this->input->post('datecreated');
 					$tcd_data['admin_id'] = $this->session->userdata('adminid');
 					$tcd_data['class1'] = $this->input->post('class1');
@@ -1538,8 +1538,51 @@ class Admin extends CI_Controller
 				}
 			}
 			elseif($para1 == 'edit'){
-				$this->page_data['page'] = $page = 'U';			
+				$this->page_data['page'] = $page = 'U';
+				$tcd = $this->tcd_model->specific_tcr($para2);
+				$this->page_data['tcd'] = $this->tcd_model->tcr_edit_data($para2,$tcd[0]);
+				
 				$this->load->view('back/add_tcd', $this->page_data);
+			}
+			elseif($para1 == 'do_edit'){
+				$this->load->library('form_validation');
+				$this->form_validation->set_rules('toolplaza_id','Tollplaza','required|trim');
+				$this->form_validation->set_rules('datecreated','Date','required|trim');
+				$this->form_validation->set_rules('survey_month','Survey Month','required|trim');
+				$this->form_validation->set_rules('description','Description','required|trim');
+				$this->form_validation->set_rules('notes','Notes','required|trim');
+				$this->form_validation->set_rules('class1','Car/Jeep passages','required|trim|is_natural');
+				$this->form_validation->set_rules('class2','Wagons/Hiace passages','required|trim|is_natural');
+				$this->form_validation->set_rules('class3','Buses/Coasters passages','required|trim|is_natural');
+				$this->form_validation->set_rules('class4','2,3 Axle Trucks/Tractors/Trolleys passages','required|trim|is_natural');
+				$this->form_validation->set_rules('class5','Above 3 Axle Articluated Trucks passages','required|trim|is_natural');
+				$this->form_validation->set_rules('total','Total','required|trim|is_natural');
+				if($this->form_validation->run() == FALSE){
+					echo json_encode(array('response' => FALSE , 'message' => validation_errors())); exit;
+				}else{
+
+					$tcd_data['toolplaza_id'] = $this->input->post('toolplaza_id');
+					$tcd_data['survey_month'] = $this->input->post('survey_month');
+					$tcd_data['datecreated'] = $this->input->post('datecreated');
+					$tcd_data['admin_id'] = $this->session->userdata('adminid');
+					$tcd_data['class1'] = $this->input->post('class1');
+					$tcd_data['class2'] = $this->input->post('class2');
+					$tcd_data['class3'] = $this->input->post('class3');
+					$tcd_data['class4'] = $this->input->post('class4');
+					$tcd_data['class5'] = $this->input->post('class5');
+					$tcd_data['total'] = $this->input->post('total');
+					$tcd_data['status'] = '0';
+					$tcd_data['action_date'] = time();
+					$table = 'tcd'; $data = $tcd_data; $where = 'id';
+					$tcd_update = $this->database_model->update($where, $para2, $table, $data);
+					if(!$tcd_update){
+						echo json_encode(array('response' => FALSE , 'message' => 'Traffic Counter Report could not be added')); exit;
+					}
+					else{
+						echo json_encode(array('response' => TRUE , 'message' => 'Added Successfully', 'is_redirect' => TRUE , 'redirect_url' => base_url().'admin/tcd'));
+					}
+
+				}
 			}
 			elseif($para1 == 'disapprove'){
 				$page = 'U';
@@ -1612,6 +1655,7 @@ class Admin extends CI_Controller
 					if(isset($data['tool_name'])){
 						$this->page_data['tool_name'] = $data['tool_name'];
 					}
+					
 					$this->load->view('back/tcd_list', $this->page_data);
 				}
 				else{
