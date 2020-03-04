@@ -26,8 +26,8 @@
                 <th>Toll Plaza</th>
                 <th>Upload Date</th>
                 <th>TCR Date</th>
-                <th width="15%">Status</th>
-                <th width="30%">Action</th>
+                <th width="10%">Status</th>
+                <th width="35%">Action</th>
 			</tr>
         </thead>
         <tbody>
@@ -50,7 +50,7 @@
 				 <td>
 					 <a href="<?php echo base_url()?>admin/traffic_counter_report/<?php echo $row['id']?>" class="btn-info btn-xs" target="__blank"><i class="fa fa-eye"></i> View</a>
 					 <?php if($row['status'] != 2){ ?>
-					 <span class="btn-secondary btn-xs fa fa-thumbs-down" onclick="ajax_html('<?php echo base_url().'admin/tcd/edit/'.$row['id'];?>','tcdEDIT_contents');" data-toggle="modal" data-target="#tcdEDIT">Edit</span>  
+					 <span class="btn-secondary btn-xs fa fa-edit" onclick="ajax_html('<?php echo base_url().'admin/tcd/edit/'.$row['id'];?>','tcdEDIT_contents');" data-toggle="modal" data-target="#tcdEDIT">Edit</span>  
 					 <span class="btn-warning btn-xs fa fa-thumbs-down" onclick="ajax_html('<?php echo base_url().'admin/tcd/disapprove/'.$row['id'];?>','dissaprove_contents');" data-toggle="modal" data-target="#dissaprove"> Disapprove</span>   
 					 <?php } ?>
 					 <?php if($row['status'] != 1){ ?>
