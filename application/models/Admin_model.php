@@ -684,7 +684,7 @@ class Admin_model extends CI_MODEL{
             $chart['tollplaza'] = $this->db->get_where('toolplaza',array('id' => $data[0]['toolplaza'],'omc' => $this->session->userdata('omcid')))->row()->name;
             $chart['toolplaza_id'] = $data[0]['toolplaza'];
              
-            // echo "<pre>"; print_r($chart['toolplaza_id']); exit;
+            
             $month_year = explode('-',$data[0]['for_month']);
             $start_date = $month_year[0].'-'.$month_year[1].'-'.$data[0]['start_date'];
             $end_date = $month_year[0].'-'.$month_year[1].'-'.$data[0]['end_date'];
