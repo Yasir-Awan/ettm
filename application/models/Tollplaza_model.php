@@ -22,6 +22,8 @@ class Tollplaza_model extends CI_MODEL{
         {
             $start_date = '';
             $end_date = '';
+            $start_date1 = '';
+            $end_date1 = '';
         }
         $chart = array();
         $revenue = array();

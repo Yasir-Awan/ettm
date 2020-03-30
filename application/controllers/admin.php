@@ -1708,6 +1708,40 @@ class Admin extends CI_Controller
 
 	}	
 	//Algorithms
+	public function dsr_limit($count, $para2){
+			if($count){
+				$this->page_data['show'] = $count +200;
+				$this->page_data['less'] = $count - 200;
+				$id = $para2; $tool = NULL; $limit = $count;
+				$dsr = $this->dsr_model->list_dsr_limit($id, $tool, $limit);
+				$this->page_data['dsr']  = $dsr;
+				$this->load->view('back/dsr_list', $this->page_data);
+			}
+			else{
+				$this->page_data['show'] = 400;
+				$id = $para2; $tool = NULL; $limit = 200;
+				$dsr = $this->dsr_model->list_dsr_limit($id, $tool, $limit);
+				$this->page_data['dsr']  = $dsr;
+				$this->load->view('back/dsr_list', $this->page_data);
+			}
+	}
+	public function dsr_by_toolplaza($para2){
+		if($para2 != ''){
+			$id = NULL;
+			$table = 'toolplaza'; $where = array('id' => $para2);
+			$toolplaza = $this->dsr_model->get_where($table, $where);
+			$tool = $toolplaza[0]['id'];
+			$dsr = $this->dsr_model->list_dsr($id, $tool);			
+			$edit['dsr']  = $dsr;
+			$this->load->view('back/dsr_list', $edit);
+		}
+		else{
+			$id = NULL; $tool = NULL;
+			$dsr = $this->dsr_model->list_dsr($id, $tool);			
+			$this->page_data['dsr']  = $dsr;
+			$this->load->view('back/dsr_list', $this->page_data);
+		}
+	}
 	public function all_tollplaza_5year_mtr($model_call, $duration){
 		$total_traffic = 0; $total_not_exempt = 0; $total_exempt = 0; $total_revenue = 0; 
 		for($year = 1; $year<$duration; $year++) {for($class = 1; $class < 6; $class++){ $total_not_exempt_clas[$class] = 0; $total_exempt_clas[$class] = 0; $total_revenue_clas[$class] = 0; $total_not_exempt_class[$year][$class] = 0; $total_exempt_class[$year][$class] = 0; $total_revenue_class[$year][$class] = 0;  } }
@@ -1878,42 +1912,15 @@ class Admin extends CI_Controller
 		
 		if($para1 == 'list'){
 			$count = $this->input->post('count');
-			if($count){
-				$this->page_data['show'] = $count +200;
-				$this->page_data['less'] = $count - 200;
-				$id = NULL; $tool = NULL; $limit = $count;
-				$dsr = $this->dsr_model->list_dsr_limit($id, $tool, $limit);
-				$this->page_data['dsr']  = $dsr;
-				$this->load->view('back/dsr_list', $this->page_data);
-			}
-			else{
-				$this->page_data['show'] = 400;
-				$id = NULL; $tool = NULL; $limit = 200;
-				$dsr = $this->dsr_model->list_dsr_limit($id, $tool, $limit);
-				$this->page_data['dsr']  = $dsr;
-				$this->load->view('back/dsr_list', $this->page_data);
-			}
+			$this->dsr_limit($count, $para2);
 		}
 		elseif($para1 == 'by_tollplaza'){
-			if($para2 != ''){
-				$id = NULL;
-				$table = 'toolplaza'; $where = array('id' => $para2);
-				$toolplaza = $this->dsr_model->get_where($table, $where);
-				$tool = $toolplaza[0]['id'];
-				$dsr = $this->dsr_model->list_dsr($id, $tool);			
-				$edit['dsr']  = $dsr;
-				$this->load->view('back/dsr_list', $edit);
-			}
-			else{
-				$id = NULL; $tool = NULL;
-				$dsr = $this->dsr_model->list_dsr($id, $tool);			
-				$this->page_data['dsr']  = $dsr;
-				$this->load->view('back/dsr_list', $this->page_data);
-			}
+			$this->dsr_by_toolplaza($para2);
 				
 		}
 		elseif($para1 == 'approve'){
 			$data['status'] = 1;
+			$data['disapprove_reason'] = NULL;
 			$data['updated_at'] = time();
 			$where = 'id'; $table = 'dsr_updated';
 			$this->dsr_model->update_dsr($where, $para2, $table, $data);		
@@ -2765,11 +2772,11 @@ class Admin extends CI_Controller
 			$this->load->view('back/view_terrif', $this->page_data);
 
 		}elseif($para1 == 'add'){
-			$this->page_data['plaza']  = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
+			$this->page_data['plaza']  = $this->db->get('toolplaza')->result_array();
 			$this->load->view('back/tarrif_add', $this->page_data);
 
 		}elseif($para1 == 'edit'){
-			$this->page_data['plaza']  = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
+			$this->page_data['plaza']  = $this->db->get('toolplaza')->result_array();
 			$this->page_data['terrif']  = $this->db->get_where('terrif',array('id' => $para2))->result_array();
 
 			$this->load->view('back/edit_terrif', $this->page_data);
@@ -3832,56 +3839,142 @@ class Admin extends CI_Controller
 
 
 	}
-	public function weighstation_report($para1 = '' , $para2 = '', $para3 =''){
-		if(!$this->session->userdata('adminid')){
+// 	public function weighstation_report($para1 = '' , $para2 = '', $para3 =''){
+// 		if(!$this->session->userdata('adminid')){
 			
-			return redirect('admin/login');
+// 			return redirect('admin/login');
+
+// 		}
+		
+//         	$this->page_data['page'] = 'weighstation daily report';
+//         	$this->page_data['weighstation'] = $this->db->get_where('weighstation',array('status' => 1))->result_array();
+// 			// $sql =	"SELECT weighstation.id, date, name, sum(case when weighstation_data.ticket_no != '' then 1 else 0 end) AS total_vehicles,
+//    // 				 		sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded,
+//    // 				 		sum(case when weighstation_data.status = 2 then fine else 0 end) fined
+//    // 				 		 FROM weighstation
+//    //  					LEFT OUTER JOIN weighstation_data ON weighstation.id = weighstation_data.weigh_id
+//    //  					WHERE weighstation.status = 1   GROUP BY weighstation.id";
+        	
+//     // 		$sql = " SELECT  id , name
+// 				// FROM    weighstation a
+//     //     LEFT OUTER JOIN
+//     //     (
+//     //         SELECT  weigh_id ,COUNT('weighstation_data.ticket_no') AS total_vehicles , MAX(date) date,sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded,
+//    	// 			 		sum(case when weighstation_data.status = 2 then fine else 0 end) fined
+   				 		
+//     //         FROM    weighstation_data
+//     //         GROUP BY date
+//     //     ) b ON a.id = b.weigh_id ";
+// 		    $sql = 'SELECT weighstation.id , weighstation.name,
+// 		    weighstation_data.weigh_id,
+// 			weighstation.last_updated,
+// 		    weighstation_data.date,
+// 		    COUNT(weighstation_data.ticket_no) AS total_vehicles,
+// 		    sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded,
+// 		    sum(case when weighstation_data.status = 2 then fine else 0 end) fined
+// 			FROM
+// 		    weighstation
+// 		    LEFT OUTER JOIN weighstation_data ON weighstation.id = weighstation_data.weigh_id
+// 			WHERE weighstation_data.date = (SELECT MAX(date) FROM weighstation_data WHERE weigh_id = weighstation.id)
+// 			GROUP BY
+// 		    weighstation.id; ';
+
+// 			$query= $this->db->query($sql);
+			
+// 			$this->page_data['record'] = $query->result_array(); 
+
+// 			$this->load->view('back/weighstation_data', $this->page_data);
+
+		
+		
+		
+// 	}
+public function weighstation_report($para1 = '' , $para2 = '', $para3 =''){
+	if(!$this->session->userdata('adminid')){
+		
+		return redirect('admin/login');
+
+	}
+	
+		$this->page_data['page'] = 'weighstation daily report';
+		$weigh = $this->db->get_where('weighstation',array('status' => 1))->result_array();        	
+		$this->page_data['weighstation'] = $weigh;//$this->db->get_where('weighstation',array('status' => 1))->result_array();
+		
+		$records = array();
+		$counter = 0;
+		foreach($weigh as $row){
+			$sqli = 'SELECT weigh_id,date,
+			COUNT(ticket_no) AS total_vehicles,
+			sum(case when status = 2 then 1 else 0 end) overloaded,
+			sum(case when status = 2 then fine else 0 end) fined
+			FROM
+			weighstation_data
+			WHERE date = (SELECT MAX(date) FROM weighstation_data WHERE weigh_id = '.$row["id"].')
+			AND weigh_id = '.$row["id"];
+			$datas =  $this->db->query($sqli)->result_array();
+			$records[$counter]['id'] = $row['id'];
+			$records[$counter]['name'] = $row['name'];
+			$records[$counter]['total_vehicles'] = $datas[0]['total_vehicles'];
+			if($datas[0]['overloaded']){
+				$records[$counter]['overloaded'] = $datas[0]['overloaded'];
+			}else{
+				$records[$counter]['overloaded'] = 0;
+			}
+			if($datas[0]['fined']){
+				$records[$counter]['fined'] = $datas[0]['fined'];
+			}else{
+				$records[$counter]['fined'] = 0;
+			}
+			if($datas[0]['date']){
+				$records[$counter]['date'] = $datas[0]['date'];
+			}else{
+				$records[$counter]['date'] = date('Y-m-d');
+			}
+			//$records[$counter]['last_updated'] = $row['last_updated'];
+			$records[$counter]['last_updated'] = $row['last_updated'];
+			$records[$counter]['con_status'] = $row['con_status'];
+			$counter++;
+			
 
 		}
+		// echo "<pre>";
+		// print_r($records); exit;
+	 //    $sql = 'SELECT weighstation.id ,weighstation.con_status as con_status, weighstation.name,
+	 //    weighstation_data.weigh_id,
+		// weighstation.last_updated,
+	 //    weighstation_data.date,
+	 //    COUNT(weighstation_data.ticket_no) AS total_vehicles,
+	 //    sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded,
+	 //    sum(case when weighstation_data.status = 2 then fine else 0 end) fined
+		// FROM
+	 //    weighstation
+	 //    LEFT OUTER JOIN weighstation_data ON weighstation.id = weighstation_data.weigh_id
+		// WHERE weighstation_data.date = (SELECT MAX(date) FROM weighstation_data WHERE weigh_id = weighstation.id)
+		// AND weighstation.status = 1
+		// GROUP BY
+	 //    weighstation.id';
+		// $query= $this->db->query($sql);
+		 $sql1 = "SELECT 
+		DATE_FORMAT(date, '%M, %Y') as date,
+		COUNT(ticket_no) AS total_vehicles_m,
+		sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded_m,
+		sum(case when weighstation_data.status = 2 then fine else 0 end) fined_m,
+		sum(case when weighstation_data.status = 2 AND fine = 0 then 1 else 0 end) without_fine
 		
-        	$this->page_data['page'] = 'weighstation daily report';
-        	$this->page_data['weighstation'] = $this->db->get_where('weighstation',array('status' => 1))->result_array();
-			// $sql =	"SELECT weighstation.id, date, name, sum(case when weighstation_data.ticket_no != '' then 1 else 0 end) AS total_vehicles,
-   // 				 		sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded,
-   // 				 		sum(case when weighstation_data.status = 2 then fine else 0 end) fined
-   // 				 		 FROM weighstation
-   //  					LEFT OUTER JOIN weighstation_data ON weighstation.id = weighstation_data.weigh_id
-   //  					WHERE weighstation.status = 1   GROUP BY weighstation.id";
-        	
-    // 		$sql = " SELECT  id , name
-				// FROM    weighstation a
-    //     LEFT OUTER JOIN
-    //     (
-    //         SELECT  weigh_id ,COUNT('weighstation_data.ticket_no') AS total_vehicles , MAX(date) date,sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded,
-   	// 			 		sum(case when weighstation_data.status = 2 then fine else 0 end) fined
-   				 		
-    //         FROM    weighstation_data
-    //         GROUP BY date
-    //     ) b ON a.id = b.weigh_id ";
-		    $sql = 'SELECT weighstation.id , weighstation.name,
-		    weighstation_data.weigh_id,
-			weighstation.last_updated,
-		    weighstation_data.date,
-		    COUNT(weighstation_data.ticket_no) AS total_vehicles,
-		    sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded,
-		    sum(case when weighstation_data.status = 2 then fine else 0 end) fined
-			FROM
-		    weighstation
-		    LEFT OUTER JOIN weighstation_data ON weighstation.id = weighstation_data.weigh_id
-			WHERE weighstation_data.date = (SELECT MAX(date) FROM weighstation_data WHERE weigh_id = weighstation.id)
-			GROUP BY
-		    weighstation.id; ';
+		FROM
+		weighstation_data
+		 WHERE MONTH(date) = '".date('m')."' AND YEAR(date) = '".date('Y')."'";
+		$this->page_data['month_count'] = $this->db->query($sql1)->result_array(); 
+		// echo "<pre>";
+		// print_r($this->page_data['month_count']); exit;
+		//$this->page_data['record'] = $query->result_array(); 
+		$this->page_data['record'] = $records;
+		$this->load->view('back/weighstation_data', $this->page_data);
 
-			$query= $this->db->query($sql);
-			
-			$this->page_data['record'] = $query->result_array(); 
-
-			$this->load->view('back/weighstation_data', $this->page_data);
-
-		
-		
-		
-	}
+	
+	
+	
+}
 
 	public function weighstation_daily_report($para1 = '' , $para2 = '', $para3 =''){
 		if($para1 == 'post'){
@@ -3909,28 +4002,88 @@ class Admin extends CI_Controller
 
 	}
 
+	// 
 	function get_weighstation_data(){
-		$sql = 'SELECT weighstation.id , weighstation.name,
-			weighstation.last_updated as last_updated,
-    		weighstation_data.weigh_id,
-    		weighstation_data.date as date,
-    		COUNT(weighstation_data.ticket_no) AS total_vehicles,
-    		sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded,
-    		sum(case when weighstation_data.status = 2 then fine else 0 end) fined
-			FROM
-    			weighstation
-    		LEFT OUTER JOIN weighstation_data ON weighstation.id = weighstation_data.weigh_id
-			WHERE weighstation_data.date = (SELECT MAX(date) FROM weighstation_data WHERE weigh_id = weighstation.id)
-			GROUP BY
-   			 weighstation.id;';
-				 $query= $this->db->query($sql);
-			$result = $query->result_array();
-    		 foreach($result as $key => $value){
-				$result[$key]['last_updated'] = date('F j, Y, g:i a', $value['last_updated']);
-				$result[$key]['date'] = date('F j, Y', strtotime( $value['date']));
+		// $sql = 'SELECT weighstation.id ,weighstation.con_status as con_status, weighstation.name,
+		//     weighstation_data.weigh_id,
+		// 	weighstation.last_updated,
+		//     weighstation_data.date,
+		//     COUNT(weighstation_data.ticket_no) AS total_vehicles,
+		//     sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded,
+		//     sum(case when weighstation_data.status = 2 then fine else 0 end) fined
+		// 	FROM
+		//     weighstation
+		//     LEFT OUTER JOIN weighstation_data ON weighstation.id = weighstation_data.weigh_id
+		// 	WHERE weighstation_data.date = (SELECT MAX(date) FROM weighstation_data WHERE weigh_id = weighstation.id)
+		// 	AND weighstation.status = 1
+		// 	GROUP BY
+		//     weighstation.id';
+		// 	$query= $this->db->query($sql);
+		// 	$result = $query->result_array();
+  //   		foreach($result as $key => $value){
+		// 		$result[$key]['last_updated'] = date('F j, Y, g:i a', $value['last_updated']);
+		// 		$result[$key]['date'] = date('F j, Y', strtotime( $value['date']));
 			 
-			}
-    		    echo json_encode($result); 
+		// 	}
+
+			//////////////////////////////////////
+			$weigh = $this->db->get_where('weighstation',array('status' => 1))->result_array();        	
+		    //$this->page_data['weighstation'] = $weigh;//$this->db->get_where('weighstation',array('status' => 1))->result_array();
+			
+		    $records = array();
+		    $counter = 0;
+		    foreach($weigh as $row){
+		    	$sqli = 'SELECT weigh_id,date,
+		    	COUNT(ticket_no) AS total_vehicles,
+			    sum(case when status = 2 then 1 else 0 end) overloaded,
+			    sum(case when status = 2 then fine else 0 end) fined
+				FROM
+			    weighstation_data
+			    WHERE date = (SELECT MAX(date) FROM weighstation_data WHERE weigh_id = '.$row["id"].')
+			    AND weigh_id = '.$row["id"];
+			    $datas =  $this->db->query($sqli)->result_array();
+			    $records[$counter]['id'] = $row['id'];
+			    $records[$counter]['name'] = $row['name'];
+			    $records[$counter]['total_vehicles'] = $datas[0]['total_vehicles'];
+			    if($datas[0]['overloaded']){
+			    	$records[$counter]['overloaded'] = $datas[0]['overloaded'];
+			    }else{
+			    	$records[$counter]['overloaded'] = 0;
+			    }
+			    if($datas[0]['fined']){
+			    	$records[$counter]['fined'] = $datas[0]['fined'];
+			    }else{
+			    	$records[$counter]['fined'] = 0;
+			    }
+			    if($datas[0]['date']){
+			    	$records[$counter]['date'] = date('F j, Y', strtotime( $datas[0]['date']));
+			    }else{
+			    	$records[$counter]['date'] = date('F j, Y');
+			    }
+
+			    $records[$counter]['last_updated'] = @date('F j, Y, g:i a', $row['last_updated']);
+				$records[$counter]['con_status'] = $row['con_status'];
+			    $counter++;
+			    
+
+		    }
+
+			////////////////////////
+
+
+			$sql1 = "SELECT 
+			DATE_FORMAT(date, '%M, %Y') as date,
+		    COUNT(ticket_no) AS total_vehicles_m,
+		    sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded_m,
+		    sum(case when weighstation_data.status = 2 then fine else 0 end) fined_m,
+			sum(case when weighstation_data.status = 2 AND fine = 0 then 1 else 0 end) without_fine
+			
+			FROM
+		    weighstation_data
+		     WHERE MONTH(date) = '".date('m')."' AND YEAR(date) = '".date('Y')."'";
+			$monthly = $this->db->query($sql1)->result_array(); 
+			
+    		    echo json_encode(array('records' => $records,'monthly' => $monthly)); 
 
 	}
 	public function daily_weighstation_pdf($para1 = '', $para2 = ''){
@@ -5029,7 +5182,19 @@ class Admin extends CI_Controller
 		
 		
 	}
-
+	/*public function dsr_lane_closed_transfer_data(){
+		$dsr_lane = $this->db->select('id,lane_closed,lane_closed_from,lane_closed_to,lane_closed_description')->from('dsr_lane')->where(array('lane_status' => 1))->get()->result_array();
+		$i = 0;
+		foreach($dsr_lane as $lane){
+			$data[$i]['dsr_lane'] = $lane['id'];
+			$data[$i]['closed_by'] = $lane['lane_closed'];
+			$data[$i]['closed_from'] = $lane['lane_closed_from'];
+			$data[$i]['closed_to'] = $lane['lane_closed_to'];
+			$data[$i]['description'] = $lane['lane_closed_description'];
+			$i++;
+		}
+		?> <pre><?php echo print_r($data);exit;
+	}*/
 
 
 

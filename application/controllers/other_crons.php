@@ -137,13 +137,11 @@ class Other_crons extends CI_Controller{
                         $this->db->insert_batch('weighstation_data', $ins_data);  
                     }
                     $this->db->where('id', $row['id']);
-                    $this->db->update('weighstation',array('file_index' => $update_file, 'last_updated' => time()));  
+                    $this->db->update('weighstation',array('file_index' => $update_file, 'last_updated' => time(),'con_status' => 1));  
                 }else{
-                    $log = array();
-                    $log['message'] = "Couldn't connect to <b>".$row['name']."</b> weighstation";
-                    $log['date'] = time();
-                    $log['status'] = 0;
-                    $this->db->insert('logs',$log);
+                        $this->db->where('id',$row['id']);
+                        $this->db->update('weighstation',array('con_status' => 0,'last_updated' => time()));
+                
                 } ////end of if connection established
                 
                

@@ -774,6 +774,72 @@ $conn = null;
        
         
  }
+ function groupdata(){
+
+  $active_weigh = $this->db->get_where('weighstation',array('status' => 1))->result_array();
+  // echo "<pre>";
+  // print_r($active_weigh); exit;
+  //foreach ($active_weigh as $key => $value) {
+    //echo $first_day_this_month = date('Y-m-01'); // hard-coded '01' for first day
+    $sql = "SELECT count(weighstation_data.id) as total_records, weighstation.id as weighstration, DATE_FORMAT(`date`,'%j') as `date`, DATE_FORMAT(`date`,'%d-%m-%Y') as `dateee` FROM `weighstation`
+
+    INNER JOIN weighstation_data ON weighstation.id = weighstation_data.weigh_id
+    WHERE `date` < '".date('Y-m-01')."'
+    GROUP BY YEAR(`date`), MONTH(`date`), DAY(`date`), weigh_id";
+    // $sql = $sql = "SELECT count(weighstation_data.id) as total_records FROM `weighstation_data`
+
+    // WHERE `date` < '".date('Y-m-01')."'";
+    $data = $this->db->query($sql)->result_array(); 
+    //echo $this->db->last_query(); exit;
+    $sum = 0;
+    foreach($data as $key => $value){
+      $sum+= $value['total_records'];
+    }
+    // $q = "SELECT MAX(id) FROM weighstation_data";
+    // print_r( $this->db->query($q)->result_array());
+    echo "<br>";
+    echo $sum."<br>";
+    echo "<pre>";
+    print_r($data); exit;
+  //}
+  //$sql11 = "EMA.COLUMNS WHERE TABLE_SCHEMA='nha' AND TABLE_NAME='weighstation_data'";
+   //$res = $this->db->query($sql11)->result();
+    // echo "<pre>";
+    // print_r($res); exit;
+  $s = "SET SESSION group_concat_max_len = 10000000";
+  $this->db->query($s);
+   $sql = "SELECT
+    GROUP_CONCAT(id) as ids,
+    COUNT(id),
+    DATE_FORMAT(date, '%M %Y') AS MONTH
+FROM
+    weighstation_data
+GROUP BY
+    DATE_FORMAT(date, '%M %Y')
+    ORDER BY
+        date DESC";
+
+    $result = $this->db->query($sql)->result_array();
+    $tp = array();
+
+    foreach($result as $row){
+      $sql1 = "SELECT
+    GROUP_CONCAT(id) as idss,
+    COUNT(id),
+    weigh_id,
+    DATE_FORMAT(date, '%M %Y') AS MONTH
+FROM
+    weighstation_data
+WHERE id IN (".$row['ids'].")
+GROUP BY
+    weigh_id";
+    $res = $this->db->query($sql1)->result_array();
+    echo "<pre>";
+    print_r($res); 
+      
+
+    }
+ }
 
 }
 

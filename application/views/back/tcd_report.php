@@ -72,7 +72,7 @@
 													<td><?php echo number_format($total);?></td>
                                                 </tr>
                                                 <tr>
-													<?php if($terrif){ ?>
+													<?php if(!isset($terrif[0][0]['message'])){ ?>
 													<td class="text-center">Revenue</td>
 													<td class="text-left"> Rupees </td>
 													<td><?php echo number_format($calculation['revenue']['1']);?></td>

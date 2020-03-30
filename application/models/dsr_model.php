@@ -329,16 +329,18 @@ class dsr_model extends MY_Model
 		return $edit;
 	}
 	public function list_dsr($id, $tool){
-		$this->db->order_by('id','DESC');
-		if($id && $tool){
-			$this->db->where('toolplaza_id', $tool);
-			$this->db->where('supervisor_id', $id);
-		}
-		if($tool){
-			$this->db->where('toolplaza_id', $tool);
-		}
-		$dsr = $this->db->get('dsr_updated')->result_array();
+		// $this->db->order_by('id','DESC');
+		// if($id && $tool){
+		// 	$this->db->where('toolplaza_id', $tool);
+		// 	$this->db->where('supervisor_id', $id);
+		// }
+		// if($tool){
+		// 	$this->db->where('toolplaza_id', $tool);
+		// }
+		// $dsr = $this->db->get('dsr_updated')->result_array();
 		
+		$dsr = $this->db->query('CALL list_dsr(\''.$id.'\',\''.$tool.'\')')->result_array();
+		$this->db->next_result();
 		return $dsr; 
 	}
 	public function delete_dsr($id, $para2){
@@ -386,17 +388,18 @@ class dsr_model extends MY_Model
 		return $data;
 	}
 	public function list_dsr_limit($id, $tool, $limit){
-		$this->db->order_by('id','DESC');
-		$this->db->limit($limit);
-		if($id && $tool){
-			$this->db->where('toolplaza_id', $tool);
-			$this->db->where('supervisor_id', $id);
-		}
-		if($tool){
-			$this->db->where('toolplaza_id', $tool);
-		}
-		$dsr = $this->db->get('dsr_updated')->result_array();
-		
+		// $this->db->order_by('id','DESC');
+		// $this->db->limit($limit);
+		// if($id && $tool){
+		// 	$this->db->where('toolplaza_id', $tool);
+		// 	$this->db->where('supervisor_id', $id);
+		// }
+		// if($tool){
+		// 	$this->db->where('toolplaza_id', $tool);
+		// }
+		// $dsr = $this->db->get('dsr_updated')->result_array();
+		$dsr = $this->db->query('CALL list_dsr_limit(\''.$id.'\',\''.$tool.'\',\''.$limit.'\')')->result_array();
+		$this->db->next_result();
 		return $dsr; 
 	}
 	

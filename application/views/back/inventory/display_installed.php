@@ -55,20 +55,22 @@
                     <tr role="row">
                       <th class="sorting_asc" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending" style="width: auto;">SR #</th>
                       <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Name</th>
-                      <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Item Category</th>
-                      <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Current Status</th>
-                      <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Office: activate to sort column ascending" style="width: auto;">Current Site</th>
-                      <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Current Location</th>
+                      <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Category</th>
+                      <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Serial No</th>
+                      <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Status</th>
+                      <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Office: activate to sort column ascending" style="width: auto;">Site</th>
+                      <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Location</th>
                     </tr>
                   </thead>
                   <tfoot>
                     <tr>
                        <th rowspan="1" colspan="1">Sr #</th>
                        <th rowspan="1" colspan="1">Name</th>
-                       <th rowspan="1" colspan="1">Item Category</th>
-                       <th rowspan="1" colspan="1">Current Status</th>
-                       <th rowspan="1" colspan="1">Current Site</th>
-                       <th rowspan="1" colspan="1">Current location</th>
+                       <th rowspan="1" colspan="1">Category</th>
+                       <th rowspan="1" colspan="1">Serial No</th>
+                       <th rowspan="1" colspan="1">Status</th>
+                       <th rowspan="1" colspan="1">Site</th>
+                       <th rowspan="1" colspan="1">location</th>
                     </tr>
                   </tfoot>
                   <tbody>
@@ -146,7 +148,7 @@
                                     echo"Tools";
                                   }
                         ?></td>
-
+                        <td><?php echo $install['serial_no'] ?></td>
                       <td>
                          <?php
                             if($install['transaction_type']=="0")

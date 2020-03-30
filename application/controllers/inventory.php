@@ -212,10 +212,8 @@ class Inventory extends CI_Controller
 
 	/** Subitems area START */
 	public function subitems($para1 = '' , $para2 = '', $para3 =''){
-		if(!$this->session->userdata('adminid')){
-			
+		if(!$this->session->userdata('adminid')){		
 			return redirect('admin/login');
-
 		}
 		if($para1 == 'reload'){
 			return redirect('inventory/tabs/subitems/');	
@@ -1565,7 +1563,10 @@ public function expand($para1 = '' , $para2 = '', $para3 =''){
 		}
 		elseif($expanded['action_status']=="13")
 		{
-			$actionStatus[] = $faulty_comp_name." Repairing Mode";
+			$installed_comp = $this->db->get_where('installed_subitems',array('asset_id' => $expanded['id'],'transaction_type' => 13))->result_array();	
+			$faulty_comp = $this->db->get_where('sub_items',array('id' => $installed_comp[0]['subitem_id']))->result_array();
+				$this->page_data['faulty_comp_name'] = $faulty_comp[0]['name'];
+			$actionStatus[] = $faulty_comp[0]['name']." Repairing Mode";
 		}
 		elseif($expanded['action_status']=="14")
 		{
@@ -1648,216 +1649,216 @@ public function add_asset_components($para1='',$para2='',$para3='')
 		$this->load->view('back/inventory/add_asset', $this->page_data);
 	 }
 	 
-    public function add_asset_do()
-    {
-	 $this->load->library('form_validation');
-	 $this->form_validation->set_rules('item_type','Item Type','required|trim');
-	 $this->form_validation->set_rules('asset_name',' Asset Name','required|trim');
-	 $this->form_validation->set_rules('product_model_no',' Product Model Number','required|trim');
-	 $this->form_validation->set_rules('supplier_id',' Supplier Name','required|trim');
-	 $this->form_validation->set_rules('equip_manufacturer',' Manufacturer','required|trim');
-	//  $this->form_validation->set_rules('id_no',' Identification Number','required|trim|is_unique[assets.identification_no]',array('is_unique' => 'Given Identification Number already exists.'));
-	 $this->form_validation->set_rules('asset_price',' Product Price','required|trim');	 
-	 $this->form_validation->set_rules('site_id',' Site','required|trim');
-	 $this->form_validation->set_rules('quantity',' Quantity','required|trim');
-	 $this->form_validation->set_rules('purchase_date',' Purchase Date','required|trim');
-	 $this->form_validation->set_rules('warranty_type',' Warranty type','required|trim');
-	 if($this->form_validation->run() == TRUE)
+	 public function add_asset_do()
 	 {
-		 if($this->session->userdata('adminid'))
-		 {
-			$eSerialCounter = 0;
-			$oldTabNumber=1;
-			$quantity = $this->input->post('quantity');
-			$cost = $this->input->post('asset_price');
-			$unit_cost = $cost/$quantity;
-			$description = $this->db->get_where('items',array('id'=>$this->input->post('asset_name')))->result_array();
-			//$date = date("Y-m-d H:i:s");				
-			$data = array();
-			$ref_id = array();
-			if(!empty($this->input->post('equip_serial_no')))
-			{
-				for( $qty=0; $qty < $this->input->post('quantity'); $qty++)
-				{
-					$equipSerial = $this->input->post('equip_serial_no');
-					$this->db->select_max('set_no');
-						$query = $this->db->get('assets');  // Produces: SELECT MAX(set_no) as age FROM assets
-						$setNO = $query->row()->set_no;
-						if($setNO==0)
-						{
-							$setNO=1;
-						}
-
-					$data = array(
-						'item_type' => $this->input->post('item_type'),
-						'name' => $this->input->post('asset_name'),
-						'set_no' => $setNO+1,
-						'product_model_no' => $this->input->post('product_model_no'),
-						'identification_no' => $this->Inventory_model->generate_id(),
-						'serial_no'=> $equipSerial[$eSerialCounter],
-						'manufacturer' => $this->input->post('equip_manufacturer'),
-						'mfg_date'=> $this->input->post('mfg_date'),
-						'cost_price' => $unit_cost,
-						'supplier' => $this->input->post('supplier_id'),
-						'site' => $this->input->post('site_id'),
-						'purchased_on' => $this->input->post('purchase_date'),
-						'po_no' => $this->input->post('po_no'),
-						'warranty_type' => $this->input->post('warranty_type'),
-						'warranty_duration' => $this->input->post('warranty_duration'),
-						'have_sub_assets'=>0,
-						'user_type' => '1',
-						'checkin_by' => $this->session->userdata('adminid'),
-						'add_date' => time()
-					); 
-					$this->db->insert('assets',$data);
-					$ref_id[] = $this->db->insert_id();
-					$eSerialCounter++;		 
-				}
-			}
-			if(!empty($this->input->post('additional_data')))
-			{
-						$this->db->select_max('set_no');
-						$query = $this->db->get('assets');  // Produces: SELECT MAX(set_no) as age FROM assets
-						$setNO = $query->row()->set_no;
-						$setNO = $setNO+1;
-						// echo "<pre>"; print_r($setNO); exit;
-				$array = json_decode($this->input->post('additional_data'), true);
-				// echo "<pre>"; print_r($array); exit;
-				foreach($array as $arr)
-				{
-					// echo "<pre>"; print_r($arr['tabNumber']);
-					
-					if($oldTabNumber==$arr['tabNumber'])
-					{
-						
-						if($setNO==0)
-						{
-							$setNO=1;
-						}
-						// echo "<pre>"; print_r($setNO); exit;
-						$data = array(
-							'item_type' => $this->input->post('item_type'),
-							'name' => $this->input->post('asset_name'),
-							'set_no' => $setNO,
-							'product_model_no' => $this->input->post('product_model_no'),
-							'identification_no' => $this->Inventory_model->generate_id(),
-							'serial_no'=> $arr['equipmentSerial'],
-							'manufacturer' => $this->input->post('equip_manufacturer'),
-							'mfg_date'=> $this->input->post('mfg_date'),
-							'cost_price' => $unit_cost,
-							'comp_cost'=> $arr['componentCost'],
-							'comp_manufacturer'=>$arr['componentManufacturer'],
-							'comp_mfg_date'=>$arr['componentMfg'],
-							'comp_model_no'=>$arr['componentModel'],
-							'comp_id'=>$arr['componentId'],
-							'comp_serial'=> $arr['componentSerial'],
-							'supplier' => $this->input->post('supplier_id'),
-							'equip_or_comp'=>1,
-							'site' => $this->input->post('site_id'),
-							'purchased_on' => $this->input->post('purchase_date'),
-							'po_no' => $this->input->post('po_no'),
-							'comp_warranty_type' => $arr['componentWT'],
-							'comp_warranty_duration' => $arr['componentWD'],
-							'warranty_type' => $this->input->post('warranty_type'),
-							'warranty_duration' => $this->input->post('warranty_duration'),
-							'user_type' => '1',
-							'have_sub_assets'=>1,
-							'checkin_by' => $this->session->userdata('adminid'),
-							'add_date' => time()
-					); 
-					// echo "<pre>"; print_r($data);
-					$this->db->insert('assets',$data);
-					$ref_id[] = $this->db->insert_id();
-		
-					}
-					if($oldTabNumber!=$arr['tabNumber'])
-					{
-						$this->db->select_max('set_no');
-						$query = $this->db->get('assets'); // Produces: SELECT MAX(set_no) as age FROM assets
-						$setNO = $query->row()->set_no;
-						$setNO = $setNO+1;
-						if($setNO==0)
-						{
-							$setNO=1;
-						}
-						
-						$data = array(
-						'item_type' => $this->input->post('item_type'),
-						'name' => $this->input->post('asset_name'),
-						'set_no' => $setNO,
-						'product_model_no' => $this->input->post('product_model_no'),
-						'identification_no' => $this->Inventory_model->generate_id(),
-						'serial_no'=> $arr['equipmentSerial'],
-						'manufacturer' => $this->input->post('equip_manufacturer'),
-						'mfg_date'=> $this->input->post('mfg_date'),
-						'cost_price' => $unit_cost,
-						'comp_cost'=> $arr['componentCost'],
-						'comp_manufacturer'=>$arr['componentManufacturer'],
-						'comp_mfg_date'=>$arr['componentMfg'],
-						'comp_model_no'=>$arr['componentModel'],
-						'comp_id'=>$arr['componentId'],
-						'comp_serial'=> $arr['componentSerial'],
-						'supplier' => $this->input->post('supplier_id'),
-						'equip_or_comp'=>1,
-						'site' => $this->input->post('site_id'),
-						'purchased_on' => $this->input->post('purchase_date'),
-						'po_no' => $this->input->post('po_no'),
-						'comp_warranty_type' => $arr['componentWT'],
-						'comp_warranty_duration' => $arr['componentWD'],
-						'warranty_type' => $this->input->post('warranty_type'),
-						'warranty_duration' => $this->input->post('warranty_duration'),
-						'have_sub_assets'=>1,
-						'user_type' => '1',
-						'checkin_by' => $this->session->userdata('adminid'),
-						'add_date' => time()
-					);
-					$this->db->insert('assets',$data);
-					$ref_id[] = $this->db->insert_id();
-					// echo "<pre>"; print_r($data);
-					}
-					$oldTabNumber=$arr['tabNumber'];
-					// $equipSerial = $this->input->post('equip_serial_no');
-					// $eSerialCounter++;
-				}	
-				// exit;	 
-			}
-				foreach($ref_id as $id)
-				{
-					$supervisor = $this->db->get('tpsupervisor')->result_array();
-					$counter = 0;
-					foreach($supervisor as $sp_id)
-					{				 
-						$data11 = array(
-							'user_id' => $this->session->userdata('adminid'),
-							'user_type' => 3,
-							'for_user_id' =>  $sp_id['id'],
-							'for_user_type' => 1,
-							'ref_id' 	=> $id,
-							'alert_type'  => 1,
-							'date' => date("Y-m-d H:i:s"),
-							'is_read' => 0,
-							'notification_msg' => 'A new Asset Added by Admin.'                
-								);
-								$counter++;
-						$this->db->insert('notifications', $data11); 
-					}
-				}
-		
-			if($this->input->post('quantity')>1)
-			{			     
-				echo json_encode(array('response' => true, 'message' =>'Asset Stock Created Successfully','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
-			}
-			if($this->input->post('quantity')==1)
-			{
-				echo json_encode(array('response' => true, 'message' =>'Asset Created Successfully','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
-			}
-		}
-	 } 
-	 else
-	 {
-		echo json_encode(array('response' => TRUE ,'message' => validation_errors())); exit;
+	  $this->load->library('form_validation');
+	  $this->form_validation->set_rules('item_type','Item Type','required|trim');
+	  $this->form_validation->set_rules('asset_name',' Asset Name','required|trim');
+	  $this->form_validation->set_rules('product_model_no',' Product Model Number','required|trim');
+	  $this->form_validation->set_rules('supplier_id',' Supplier Name','required|trim');
+	  $this->form_validation->set_rules('equip_manufacturer',' Manufacturer','required|trim');
+	 //  $this->form_validation->set_rules('id_no',' Identification Number','required|trim|is_unique[assets.identification_no]',array('is_unique' => 'Given Identification Number already exists.'));
+	  $this->form_validation->set_rules('asset_price',' Product Price','required|trim');	 
+	  $this->form_validation->set_rules('site_id',' Site','required|trim');
+	  $this->form_validation->set_rules('quantity',' Quantity','required|trim');
+	  $this->form_validation->set_rules('purchase_date',' Purchase Date','required|trim');
+	  $this->form_validation->set_rules('warranty_type',' Warranty type','required|trim');
+	  if($this->form_validation->run() == TRUE)
+	  {
+		  if($this->session->userdata('adminid'))
+		  {
+			 $eSerialCounter = 0;
+			 $oldTabNumber=1;
+			 $quantity = $this->input->post('quantity');
+			 $cost = $this->input->post('asset_price');
+			 $unit_cost = $cost/$quantity;
+			 $description = $this->db->get_where('items',array('id'=>$this->input->post('asset_name')))->result_array();
+			 //$date = date("Y-m-d H:i:s");				
+			 $data = array();
+			 $ref_id = array();
+			 if(!empty($this->input->post('equip_serial_no')))
+			 {
+				 for( $qty=0; $qty < $this->input->post('quantity'); $qty++)
+				 {
+					 $equipSerial = $this->input->post('equip_serial_no');
+					 $this->db->select_max('set_no');
+						 $query = $this->db->get('assets');  // Produces: SELECT MAX(set_no) as age FROM assets
+						 $setNO = $query->row()->set_no;
+						 if($setNO==0)
+						 {
+							 $setNO=1;
+						 }
+ 
+					 $data = array(
+						 'item_type' => $this->input->post('item_type'),
+						 'name' => $this->input->post('asset_name'),
+						 'set_no' => $setNO+1,
+						 'product_model_no' => $this->input->post('product_model_no'),
+						 'identification_no' => $this->Inventory_model->generate_id(),
+						 'serial_no'=> $equipSerial[$eSerialCounter],
+						 'manufacturer' => $this->input->post('equip_manufacturer'),
+						 'mfg_date'=> $this->input->post('mfg_date'),
+						 'cost_price' => $unit_cost,
+						 'supplier' => $this->input->post('supplier_id'),
+						 'site' => $this->input->post('site_id'),
+						 'purchased_on' => $this->input->post('purchase_date'),
+						 'po_no' => $this->input->post('po_no'),
+						 'warranty_type' => $this->input->post('warranty_type'),
+						 'warranty_duration' => $this->input->post('warranty_duration'),
+						 'have_sub_assets'=>0,
+						 'user_type' => '1',
+						 'checkin_by' => $this->session->userdata('adminid'),
+						 'add_date' => time()
+					 ); 
+					 $this->db->insert('assets',$data);
+					 $ref_id[] = $this->db->insert_id();
+					 $eSerialCounter++;		 
+				 }
+			 }
+			 if(!empty($this->input->post('additional_data')))
+			 {
+						 $this->db->select_max('set_no');
+						 $query = $this->db->get('assets');  // Produces: SELECT MAX(set_no) as age FROM assets
+						 $setNO = $query->row()->set_no;
+						 $setNO = $setNO+1;
+						 // echo "<pre>"; print_r($setNO); exit;
+				 $array = json_decode($this->input->post('additional_data'), true);
+				 // echo "<pre>"; print_r($array); exit;
+				 foreach($array as $arr)
+				 {
+					 // echo "<pre>"; print_r($arr['tabNumber']);
+					 
+					 if($oldTabNumber==$arr['tabNumber'])
+					 {
+						 
+						 if($setNO==0)
+						 {
+							 $setNO=1;
+						 }
+						 // echo "<pre>"; print_r($setNO); exit;
+						 $data = array(
+							 'item_type' => $this->input->post('item_type'),
+							 'name' => $this->input->post('asset_name'),
+							 'set_no' => $setNO,
+							 'product_model_no' => $this->input->post('product_model_no'),
+							 'identification_no' => $this->Inventory_model->generate_id(),
+							 'serial_no'=> $arr['equipmentSerial'],
+							 'manufacturer' => $this->input->post('equip_manufacturer'),
+							 'mfg_date'=> $this->input->post('mfg_date'),
+							 'cost_price' => $unit_cost,
+							 'comp_cost'=> $arr['componentCost'],
+							 'comp_manufacturer'=>$arr['componentManufacturer'],
+							 'comp_mfg_date'=>$arr['componentMfg'],
+							 'comp_model_no'=>$arr['componentModel'],
+							 'comp_id'=>$arr['componentId'],
+							 'comp_serial'=> $arr['componentSerial'],
+							 'supplier' => $this->input->post('supplier_id'),
+							 'equip_or_comp'=>1,
+							 'site' => $this->input->post('site_id'),
+							 'purchased_on' => $this->input->post('purchase_date'),
+							 'po_no' => $this->input->post('po_no'),
+							 'comp_warranty_type' => $arr['componentWT'],
+							 'comp_warranty_duration' => $arr['componentWD'],
+							 'warranty_type' => $this->input->post('warranty_type'),
+							 'warranty_duration' => $this->input->post('warranty_duration'),
+							 'user_type' => '1',
+							 'have_sub_assets'=>1,
+							 'checkin_by' => $this->session->userdata('adminid'),
+							 'add_date' => time()
+					 ); 
+					 // echo "<pre>"; print_r($data);
+					 $this->db->insert('assets',$data);
+					 $ref_id[] = $this->db->insert_id();
+		 
+					 }
+					 if($oldTabNumber!=$arr['tabNumber'])
+					 {
+						 $this->db->select_max('set_no');
+						 $query = $this->db->get('assets'); // Produces: SELECT MAX(set_no) as age FROM assets
+						 $setNO = $query->row()->set_no;
+						 $setNO = $setNO+1;
+						 if($setNO==0)
+						 {
+							 $setNO=1;
+						 }
+						 
+						 $data = array(
+						 'item_type' => $this->input->post('item_type'),
+						 'name' => $this->input->post('asset_name'),
+						 'set_no' => $setNO,
+						 'product_model_no' => $this->input->post('product_model_no'),
+						 'identification_no' => $this->Inventory_model->generate_id(),
+						 'serial_no'=> $arr['equipmentSerial'],
+						 'manufacturer' => $this->input->post('equip_manufacturer'),
+						 'mfg_date'=> $this->input->post('mfg_date'),
+						 'cost_price' => $unit_cost,
+						 'comp_cost'=> $arr['componentCost'],
+						 'comp_manufacturer'=>$arr['componentManufacturer'],
+						 'comp_mfg_date'=>$arr['componentMfg'],
+						 'comp_model_no'=>$arr['componentModel'],
+						 'comp_id'=>$arr['componentId'],
+						 'comp_serial'=> $arr['componentSerial'],
+						 'supplier' => $this->input->post('supplier_id'),
+						 'equip_or_comp'=>1,
+						 'site' => $this->input->post('site_id'),
+						 'purchased_on' => $this->input->post('purchase_date'),
+						 'po_no' => $this->input->post('po_no'),
+						 'comp_warranty_type' => $arr['componentWT'],
+						 'comp_warranty_duration' => $arr['componentWD'],
+						 'warranty_type' => $this->input->post('warranty_type'),
+						 'warranty_duration' => $this->input->post('warranty_duration'),
+						 'have_sub_assets'=>1,
+						 'user_type' => '1',
+						 'checkin_by' => $this->session->userdata('adminid'),
+						 'add_date' => time()
+					 );
+					 $this->db->insert('assets',$data);
+					 $ref_id[] = $this->db->insert_id();
+					 // echo "<pre>"; print_r($data);
+					 }
+					 $oldTabNumber=$arr['tabNumber'];
+					 // $equipSerial = $this->input->post('equip_serial_no');
+					 // $eSerialCounter++;
+				 }	
+				 // exit;	 
+			 }
+				 foreach($ref_id as $id)
+				 {
+					 $supervisor = $this->db->get('tpsupervisor')->result_array();
+					 $counter = 0;
+					 foreach($supervisor as $sp_id)
+					 {				 
+						 $data11 = array(
+							 'user_id' => $this->session->userdata('adminid'),
+							 'user_type' => 3,
+							 'for_user_id' =>  $sp_id['id'],
+							 'for_user_type' => 1,
+							 'ref_id' 	=> $id,
+							 'alert_type'  => 1,
+							 'date' => date("Y-m-d H:i:s"),
+							 'is_read' => 0,
+							 'notification_msg' => 'A new Asset Added by Admin.'                
+								 );
+								 $counter++;
+						 $this->db->insert('notifications', $data11); 
+					 }
+				 }
+		 
+			 if($this->input->post('quantity')>1)
+			 {			     
+				 echo json_encode(array('response' => true, 'message' =>'Asset Stock Created Successfully','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
+			 }
+			 if($this->input->post('quantity')==1)
+			 {
+				 echo json_encode(array('response' => true, 'message' =>'Asset Created Successfully','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
+			 }
+		 }
+	  } 
+	  else
+	  {
+		 echo json_encode(array('response' => TRUE ,'message' => validation_errors())); exit;
+	  }
 	 }
-	}
 
 	public function asset_edit($para1 = ''){
 		if(!$para1){
@@ -3296,7 +3297,7 @@ public function add_asset_components($para1='',$para2='',$para3='')
 		 
 		 foreach($repairs as $repair)
 		 {
-			 $installed_location = $this->db->get_where('installed_inventory',array('id' => $repair,'transaction_type'=> 3))->result_array();
+			 $installed_location = $this->db->get_where('installed_inventory',array('id' => $repair))->result_array();
 			 $locationNames = $this->db->get_where('locations',array('id' => $installed_location[0]['location']))->result_array();
 			 $siteNames = $this->db->get_where('sites',array('id' => $locationNames[0]['site']))->result_array();			 
 			 $this->page_data['sites'] = $siteNames;
@@ -3342,7 +3343,6 @@ public function add_asset_components($para1='',$para2='',$para3='')
 							$subitems = $this->db->get_where('installed_subitems',array('installed_id' => $repairing_start[0]['id']))->result_array();
 							$overAllEstCost = "Overall Estimate Cost of Equipment,".$this->input->post('estimated_cost');
 							foreach($subitems as $subasset){
-
 								$installing_data = array(
 									'transaction_type' => "10",
 									'subitem_id'=> $subasset['subitem_id'],
@@ -3362,15 +3362,15 @@ public function add_asset_components($para1='',$para2='',$para3='')
 									$this->db->where('id',$id);
 								$this->db->update('installed_inventory',$installing_data);
 
-								$subAsset_data = array
-								(
-								'action_status' => "10",
-								'user_type' => "1",
-								'user' => $this->session->userdata('adminid'),
-								'action_date' => $date ,
-								);
-								$this->db->where('id',$repairing_start[0]['asset_id']);
-								$this->db->update('sub_assets',$subAsset_data);
+								// $subAsset_data = array
+								// (
+								// 'action_status' => "10",
+								// 'user_type' => "1",
+								// 'user' => $this->session->userdata('adminid'),
+								// 'action_date' => $date ,
+								// );
+								// $this->db->where('id',$repairing_start[0]['asset_id']);
+								// $this->db->update('sub_assets',$subAsset_data);
 
 								$installing_subitem_data = array(
 									'transaction_type' => 10,
@@ -3396,6 +3396,7 @@ public function add_asset_components($para1='',$para2='',$para3='')
 										'installed_id' => $id,
 										'subitem_id' => $subasset['subitem_id'],
 										'serial_no' => $subasset['serial_no'],
+										'identification_no' => $subasset['identification_no'],
 										'item_id' => $subasset['item_id'],
 										'is_sub_item' => 1,
 										'installed_subitem_id' => $subasset['id'],
@@ -3414,6 +3415,7 @@ public function add_asset_components($para1='',$para2='',$para3='')
 										'item_id' => $subasset['item_id'],
 										'subitem_id' => $subasset['subitem_id'],
 										'serial_no' => $subasset['serial_no'],
+										'identification_no' => $subasset['identification_no'],
 										'is_sub_item' => 1,
 										'installed_subitem_id' => $subasset['id'],
 										'asset_id'=> $subasset['asset_id'],
@@ -3456,6 +3458,7 @@ public function add_asset_components($para1='',$para2='',$para3='')
 								'installed_id' => $id,
 								'item_id' => $repairing_start[0]['name'],
 								'serial_no' => $repairing_start[0]['serial_no'],
+								'identification_no' => $repairing_start[0]['identification_no'],
 								'is_sub_item' => $repairing_start[0]['have_sub_items'],
 								'site' => $repairing_start[0]['site'],
 								'location' => $repairing_start[0]['location'],
@@ -3471,6 +3474,7 @@ public function add_asset_components($para1='',$para2='',$para3='')
 						'installed_id' => $id,
 						'item_id' => $repairing_start[0]['name'],
 						'serial_no' => $repairing_start[0]['serial_no'],
+						'identification_no' => $repairing_start[0]['identification_no'],
 						'asset_id'=> $repairing_start[0]['asset_id'],
 						'have_sub_items' => $repairing_start[0]['have_sub_items'],
 						'transaction_type' => "10",
@@ -3646,6 +3650,7 @@ elseif ($para1 == 'component_faulty_do')
 							'installed_id' => $subasset['installed_id'],
 							'subitem_id' => $subasset['subitem_id'],
 							'serial_no' => $subasset['serial_no'],
+							'identification_no' => $subasset['identification_no'],
 							'item_id' => $subasset['item_id'],
 							'is_sub_item' => 1,
 							'installed_subitem_id' => $subasset['id'],
@@ -3663,6 +3668,7 @@ elseif ($para1 == 'component_faulty_do')
 							'item_id' => $subasset['item_id'],
 							'subitem_id' => $subasset['subitem_id'],
 							'serial_no' => $subasset['serial_no'],
+							'identification_no' => $subasset['identification_no'],
 							'is_sub_item' => 1,
 							'installed_subitem_id' => $subasset['id'],
 							'asset_id'=> $subasset['asset_id'],
@@ -3757,7 +3763,7 @@ elseif ($para1 == 'component_replace')
 		$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
 
 		foreach($data as $rec){
-			$subasset = $this->db->get_where('sub_assets',array('subitem_id' => $rec['subitem_id']))->result_array();
+			$subasset = $this->db->get_where('assets',array('id' => $rec['asset_id']))->result_array();
 		}
 
 		foreach($subasset as $row){
@@ -3776,13 +3782,13 @@ elseif ($para1 == 'component_replace')
 				
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_replace_warranty'] = "equip replace warranty <br>" ;						
 						$this->page_data['replace_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -3796,13 +3802,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_replace_warranty'] = "comp replace warranty <br>" ;						
 						$this->page_data['replace_compname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -3812,7 +3818,7 @@ elseif ($para1 == 'component_replace')
 					}
 				}
 				else{
-					$this->page_data['replace_warranty_finished'] ="Replace Warranty Finished <br>" ;
+					$this->page_data['replace_warranty_finished'] = "Replace Warranty Finished <br>" ;
 				}
 			}
 
@@ -3829,13 +3835,13 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_replace_warranty'] = "equip replace warranty <br>" ;						
 						$this->page_data['replace_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -3849,13 +3855,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_replace_warranty'] = "comp replace warranty <br>" ;						
 						$this->page_data['replace_compname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -3883,13 +3889,13 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_replace_warranty'] = "equip replace warranty <br>" ;						
 						$this->page_data['replace_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br> " ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -3903,13 +3909,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_replace_warranty'] = "comp replace warranty <br>" ;						
 						$this->page_data['replace_compname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -3937,13 +3943,13 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_replace_warranty'] = "equip replace warranty <br>" ;						
 						$this->page_data['replace_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br> " ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -3957,13 +3963,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_replace_warranty'] = "comp replace warranty <br>" ;						
 						$this->page_data['replace_compname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br> " ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -3991,13 +3997,13 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_replace_warranty'] = "equip replace warranty <br>" ;						
 						$this->page_data['replace_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br> " ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -4011,13 +4017,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_replace_warranty'] = "comp replace warranty <br>" ;						
 						$this->page_data['replace_compname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -4045,13 +4051,13 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_replace_warranty'] = "equip replace warranty <br>" ;						
 						$this->page_data['replace_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -4065,13 +4071,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_replace_warranty'] = "comp replace warranty <br>" ;						
 						$this->page_data['replace_compname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br> " ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -4099,13 +4105,13 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_replace_warranty'] = "equip replace warranty <br>" ;						
 						$this->page_data['replace_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -4119,13 +4125,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_replace_warranty'] = "comp replace warranty <br>" ;						
 						$this->page_data['replace_compname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -4153,14 +4159,14 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 					
 						$this->page_data['equip_replace_warranty'] = "equip replace warranty <br>" ;						
 						$this->page_data['replace_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -4174,13 +4180,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_replace_warranty'] = "comp replace warranty <br>" ;						
 						$this->page_data['replace_compname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -4208,13 +4214,13 @@ elseif ($para1 == 'component_replace')
 				
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_repair_warranty'] = "Equip Repair Warranty <br>" ;						
 						$this->page_data['repair_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -4228,13 +4234,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_repair_warranty'] = "Comp Repair Warranty <br>" ;						
 						$this->page_data['repair_compname'] = $itemName."'s".$subitemName." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -4262,13 +4268,13 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_repair_warranty'] = "Equip Repair Warranty <br> " ;						
 						$this->page_data['repair_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -4282,13 +4288,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_repair_warranty'] = "Comp Repair Warranty <br>" ;						
 						$this->page_data['repair_compname'] = $itemName."'s".$subitemName." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -4316,13 +4322,13 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_repair_warranty'] = "Equip Repair Warranty <br>" ;						
 						$this->page_data['repair_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -4336,13 +4342,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_repair_warranty'] = "Comp Repair Warranty <br>" ;						
 						$this->page_data['repair_compname'] = $itemName."'s".$subitemName." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -4370,13 +4376,13 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_repair_warranty'] = "Equip Repair Warranty <br>" ;						
 						$this->page_data['repair_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br> " ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -4390,13 +4396,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_repair_warranty'] = "Comp Repair Warranty <br>" ;						
 						$this->page_data['repair_compname'] = $itemName."'s".$subitemName." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -4424,13 +4430,13 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_repair_warranty'] = "Equip Repair Warranty <br>" ;						
 						$this->page_data['repair_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -4444,13 +4450,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_repair_warranty'] = "Comp Repair Warranty <br>" ;						
 						$this->page_data['repair_compname'] = $itemName."'s".$subitemName." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -4478,13 +4484,13 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_repair_warranty'] = "Equip Repair Warranty <br>" ;						
 						$this->page_data['repair_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['comp_mfg'] = $row['manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
@@ -4494,13 +4500,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_repair_warranty'] = "Comp Repair Warranty <br>" ;						
 						$this->page_data['repair_compname'] = $itemName."'s".$subitemName." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -4528,13 +4534,13 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==1){
 						$this->page_data['equip_repair_warranty'] = "Equip Repair Warranty <br>" ;						
 						$this->page_data['repair_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -4548,13 +4554,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_repair_warranty'] = "Comp Repair Warranty <br>" ;						
 						$this->page_data['repair_compname'] = $itemName."'s".$subitemName." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -4582,13 +4588,13 @@ elseif ($para1 == 'component_replace')
 
 				if($interval2->days < $interval->days){
 					// echo "warranty Remaining";
-					$itemName = $this->db->get_where('items',array('id' => $row['item_id']))->result_array();
-					$subitemName = $this->db->get_where('sub_items',array('id' => $row['subitem_id']))->result_array();
-					if($row['equipment_warranty']==1){
+					$itemName = $this->db->get_where('items',array('id' => $row['name']))->result_array();
+					$subitemName = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					if($row['equip_or_comp']==0){
 						$this->page_data['equip_repair_warranty'] = "Equip Repair Warranty <br>" ;						
 						$this->page_data['repair_equipname'] = $itemName[0]['name']."'s".$subitemName[0]['name']." warranty <br>" ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
+						$this->page_data['comp_id'] = $row['name'];
 						$this->page_data['modelNo'] = $row['product_model_no'];
 						$this->page_data['equip_mfg_id'] = $row['manufacturer'];
                         $manufacturer = $this->db->get_where('manufacturers',array('id' => $row['manufacturer']))->result_array();
@@ -4602,13 +4608,13 @@ elseif ($para1 == 'component_replace')
 						// shows the total amount of days (not divided into years, months and days like above)
 						$this->page_data['working_days'] =  "working " . $interval2->days . " days <br>";
 					}
-					if($row['equipment_warranty']==0){
+					if($row['equip_or_comp']==1){
 						$this->page_data['comp_repair_warranty'] = "Comp Repair Warranty  <br>" ;						
 						$this->page_data['repair_compname'] = $itemName."'s".$subitemName." warranty <br> " ;
 						$this->page_data['comp_name'] = $subitemName[0]['name'];
-						$this->page_data['comp_id'] = $row['subitem_id'];
-						$this->page_data['modelNo'] = $row['product_model_no'];
-						$this->page_data['comp_mfg'] = $row['manufacturer'];
+						$this->page_data['comp_id'] = $row['comp_id'];
+						$this->page_data['modelNo'] = $row['comp_model_no'];
+						$this->page_data['comp_mfg'] = $row['comp_manufacturer'];
 						$this->page_data['comp_supplier'] = $row['supplier'];
 						$this->page_data['warranty_ymd'] = "warranty " . $interval->y . " years, " . $interval->m." months, ".$interval->d." days <br>";
 						$this->page_data['warranty_days'] = "warranty " . $interval->days . " days <br>";
@@ -4667,19 +4673,19 @@ elseif ($para1 == 'component_replace_do')
 					$this->db->where('id',$subasset['asset_id']);
 					$this->db->update('assets',$asset_data);
 
-					$subasset_data = array
-					(
-					'action_status' => "12",
-					'equipment_warranty'=> '1',
-					'product_model_no' => $this->input->post('model_no'),
-					'manufacturer' => $this->input->post('mfg'),
-					'supplier' => $this->input->post('supplier'),
-					'user_type' => "1",
-					'user' => $this->session->userdata('adminid'),
-					'action_date' => time() ,
-					);
-					$this->db->where('id',$subasset['subitem_id']);
-					$this->db->update('sub_assets',$subasset_data);
+					// $subasset_data = array
+					// (
+					// 'action_status' => "12",
+					// 'equipment_warranty'=> '1',
+					// 'product_model_no' => $this->input->post('model_no'),
+					// 'manufacturer' => $this->input->post('mfg'),
+					// 'supplier' => $this->input->post('supplier'),
+					// 'user_type' => "1",
+					// 'user' => $this->session->userdata('adminid'),
+					// 'action_date' => time() ,
+					// );
+					// $this->db->where('id',$subasset['subitem_id']);
+					// $this->db->update('sub_assets',$subasset_data);
 
 					$installing_data = array(
 						'transaction_type' => "12",
@@ -4690,13 +4696,13 @@ elseif ($para1 == 'component_replace_do')
 						$this->db->where('id',$subasset['installed_id']);
 						$this->db->update('installed_inventory',$installing_data);
 					
-					$cs_no = array(
-						'component' => 1,
-						'serial_no'=>$this->input->post('serial_no'),
-						'asset_id'=>$subasset['asset_id'], 
-						'installed_id'=>$subasset['installed_id'],                    
-						 );
-						 $this->db->insert('serial_no',$cs_no);
+					// $cs_no = array(
+					// 	'component' => 1,
+					// 	'serial_no'=>$this->input->post('serial_no'),
+					// 	'asset_id'=>$subasset['asset_id'], 
+					// 	'installed_id'=>$subasset['installed_id'],                    
+					// 	 );
+					// 	 $this->db->insert('serial_no',$cs_no);
 
 					$installed_subitem_data = array(
 						'transaction_type' => 12,
@@ -4733,6 +4739,7 @@ elseif ($para1 == 'component_replace_do')
 							'item_id' => $subasset['item_id'],
 							'subitem_id' => $subasset['subitem_id'],
 							'serial_no' => $this->input->post('serial_no'),
+							'identification_no'=> $subasset['identification_no'],
 							'is_sub_item' => 1,
 							'installed_subitem_id' => $subasset['id'],
 							'asset_id'=> $subasset['asset_id'],
@@ -4772,19 +4779,19 @@ elseif ($para1 == 'component_replace_do')
 					$this->db->where('id',$subasset['asset_id']);
 					$this->db->update('assets',$asset_data);
 
-					$subasset_data = array
-					(
-					'action_status' => "12",
-					'equipment_warranty'=> '1',
-					'product_model_no' => $this->input->post('model_no'),
-					'manufacturer' => $this->input->post('mfg'),
-					'supplier' => $this->input->post('supplier'),
-					'user_type' => "1",
-					'user' => $this->session->userdata('adminid'),
-					'action_date' => time() ,
-					);
-					$this->db->where('id',$subasset['subitem_id']);
-					$this->db->update('sub_assets',$subasset_data);
+					// $subasset_data = array
+					// (
+					// 'action_status' => "12",
+					// 'equipment_warranty'=> '1',
+					// 'product_model_no' => $this->input->post('model_no'),
+					// 'manufacturer' => $this->input->post('mfg'),
+					// 'supplier' => $this->input->post('supplier'),
+					// 'user_type' => "1",
+					// 'user' => $this->session->userdata('adminid'),
+					// 'action_date' => time() ,
+					// );
+					// $this->db->where('id',$subasset['subitem_id']);
+					// $this->db->update('sub_assets',$subasset_data);
 
 					$installing_data = array(
 						'transaction_type' => "12",
@@ -4795,13 +4802,13 @@ elseif ($para1 == 'component_replace_do')
 						$this->db->where('id',$subasset['installed_id']);
 						$this->db->update('installed_inventory',$installing_data);
 					
-					$cs_no = array(
-						'component' => 1,
-						'serial_no'=>$this->input->post('serial_no'),
-						'asset_id'=>$subasset['asset_id'], 
-						'installed_id'=>$subasset['installed_id'],                    
-						 );
-						 $this->db->insert('serial_no',$cs_no);
+					// $cs_no = array(
+					// 	'component' => 1,
+					// 	'serial_no'=>$this->input->post('serial_no'),
+					// 	'asset_id'=>$subasset['asset_id'], 
+					// 	'installed_id'=>$subasset['installed_id'],                    
+					// 	 );
+					// 	 $this->db->insert('serial_no',$cs_no);
 
 					$installed_subitem_data = array(
 						'transaction_type' => 12,
@@ -4838,6 +4845,7 @@ elseif ($para1 == 'component_replace_do')
 							'item_id' => $subasset['item_id'],
 							'subitem_id' => $subasset['subitem_id'],
 							'serial_no' => $this->input->post('serial_no'),
+							'identification_no' => $subasset['identification_no'],
 							'is_sub_item' => 1,
 							'installed_subitem_id' => $subasset['id'],
 							'asset_id'=> $subasset['asset_id'],
@@ -4902,19 +4910,19 @@ elseif ($para1 == 'component_replace_do')
 					$this->db->where('id',$subasset['asset_id']);
 					$this->db->update('assets',$asset_data);
 
-					$subasset_data = array
-					(
-					'action_status' => "12",
-					'equipment_warranty'=> '0',
-					'product_model_no' => $this->input->post('model_no'),
-					'manufacturer' => $this->input->post('mfg'),
-					'supplier' => $this->input->post('supplier'),
-					'user_type' => "1",
-					'user' => $this->session->userdata('adminid'),
-					'action_date' => time() ,
-					);
-					$this->db->where('id',$subasset['subitem_id']);
-					$this->db->update('sub_assets',$subasset_data);
+					// $subasset_data = array
+					// (
+					// 'action_status' => "12",
+					// 'equipment_warranty'=> '0',
+					// 'product_model_no' => $this->input->post('model_no'),
+					// 'manufacturer' => $this->input->post('mfg'),
+					// 'supplier' => $this->input->post('supplier'),
+					// 'user_type' => "1",
+					// 'user' => $this->session->userdata('adminid'),
+					// 'action_date' => time() ,
+					// );
+					// $this->db->where('id',$subasset['subitem_id']);
+					// $this->db->update('sub_assets',$subasset_data);
 
 					$installing_data = array(
 						'transaction_type' => "12",
@@ -4925,13 +4933,13 @@ elseif ($para1 == 'component_replace_do')
 						$this->db->where('id',$subasset['installed_id']);
 						$this->db->update('installed_inventory',$installing_data);
 						
-					$cs_no = array(
-						'component' => 1,
-						'serial_no'=>$this->input->post('serial_no'),
-						'asset_id'=>$subasset['asset_id'], 
-						'installed_id'=>$subasset['installed_id'],                    
-						 );
-						 $this->db->insert('serial_no',$cs_no);
+					// $cs_no = array(
+					// 	'component' => 1,
+					// 	'serial_no'=>$this->input->post('serial_no'),
+					// 	'asset_id'=>$subasset['asset_id'], 
+					// 	'installed_id'=>$subasset['installed_id'],                    
+					// 	 );
+					// 	 $this->db->insert('serial_no',$cs_no);
 
 					$installed_subitem_data = array(
 						'transaction_type' => 12,
@@ -4975,6 +4983,7 @@ elseif ($para1 == 'component_replace_do')
 							'item_id' => $subasset['item_id'],
 							'subitem_id' => $subasset['subitem_id'],
 							'serial_no'=>$this->input->post('serial_no'),
+							'identification_no'=>$subasset['identification_no'],
 							'is_sub_item' => 1,
 							'installed_subitem_id' => $subasset['id'],
 							'asset_id'=> $subasset['asset_id'],
@@ -5004,13 +5013,13 @@ elseif ($para1 == 'component_replace_do')
 /** component Repair Start */
 elseif ($para1 == 'component_repair')
 	{
-		echo "inside component Repair"; exit;
+		// echo "inside component Repair"; exit;
 			$this->page_data['repairs'] = explode(',', $_POST['asset']);
 			$repairs = $this->page_data['repairs'];
 			$data = array();
 			foreach($repairs as $repair)
 			{
-				$data[] = $this->db->get_where('installed_inventory',array('id' => $repair))->result_array();
+				$data[] = $this->db->get_where('installed_subitems',array('id' => $repair))->result_array();
 			}
 		 	// echo "<pre>"; print_r($data); exit;
 			$data2 = array();
@@ -5024,6 +5033,10 @@ elseif ($para1 == 'component_repair')
 					// {
 					// 	echo "Checked Out item cannot be repair."; exit;
 					// }
+					if($row[0]['transaction_type'] == "13")
+					{
+						echo "Selected comp already in repairing mode."; exit;
+					}
 					if($row[0]['transaction_type'] == "4")
 					{
 						echo "Selected item already in repairing mode."; exit;
@@ -5040,11 +5053,11 @@ elseif ($para1 == 'component_repair')
 			$data3 = array();
 		 foreach($repairs as $repair)
 		 {
-			 $installing_names = $this->db->get_where('installed_inventory',array('id' => $repair))->result_array();
-			 $this->db->select('installed_inventory.name AS temp_id,items.*');
-			 $this->db->from('installed_inventory');
-			 $this->db->join('items','installed_inventory.name = items.id');
-			 $this->db->where('installed_inventory.id',$repair);
+			 $installing_names = $this->db->get_where('installed_subitems',array('id' => $repair))->result_array();
+			 $this->db->select('installed_subitems.subitem_id AS temp_id,sub_items.*');
+			 $this->db->from('installed_subitems');
+			 $this->db->join('sub_items','installed_subitems.subitem_id = sub_items.id');
+			 $this->db->where('installed_subitems.id',$repair);
 			 $query=$this->db->get();
 			 $data3[]= $query->result_array();
 			 $this->page_data['data'] = $data3; 		
@@ -5052,7 +5065,7 @@ elseif ($para1 == 'component_repair')
 		 
 		 foreach($repairs as $repair)
 		 {
-			 $installed_location = $this->db->get_where('installed_inventory',array('id' => $repair))->result_array();
+			 $installed_location = $this->db->get_where('installed_subitems',array('id' => $repair))->result_array();
 			 $locationNames = $this->db->get_where('locations',array('id' => $installed_location[0]['location']))->result_array();
 			 $siteNames = $this->db->get_where('sites',array('id' => $locationNames[0]['site']))->result_array();			 
 			 $this->page_data['sites'] = $siteNames;
@@ -5060,12 +5073,12 @@ elseif ($para1 == 'component_repair')
 		 }
 			$this->page_data['data1'] = $data;
 			$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
-			$this->load->view('back/inventory/start_repair',$this->page_data);	
+			$this->load->view('back/inventory/repair_component',$this->page_data);	
  }
 
  elseif ($para1 == 'component_repair_do')
  {
-	 echo "inside Component Repair Do"; exit;
+	//  echo "inside Component Repair Do"; exit;
  $this->load->library('form_validation');
  $this->form_validation->set_rules('item_site','Item Site','required|trim');
  $this->form_validation->set_rules('item_location','Item Location','required|trim');
@@ -5091,38 +5104,38 @@ elseif ($para1 == 'component_repair')
 			foreach ($install_ids as $id){
 			$date = date("Y-m-d H:i:s");
 
-			$install = $this->db->get_where('installed_inventory',array('id' => $id))->result_array();
+			$install = $this->db->get_where('installed_subitems',array('id' => $id))->result_array();
 			$ast_mfg = $this->db->get_where('assets',array('id' => $install[0]['asset_id']))->result_array();
 
-			$assets_data = array('action_status'=>'4','user_type' => "1",'checkin_by' => $this->session->userdata('adminid'),'site'=> $this->input->post('item_site'));
+			$assets_data = array('action_status'=>'13','user_type' => "1",'checkin_by' => $this->session->userdata('adminid'),'site'=> $this->input->post('item_site'));
 			$this->db->where('id',$install[0]['asset_id']);
 			$this->db->update('assets',$assets_data);
 			
 			$installing_data = array(
-				'transaction_type' => "4",
+				'transaction_type' => "13",
 				'user_type' => "1",
 				'user_name' => $this->session->userdata('adminid'),
 				'action_date' => $date,
 				);
-				$this->db->where('id',$id);
+				$this->db->where('id',$install[0]['installed_id']);
 			$this->db->update('installed_inventory',$installing_data);
 			
-			if($install[0]['have_sub_items']==1){	
-				$subitems = $this->db->get_where('installed_subitems',array('installed_id' => $install[0]['id']))->result_array();
+			if($install){	
+				$subitems = $this->db->get_where('installed_subitems',array('id' => $install[0]['id']))->result_array();
 				foreach($subitems as $subasset){
 
-					$subAsset_data = array
-					(
-					'action_status' => "4",
-					'user_type' => "1",
-					'user' => $this->session->userdata('adminid'),
-					'action_date' => $date ,
-					);
-					$this->db->where('installed_id',$id);
-					$this->db->update('sub_assets',$subAsset_data);
+					// $subAsset_data = array
+					// (
+					// 'action_status' => "4",
+					// 'user_type' => "1",
+					// 'user' => $this->session->userdata('adminid'),
+					// 'action_date' => $date ,
+					// );
+					// $this->db->where('installed_id',$id);
+					// $this->db->update('sub_assets',$subAsset_data);
 
 					$installing_subitem_data = array(
-						'transaction_type' => 4,
+						'transaction_type' => 13,
 						'company_type'=>'3',
 						'company_name'=>$ast_mfg[0]['manufacturer'],
 						'company_address'=>'see manufacturer address',
@@ -5141,14 +5154,15 @@ elseif ($para1 == 'component_repair')
 						$this->db->update('installed_subitems',$installing_subitem_data);
 											
 						$data = array(
-							'asset_id' => $install[0]['asset_id'],
-							'installed_id' => $id,
+							'asset_id' => $subasset['asset_id'],
+							'installed_id' => $subasset['installed_id'],
 							'installed_subitem_id' => $subasset['id'],
 							'item_id' => $subasset['item_id'],
 							'subitem_id' => $subasset['subitem_id'],
 							'serial_no'=>$subasset['serial_no'],
+							'identification_no'=>$subasset['identification_no'],
 							'is_sub_item'=>1,
-							'transaction_type' => 4,
+							'transaction_type' => 13,
 							'site' => $this->input->post('item_site'),
 							'location' => $this->input->post('item_location'),
 							'repair_type' => $this->input->post('repair_type'),
@@ -5157,7 +5171,7 @@ elseif ($para1 == 'component_repair')
 							'added_by' => $this->session->userdata('adminid'),
 							'action_date' => $date,
 							'organisation_type' => 3,
-							'organisation' => $ast_mfg[0]['manufacturer'],
+							'organisation' => $ast_mfg[0]['comp_manufacturer'],
 							'organisation_address' => 'see manufacturer address',
 							'repairing_person_type' => $this->input->post('tsp_person_type'),
 							'person' => 'manufacturer focal person does not exist',
@@ -5168,34 +5182,35 @@ elseif ($para1 == 'component_repair')
 							$this->db->insert('asset_transaction',$data);
 				}	
 			 }
-			 if($install[0]['have_sub_items']==0){
+			//  if($install[0]['have_sub_items']==0){
 											
-						$data = array(
-							'asset_id' => $install[0]['asset_id'],
-							'installed_id' => $id,
-							'item_id' => $install[0]['name'],
-							'serial_no'=>$install[0]['serial_no'],
-							'is_sub_item'=>0,
-							'have_sub_items'=>1,
-							'transaction_type' => 4,
-							'site' => $this->input->post('item_site'),
-							'location' => $this->input->post('item_location'),
-							'repair_type' => $this->input->post('repair_type'),
-							'available' => $this->input->post('item_availability'),
-							'user_type' => "1",
-							'added_by' => $this->session->userdata('adminid'),
-							'action_date' => $date,
-							'organisation_type' => 3,
-							'organisation' => $ast_mfg[0]['manufacturer'],
-							'organisation_address' => 'see manufacturer address',
-							'repairing_person_type' => $this->input->post('tsp_person_type'),
-							'person' => 'manufacturer focal person does not exist',
-							'person_contact' => 'not available',
-							'return_date' => $this->input->post('expected_completion'),
-							'action_comments' => $this->input->post('start_repair_reason'),
-							);
-							$this->db->insert('asset_transaction',$data);
-			}
+			// 			$data = array(
+			// 				'asset_id' => $install[0]['asset_id'],
+			// 				'installed_id' => $id,
+			// 				'item_id' => $install[0]['name'],
+			// 				'serial_no'=>$install[0]['serial_no'],
+			// 				'identification_no'=>$install[0]['identification_no'],
+			// 				'is_sub_item'=>0,
+			// 				'have_sub_items'=>1,
+			// 				'transaction_type' => 4,
+			// 				'site' => $this->input->post('item_site'),
+			// 				'location' => $this->input->post('item_location'),
+			// 				'repair_type' => $this->input->post('repair_type'),
+			// 				'available' => $this->input->post('item_availability'),
+			// 				'user_type' => "1",
+			// 				'added_by' => $this->session->userdata('adminid'),
+			// 				'action_date' => $date,
+			// 				'organisation_type' => 3,
+			// 				'organisation' => $ast_mfg[0]['manufacturer'],
+			// 				'organisation_address' => 'see manufacturer address',
+			// 				'repairing_person_type' => $this->input->post('tsp_person_type'),
+			// 				'person' => 'manufacturer focal person does not exist',
+			// 				'person_contact' => 'not available',
+			// 				'return_date' => $this->input->post('expected_completion'),
+			// 				'action_comments' => $this->input->post('start_repair_reason'),
+			// 				);
+			// 				$this->db->insert('asset_transaction',$data);
+			// }
 
 			/** Query to insert Action Noification Table */
 			// $supervisors = $this->db->get('tpsupervisor')->result_array();
@@ -5230,37 +5245,37 @@ elseif ($para1 == 'component_repair')
 				foreach ($install_ids as $id){
 				$date = date("Y-m-d H:i:s");
 
-				$install = $this->db->get_where('installed_inventory',array('id' => $id))->result_array();
+				$install = $this->db->get_where('installed_subitems',array('id' => $id))->result_array();
 
-				$assets_data = array('action_status'=>'4','user_type' => "1",'checkin_by' => $this->session->userdata('adminid'),'site'=> $this->input->post('item_site'));
+				$assets_data = array('action_status'=>'13','user_type' => "1",'checkin_by' => $this->session->userdata('adminid'),'site'=> $this->input->post('item_site'));
 				$this->db->where('id',$install[0]['asset_id']);
 				$this->db->update('assets',$assets_data);
 
 				$installing_data = array(
-					'transaction_type' => "4",
+					'transaction_type' => "13",
 					'user_type' => "1",
 					'user_name' => $this->session->userdata('adminid'),
 					'action_date' => $date,
 					);
-					$this->db->where('id',$id);
+					$this->db->where('id',$install[0]['installed_id']);
 				$this->db->update('installed_inventory',$installing_data);
 				
-				if($install[0]['have_sub_items']==1){	
-					$subitems = $this->db->get_where('installed_subitems',array('installed_id' => $install[0]['id']))->result_array();
+				if($install){	
+					$subitems = $this->db->get_where('installed_subitems',array('id' => $install[0]['id']))->result_array();
 					foreach($subitems as $subasset){
 	
-						$subAsset_data = array
-						(
-						'action_status' => "4",
-						'user_type' => "1",
-						'user' => $this->session->userdata('adminid'),
-						'action_date' => $date ,
-						);
-						$this->db->where('installed_id',$id);
-						$this->db->update('sub_assets',$subAsset_data);
+						// $subAsset_data = array
+						// (
+						// 'action_status' => "4",
+						// 'user_type' => "1",
+						// 'user' => $this->session->userdata('adminid'),
+						// 'action_date' => $date ,
+						// );
+						// $this->db->where('installed_id',$id);
+						// $this->db->update('sub_assets',$subAsset_data);
 	
 						$installing_subitem_data = array(
-							'transaction_type' => 4,
+							'transaction_type' => 13,
 							'company_type'=>'1',
 							'company_name'=>$this->input->post('repairing_tsp'),
 							'company_address'=>$this->input->post('tsp_address'),
@@ -5280,13 +5295,14 @@ elseif ($para1 == 'component_repair')
 												
 							$data = array(
 								'asset_id' => $install[0]['asset_id'],
-								'installed_id' => $id,
+								'installed_id' => $subasset['installed_id'],
 								'installed_subitem_id' => $subasset['id'],
 								'item_id' => $subasset['item_id'],
 								'subitem_id' => $subasset['subitem_id'],
 								'serial_no'=>$subasset['serial_no'],
+								'identification_no'=>$subasset['identification_no'],
 								'is_sub_item'=>1,
-								'transaction_type' => "4",
+								'transaction_type' => "13",
 								'site' => $this->input->post('item_site'),
 								'location' => $this->input->post('item_location'),
 								'repair_type' => $this->input->post('repair_type'),
@@ -5306,34 +5322,35 @@ elseif ($para1 == 'component_repair')
 							 $this->db->insert('asset_transaction',$data);
 					}	
 				 }
-				 if($install[0]['have_sub_items']==0){
+				//  if($install[0]['have_sub_items']==0){
 												
-							$data = array(
-								'asset_id' => $install[0]['asset_id'],
-								'installed_id' => $id,
-								'item_id' => $install[0]['name'],
-								'serial_no'=>$install[0]['serial_no'],
-								'is_sub_item'=>0,
-								'have_sub_items'=>1,
-								'transaction_type' => "4",
-								'site' => $this->input->post('item_site'),
-								'location' => $this->input->post('item_location'),
-								'repair_type' => $this->input->post('repair_type'),
-								'available' => $this->input->post('item_availability'),
-								'user_type' => "1",
-								'added_by' => $this->session->userdata('adminid'),
-								'action_date' => $date,
-								'organisation_type' => 1,
-								'organisation' => $this->input->post('repairing_tsp'),
-								'organisation_address' => $this->input->post('tsp_address'),
-								'repairing_person_type' => $this->input->post('tsp_person_type'),
-								'person' => $this->input->post('tsp_person'),
-								'person_contact' => $this->input->post('tsp_person_contact'),
-								'return_date' => $this->input->post('expected_completion'),
-								'action_comments' => $this->input->post('start_repair_reason'),
-								);
-							 $this->db->insert('asset_transaction',$data);
-				}
+				// 			$data = array(
+				// 				'asset_id' => $install[0]['asset_id'],
+				// 				'installed_id' => $id,
+				// 				'item_id' => $install[0]['name'],
+				// 				'serial_no'=>$install[0]['serial_no'],
+				// 				'identification_no'=>$install[0]['identification_no'],
+				// 				'is_sub_item'=>0,
+				// 				'have_sub_items'=>1,
+				// 				'transaction_type' => "4",
+				// 				'site' => $this->input->post('item_site'),
+				// 				'location' => $this->input->post('item_location'),
+				// 				'repair_type' => $this->input->post('repair_type'),
+				// 				'available' => $this->input->post('item_availability'),
+				// 				'user_type' => "1",
+				// 				'added_by' => $this->session->userdata('adminid'),
+				// 				'action_date' => $date,
+				// 				'organisation_type' => 1,
+				// 				'organisation' => $this->input->post('repairing_tsp'),
+				// 				'organisation_address' => $this->input->post('tsp_address'),
+				// 				'repairing_person_type' => $this->input->post('tsp_person_type'),
+				// 				'person' => $this->input->post('tsp_person'),
+				// 				'person_contact' => $this->input->post('tsp_person_contact'),
+				// 				'return_date' => $this->input->post('expected_completion'),
+				// 				'action_comments' => $this->input->post('start_repair_reason'),
+				// 				);
+				// 			 $this->db->insert('asset_transaction',$data);
+				// }
 
 
 				/** Query to insert Action Noification Table */
@@ -5364,37 +5381,37 @@ elseif ($para1 == 'component_repair')
 				foreach ($install_ids as $id){
 				$date = date("Y-m-d H:i:s");
 
-				$install = $this->db->get_where('installed_inventory',array('id' => $id))->result_array();
+				$install = $this->db->get_where('installed_subitems',array('id' => $id))->result_array();
 
-				$assets_data = array('action_status'=>'4','user_type' => "1",'checkin_by' => $this->session->userdata('adminid'),'site'=> $this->input->post('item_site'));
+				$assets_data = array('action_status'=>'13','user_type' => "1",'checkin_by' => $this->session->userdata('adminid'),'site'=> $this->input->post('item_site'));
 				$this->db->where('id',$install[0]['asset_id']);
 				$this->db->update('assets',$assets_data);
 
 				$installing_data = array(
-					'transaction_type' => "4",
+					'transaction_type' => "13",
 					'user_type' => "1",
 					'user_name' => $this->session->userdata('adminid'),
 					'action_date' => $date,
 					);
-					$this->db->where('id',$id);
+					$this->db->where('id',$install[0]['installed_id']);
 				$this->db->update('installed_inventory',$installing_data);
 				
-				if($install[0]['have_sub_items']==1){	
-					$subitems = $this->db->get_where('installed_subitems',array('installed_id' => $install[0]['id']))->result_array();
+				if($install){	
+					$subitems = $this->db->get_where('installed_subitems',array('id' => $install[0]['id']))->result_array();
 					foreach($subitems as $subasset){
 	
-						$subAsset_data = array
-						(
-						'action_status' => "4",
-						'user_type' => "1",
-						'user' => $this->session->userdata('adminid'),
-						'action_date' => $date ,
-						);
-						$this->db->where('installed_id',$id);
-						$this->db->update('sub_assets',$subAsset_data);
+						// $subAsset_data = array
+						// (
+						// 'action_status' => "4",
+						// 'user_type' => "1",
+						// 'user' => $this->session->userdata('adminid'),
+						// 'action_date' => $date ,
+						// );
+						// $this->db->where('installed_id',$id);
+						// $this->db->update('sub_assets',$subAsset_data);
 	
 						$installing_subitem_data = array(
-							'transaction_type' => 4,
+							'transaction_type' => 13,
 							'company_type'=>'2',
 							'company_name'=>$this->input->post('outer_company_name'),
 							'company_address'=>$this->input->post('outer_company_address'),
@@ -5413,13 +5430,14 @@ elseif ($para1 == 'component_repair')
 												
 							$data = array(
 								'asset_id' => $install[0]['asset_id'],
-								'installed_id' => $id,
+								'installed_id' => $subasset['install_id'],
 								'installed_subitem_id' => $subasset['id'],
 								'item_id' => $subasset['item_id'],
 								'subitem_id' => $subasset['subitem_id'],
 								'serial_no'=>$subasset['serial_no'],
+								'identification_no'=>$subasset['identification_no'],
 								'is_sub_item'=>1,
-								'transaction_type' => "4",
+								'transaction_type' => "13",
 								'site' => $this->input->post('item_site'),
 								'location' => $this->input->post('item_location'),
 								'repair_type' => $this->input->post('repair_type'),
@@ -5438,32 +5456,33 @@ elseif ($para1 == 'component_repair')
 							$this->db->insert('asset_transaction',$data);
 					}	
 				 }
-				 if($install[0]['have_sub_items']==0){
-					$data = array(
-						'asset_id' => $install[0]['asset_id'],
-						'installed_id' => $id,
-						'item_id' => $install[0]['name'],
-						'serial_no'=>$install[0]['serial_no'],
-						'is_sub_item'=>0,
-						'have_sub_items'=>1,
-						'transaction_type' => "4",
-						'site' => $this->input->post('item_site'),
-						'location' => $this->input->post('item_location'),
-						'repair_type' => $this->input->post('repair_type'),
-						'available' => $this->input->post('item_availability'),
-						'user_type' => "1",
-						'added_by' => $this->session->userdata('adminid'),
-						'action_date' => $date,
-						'organisation_type' => 2,
-						'organisation' => $this->input->post('outer_company_name'),
-						'organisation_address' => $this->input->post('outer_company_address'),
-						'person' => $this->input->post('outsider_name'),
-						'person_contact' => $this->input->post('outsider_contact'),
-						'return_date' => $this->input->post('expected_completion'),
-						'action_comments' => $this->input->post('start_repair_reason'),
-						);
-					$this->db->insert('asset_transaction',$data);
-				}
+				//  if($install[0]['have_sub_items']==0){
+				// 	$data = array(
+				// 		'asset_id' => $install[0]['asset_id'],
+				// 		'installed_id' => $id,
+				// 		'item_id' => $install[0]['name'],
+				// 		'serial_no'=>$install[0]['serial_no'],
+				// 		'identification_no'=>$install[0]['identification_no'],
+				// 		'is_sub_item'=>0,
+				// 		'have_sub_items'=>1,
+				// 		'transaction_type' => "4",
+				// 		'site' => $this->input->post('item_site'),
+				// 		'location' => $this->input->post('item_location'),
+				// 		'repair_type' => $this->input->post('repair_type'),
+				// 		'available' => $this->input->post('item_availability'),
+				// 		'user_type' => "1",
+				// 		'added_by' => $this->session->userdata('adminid'),
+				// 		'action_date' => $date,
+				// 		'organisation_type' => 2,
+				// 		'organisation' => $this->input->post('outer_company_name'),
+				// 		'organisation_address' => $this->input->post('outer_company_address'),
+				// 		'person' => $this->input->post('outsider_name'),
+				// 		'person_contact' => $this->input->post('outsider_contact'),
+				// 		'return_date' => $this->input->post('expected_completion'),
+				// 		'action_comments' => $this->input->post('start_repair_reason'),
+				// 		);
+				// 	$this->db->insert('asset_transaction',$data);
+				// }
 
 				/** Query to insert Action Noification in Table */
 				// $supervisors = $this->db->get('tpsupervisor')->result_array();
@@ -5599,16 +5618,6 @@ elseif ($para1 == 'component_repair')
 				$subitems = $this->db->get_where('installed_subitems',array('installed_id' => $install[0]['id']))->result_array();
 				foreach($subitems as $subasset){
 
-					$subAsset_data = array
-					(
-					'action_status' => "4",
-					'user_type' => "1",
-					'user' => $this->session->userdata('adminid'),
-					'action_date' => $date ,
-					);
-					$this->db->where('installed_id',$id);
-					$this->db->update('sub_assets',$subAsset_data);
-
 					$installing_subitem_data = array(
 						'transaction_type' => 4,
 						'company_type'=>'3',
@@ -5635,6 +5644,7 @@ elseif ($para1 == 'component_repair')
 							'item_id' => $subasset['item_id'],
 							'subitem_id' => $subasset['subitem_id'],
 							'serial_no'=>$subasset['serial_no'],
+							'identification_no'=>$subasset['identification_no'],
 							'is_sub_item'=>1,
 							'transaction_type' => 4,
 							'site' => $this->input->post('item_site'),
@@ -5663,8 +5673,9 @@ elseif ($para1 == 'component_repair')
 							'installed_id' => $id,
 							'item_id' => $install[0]['name'],
 							'serial_no'=>$install[0]['serial_no'],
+							'identification_no'=>$install[0]['identification_no'],
 							'is_sub_item'=>0,
-							'have_sub_items'=>1,
+							'have_sub_items'=>0,
 							'transaction_type' => 4,
 							'site' => $this->input->post('item_site'),
 							'location' => $this->input->post('item_location'),
@@ -5737,16 +5748,6 @@ elseif ($para1 == 'component_repair')
 					$subitems = $this->db->get_where('installed_subitems',array('installed_id' => $install[0]['id']))->result_array();
 					foreach($subitems as $subasset){
 	
-						$subAsset_data = array
-						(
-						'action_status' => "4",
-						'user_type' => "1",
-						'user' => $this->session->userdata('adminid'),
-						'action_date' => $date ,
-						);
-						$this->db->where('installed_id',$id);
-						$this->db->update('sub_assets',$subAsset_data);
-	
 						$installing_subitem_data = array(
 							'transaction_type' => 4,
 							'company_type'=>'1',
@@ -5773,6 +5774,7 @@ elseif ($para1 == 'component_repair')
 								'item_id' => $subasset['item_id'],
 								'subitem_id' => $subasset['subitem_id'],
 								'serial_no'=>$subasset['serial_no'],
+								'identification_no'=>$subasset['identification_no'],
 								'is_sub_item'=>1,
 								'transaction_type' => "4",
 								'site' => $this->input->post('item_site'),
@@ -5801,8 +5803,9 @@ elseif ($para1 == 'component_repair')
 								'installed_id' => $id,
 								'item_id' => $install[0]['name'],
 								'serial_no'=>$install[0]['serial_no'],
+								'identification_no'=>$install[0]['identification_no'],
 								'is_sub_item'=>0,
-								'have_sub_items'=>1,
+								'have_sub_items'=>0,
 								'transaction_type' => "4",
 								'site' => $this->input->post('item_site'),
 								'location' => $this->input->post('item_location'),
@@ -5822,7 +5825,6 @@ elseif ($para1 == 'component_repair')
 								);
 							 $this->db->insert('asset_transaction',$data);
 				}
-
 
 				/** Query to insert Action Noification Table */
 				// $supervisors = $this->db->get('tpsupervisor')->result_array();
@@ -5871,15 +5873,15 @@ elseif ($para1 == 'component_repair')
 					$subitems = $this->db->get_where('installed_subitems',array('installed_id' => $install[0]['id']))->result_array();
 					foreach($subitems as $subasset){
 	
-						$subAsset_data = array
-						(
-						'action_status' => "4",
-						'user_type' => "1",
-						'user' => $this->session->userdata('adminid'),
-						'action_date' => $date ,
-						);
-						$this->db->where('installed_id',$id);
-						$this->db->update('sub_assets',$subAsset_data);
+						// $subAsset_data = array
+						// (
+						// 'action_status' => "4",
+						// 'user_type' => "1",
+						// 'user' => $this->session->userdata('adminid'),
+						// 'action_date' => $date ,
+						// );
+						// $this->db->where('installed_id',$id);
+						// $this->db->update('sub_assets',$subAsset_data);
 	
 						$installing_subitem_data = array(
 							'transaction_type' => 4,
@@ -5906,6 +5908,7 @@ elseif ($para1 == 'component_repair')
 								'item_id' => $subasset['item_id'],
 								'subitem_id' => $subasset['subitem_id'],
 								'serial_no'=>$subasset['serial_no'],
+								'identification_no'=>$subasset['identification_no'],
 								'is_sub_item'=>1,
 								'transaction_type' => "4",
 								'site' => $this->input->post('item_site'),
@@ -5932,8 +5935,9 @@ elseif ($para1 == 'component_repair')
 						'installed_id' => $id,
 						'item_id' => $install[0]['name'],
 						'serial_no'=>$install[0]['serial_no'],
+						'identification_no'=>$install[0]['identification_no'],
 						'is_sub_item'=>0,
-						'have_sub_items'=>1,
+						'have_sub_items'=>0,
 						'transaction_type' => "4",
 						'site' => $this->input->post('item_site'),
 						'location' => $this->input->post('item_location'),
@@ -5983,7 +5987,6 @@ elseif ($para1 == 'end_repair')
 	{
 			$this->page_data['end_repairs'] = explode(',', $_POST['asset']);
 			$end_repairs = $this->page_data['end_repairs'];
-			
 			$data = array();
 			$asset_transaction = array();
 			$quantity = 0;
@@ -5992,9 +5995,8 @@ elseif ($para1 == 'end_repair')
 			{
 				$quantity++;
 				$data[] = $this->db->get_where('installed_inventory',array('id' => $repair))->result_array();
-				$locations[] = $this->db->get_where('asset_transaction',array( 'asset_id'=> $repair , 'transaction_type' => "4" , 'site' => $this->session->userdata('site')))->result_array();	
+				$locations[] = $this->db->get_where('asset_transaction',array( 'installed_id'=> $repair , 'transaction_type' => "4" , 'site' => $this->session->userdata('site')))->result_array();	
 			} 
-
 
 			$data2 = array();
 			foreach($data as $row)
@@ -6058,7 +6060,6 @@ elseif ($para1 == 'end_repair')
 
  elseif ($para1 == 'end_repair_do')
  {
-	 
  $this->load->library('form_validation');
  $this->form_validation->set_rules('repair_completion','Repair Completed Date','required|trim');
  $this->form_validation->set_rules('end_repair_comments','Repairing Comments ','required|trim');
@@ -6076,7 +6077,7 @@ elseif ($para1 == 'end_repair')
 			foreach ($asset_ids as $id)
 			{
 				$repairing_start = $this->db->select('*')->order_by('id','desc')->get_where('asset_transaction',array('installed_id' => $id,'transaction_type'=> 4))->result_array();
-			$date = date("Y-m-d H:i:s");
+			    $date = date("Y-m-d H:i:s");
 
 			$installing_data = array(
 				'transaction_type' => "9",
@@ -6086,26 +6087,89 @@ elseif ($para1 == 'end_repair')
 				);
 				$this->db->where('id',$id);
 		 $this->db->update('installed_inventory',$installing_data);
+		 if($repairing_start[0]['have_sub_items']==1){	
+			$subitems = $this->db->get_where('installed_subitems',array('installed_id' => $repairing_start[0]['installed_id']))->result_array();
+			foreach($subitems as $subasset){
+				$installing_subitem_data = array(
+					'transaction_type' => 9,
+					'company_type'=>'2',
+					'company_name'=>$this->input->post('outer_company_name'),
+					'company_address'=>$this->input->post('outer_company_address'),
+					'person_name'=>$this->input->post('outsider_name'),
+					'person_contact'=>$this->input->post('outsider_contact'),
+					'faulty_time_omc' => '',
+					'faulty_date' => '',
+					'est_cost' => '',
+					'comments' => $this->input->post('start_repair_reason'),
+					'action_by_user_type' => "1",
+					'action_by_user' => $this->session->userdata('adminid'),
+					'action_date' => $date,
+					);
+					$this->db->where('id',$subasset['id']);
+					$this->db->update('installed_subitems',$installing_subitem_data);
+
+					$this->db->where('identification_no',$subasset['identification_no']);
+					$this->db->delete('faulty_equipment_list');
+										
+					$data = array(
+						'asset_id' => $install[0]['asset_id'],
+						'installed_id' => $id,
+						'installed_subitem_id' => $subasset['id'],
+						'item_id' => $subasset['item_id'],
+						'subitem_id' => $subasset['subitem_id'],
+						'serial_no'=>$subasset['serial_no'],
+						'identification_no'=>$subasset['identification_no'],
+						'is_sub_item'=>1,
+						'transaction_type' => "4",
+						'site' => $this->input->post('item_site'),
+						'location' => $this->input->post('item_location'),
+						'repair_type' => $this->input->post('repair_type'),
+						'available' => $this->input->post('item_availability'),
+						'user_type' => "1",
+						'added_by' => $this->session->userdata('adminid'),
+						'action_date' => $date,
+						'organisation_type' => 2,
+						'organisation' => $this->input->post('outer_company_name'),
+						'organisation_address' => $this->input->post('outer_company_address'),
+						'person' => $this->input->post('outsider_name'),
+						'person_contact' => $this->input->post('outsider_contact'),
+						'return_date' => $this->input->post('expected_completion'),
+						'action_comments' => $this->input->post('start_repair_reason'),
+						);
+					$this->db->insert('asset_transaction',$data);
+			}	
+		 }
+		 if($repairing_start[0]['have_sub_items']==0){
+
+			$this->db->where('identification_no',$repairing_start[0]['identification_no']);
+			$this->db->delete('faulty_equipment_list');
 
 			$data = array(
-			'installed_id' => $id,
-			'asset_id'=> $repairing_start[0]['asset_id'],
-			'transaction_type' => "9",
-			'site' => $repairing_start[0]['site'],
-			'location' => $repairing_start[0]['location'],
-			'unit_repairing_cost' => $unit_repair_cost,
-			'organisation_type' => $repairing_start[0]['organisation_type'],
-			'organisation' => $repairing_start[0]['organisation'],
-			'organisation_address' => $repairing_start[0]['organisation_address'],
-			'repairing_person_type' => $repairing_start[0]['repairing_person_type'],
-			'person' => $repairing_start[0]['person'],
-			'person_contact' => $repairing_start[0]['person_contact'],
-			'user_type' => "1",
-			'added_by' => $this->session->userdata('adminid'),
-			'action_date' => $date,
-			'return_date' => $this->input->post('repair_completion'),
-			'action_comments' => $this->input->post('end_repair_comments'),
-			);
+				'installed_id' => $id,
+				'asset_id'=> $repairing_start[0]['asset_id'],
+				'item_id' => $repairing_start[0]['item_id'],
+				'installed_id' => $repairing_start[0]['installed_id'],
+				'serial_no'=>$repairing_start[0]['serial_no'],
+				'identification_no'=>$repairing_start[0]['identification_no'],
+				'transaction_type' => "9",
+				'site' => $repairing_start[0]['site'],
+				'location' => $repairing_start[0]['location'],
+				'unit_repairing_cost' => $unit_repair_cost,
+				'organisation_type' => $repairing_start[0]['organisation_type'],
+				'organisation' => $repairing_start[0]['organisation'],
+				'organisation_address' => $repairing_start[0]['organisation_address'],
+				'repairing_person_type' => $repairing_start[0]['repairing_person_type'],
+				'person' => $repairing_start[0]['person'],
+				'person_contact' => $repairing_start[0]['person_contact'],
+				'user_type' => "1",
+				'added_by' => $this->session->userdata('adminid'),
+				'action_date' => $date,
+				'return_date' => $this->input->post('repair_completion'),
+				'action_comments' => $this->input->post('end_repair_comments'),
+				);
+		}
+
+			
 			$counter++;
 			// echo "<pre>"; print_r($data); exit;  
 				  
@@ -6178,83 +6242,118 @@ elseif ($para1 == 'retire')
 
 
 
-  elseif ($para1 == 'retire_do')
- {
- $this->load->library('form_validation');
- $this->form_validation->set_rules('retire_type','Retire Type','required|trim');
- $this->form_validation->set_rules('site_id','Site','required|trim');
- $this->form_validation->set_rules('retire_date','Retire Date','required|trim');
- $this->form_validation->set_rules('retire_reason','Retire Reason ','required|trim');
- 	
- if($this->form_validation->run() == TRUE)
- {
-	 if($this->session->userdata('adminid'))
-	 {
-				$this->page_data['assets_ids'] = explode(',', $_POST['asset_id']);
-				$install_ids = $this->page_data['assets_ids'];
+    elseif ($para1 == 'retire_do')
+		{
+		$this->load->library('form_validation');
+		$this->form_validation->set_rules('retire_type','Retire Type','required|trim');
+		$this->form_validation->set_rules('site_id','Site','required|trim');
+		$this->form_validation->set_rules('retire_date','Retire Date','required|trim');
+		$this->form_validation->set_rules('retire_reason','Retire Reason ','required|trim');
 			
-				foreach ($install_ids as $id){
-					$installed_inventory = $this->db->get_where('installed_inventory',array('id' => $id))->result_array();
-				    
-					$date = date("Y-m-d H:i:s");
+		if($this->form_validation->run() == TRUE)
+		{
+			if($this->session->userdata('adminid'))
+			{
+						$this->page_data['assets_ids'] = explode(',', $_POST['asset_id']);
+						$install_ids = $this->page_data['assets_ids'];
+					
+						foreach ($install_ids as $id){
+							$installed_inventory = $this->db->get_where('installed_inventory',array('id' => $id))->result_array();
+							
+							$date = date("Y-m-d H:i:s");
+							$installing_data = array(
+								'transaction_type' => "6",
+								'user_type' => "1",
+								'user_name' => $this->session->userdata('adminid'),
+								'action_date' => $date,
+								);
+								$this->db->where('id',$id);
+						$this->db->update('installed_inventory',$installing_data);
 
-					$installing_data = array(
-						'transaction_type' => "6",
-						'user_type' => "1",
-						'user_name' => $this->session->userdata('adminid'),
-						'action_date' => $date,
-						);
-						$this->db->where('id',$id);
-				 $this->db->update('installed_inventory',$installing_data);
+						$assets_data = array('action_status'=>'6','user_type' => "1",'checkin_by' => $this->session->userdata('adminid'),'site'=> $this->input->post('site_id'));
+					$this->db->where('id',$installed_inventory[0]['asset_id']);
+					$this->db->update('assets',$assets_data);
 
+                            if($installed_inventory[0]['have_sub_items']==1){	
+								$subitems = $this->db->get_where('installed_subitems',array('installed_id' => $installed_inventory[0]['id']))->result_array();
+								foreach($subitems as $subasset){
+									$installing_subitem_data = array(
+										'transaction_type' => 6,
+										'user_type' => "1",
+										'user_name' => $this->session->userdata('adminid'),
+										'action_date' => $date,
+										);
+										$this->db->where('id',$subasset['id']);
+										$this->db->update('installed_subitems',$installing_subitem_data);
+					
+										$this->db->where('identification_no',$subasset['identification_no']);
+										$this->db->delete('faulty_equipment_list');
+															
+										$data = array(
+											'asset_id' => $install[0]['asset_id'],
+											'installed_id' => $id,
+											'installed_subitem_id' => $subasset['id'],
+											'item_id' => $subasset['item_id'],
+											'subitem_id' => $subasset['subitem_id'],
+											'serial_no'=>$subasset['serial_no'],
+											'identification_no'=>$subasset['identification_no'],
+											'is_sub_item'=>1,
+											'transaction_type' => "6",
+											'action_date' => $date,
+											'retire_type' => $this->input->post('retire_type'),
+											'site' => $this->input->post('site_id'),
+											'retire_date' => $this->input->post('retire_date'),
+											'action_comments' => $this->input->post('retire_reason')
+											);
+										$this->db->insert('asset_transaction',$data);
+								}	
+							 }
+							 if($installed_inventory[0]['have_sub_items']==0){
 
-				$data = array(
-					'asset_id' => $installed_inventory[0]['asset_id'],
-				'installed_id' => $id,
-				'transaction_type' => "6",
-				'user_type' => "1",
-				'added_by' => $this->session->userdata('adminid'),
-				'action_date' => $date,
-				'retire_type' => $this->input->post('retire_type'),
-				'retire_type' => $installed_inventory[0]['asset_id'],
-				'site' => $this->input->post('site_id'),
-				'retire_date' => $this->input->post('retire_date'),
-				'action_comments' => $this->input->post('retire_reason'),
-				);
-				
-			//echo "<pre>"; print_r($data); exit;
-			$assets_data = array('action_status'=>'6','user_type' => "1",'checkin_by' => $this->session->userdata('adminid'),'site'=> $this->input->post('site_id'));
-			 $this->db->where('id',$installed_inventory[0]['asset_id']);
-			 $this->db->update('assets',$assets_data);
-			 $this->db->insert('asset_transaction',$data);
-				/** Query to insert Action Noification in Table */
-				$supervisors = $this->db->get('tpsupervisor')->result_array();
-				foreach($supervisors as $sp_id)
-				{
-				$data11 = array(
-					'for_user_id' => $sp_id['id'],
-					'for_user_type' => 1,
-					'user_id' => $this->session->userdata('adminid'),
-					'user_type' => 3,
-					'ref_id' 	=> $id,
-					'alert_type'  => 1,
-					'date' => date("Y-m-d H:i:s"),
-					'is_read' => 0,
-					'notification_msg' => 'An Asset retired by Admin.'                
-					 );
-					$this->db->insert('notifications', $data11);
-				} 
-				/** Query to insert Action Noification in Table */
-			 }
-		 echo json_encode(array('response' => true, 'message' =>'Retired.','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
-			
-	 }
-	}
-}
-
-	
-
-
+								$this->db->where('identification_no',$installed_inventory[0]['identification_no']);
+								$this->db->delete('faulty_equipment_list');
+					
+								$data = array(
+									'installed_id' => $id,
+									'asset_id'=> $installed_inventory[0]['asset_id'],
+									'item_id' => $installed_inventory[0]['name'],
+									'serial_no'=>$installed_inventory[0]['serial_no'],
+									'identification_no'=>$installed_inventory[0]['identification_no'],
+									'transaction_type' => "6",
+									'retire_type' => $this->input->post('retire_type'),
+									'site' => $this->input->post('site_id'),
+									'retire_date' => $this->input->post('retire_date'),
+									'user_type' => "1",
+									'added_by' => $this->session->userdata('adminid'),
+									'action_date' => $date,
+									'action_comments' => $this->input->post('retire_reason')
+									);
+									$this->db->insert('asset_transaction',$data);
+							}
+							
+						/** Query to insert Action Noification in Table */
+						// $supervisors = $this->db->get('tpsupervisor')->result_array();
+						// foreach($supervisors as $sp_id)
+						// {
+						// $data11 = array(
+						// 	'for_user_id' => $sp_id['id'],
+						// 	'for_user_type' => 1,
+						// 	'user_id' => $this->session->userdata('adminid'),
+						// 	'user_type' => 3,
+						// 	'ref_id' 	=> $id,
+						// 	'alert_type'  => 1,
+						// 	'date' => date("Y-m-d H:i:s"),
+						// 	'is_read' => 0,
+						// 	'notification_msg' => 'An Asset retired by Admin.'                
+						// 	);
+						// 	$this->db->insert('notifications', $data11);
+						// } 
+						/** Query to insert Action Noification in Table */
+					}
+				echo json_encode(array('response' => true, 'message' =>'Retired.','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;		
+			}
+			}
+		}
 
 		elseif ($para1 == 'change_role')
 		{

@@ -104,8 +104,7 @@
                        // $toolplaza_name = $this->db->get_where('toolplaza',array('id' =>$row['toolplaza']))->row()->name;
                        // $support = $this->db->get_where('supporting_document',array('mtr_id' => $row['id']))->result_array();
                     ?>
-                    <?php if(count($items)>1){?> 
-                                        
+                    <?php if(count($items)>1){?>                           
                   <tr role="row" class="odd " id="mainrow<?php echo $counter ?>" >
                       <td class="sorting_1">
                       <i class="far fa-caret-square-down" data-toggle="collapse" data-parent="tbody<?php echo $counter ?>"  data-target="#collapseme" style="cursor:pointer;" onclick="expandCollapse(this,'expanded_asset')">

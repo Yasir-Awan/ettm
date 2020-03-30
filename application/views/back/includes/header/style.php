@@ -23,4 +23,4 @@
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url();?>assets/admin_logout_vendor/fontawesome-free/css/all.min.css">
 	<!--added a custom.css file which includes the previous header styling-->
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url();?>assets/back/custom.css">
-	
+    <link rel="stylesheet" href="<?php echo base_url();?>assets/back/css/odometer-theme-car.css" />

@@ -43,12 +43,20 @@ class tcd_model extends MY_Model
 		$toll = 'toolplaza'; $where = array('id' => $tool);
 		$postload[0]['plaza_name'] = $this->database_model->get_where($toll, $where)->row()->name;
 		$terrif = $this->calculation_model->terrif_value($tool, $date)->result_array();
-		$tarrif[0][0]['class_1_value'] = $terrif[0]['class_1_value'];
-		$tarrif[0][0]['class_2_value'] = $terrif[0]['class_2_value'];
-		$tarrif[0][0]['class_3_value'] = $terrif[0]['class_4_value'];
-		$tarrif[0][0]['class_4_value'] = $terrif[0]['class_3_value'];
-		$tarrif[0][0]['class_5_value'] = $terrif[0]['class_7_value'];
+		if(isset($terrif[0][0])){
+			$tarrif[0][0]['class_1_value'] = $terrif[0]['class_1_value'];
+			$tarrif[0][0]['class_2_value'] = $terrif[0]['class_2_value'];
+			$tarrif[0][0]['class_3_value'] = $terrif[0]['class_4_value'];
+			$tarrif[0][0]['class_4_value'] = $terrif[0]['class_3_value'];
+			$tarrif[0][0]['class_5_value'] = $terrif[0]['class_7_value'];
+			
+		}
+		else{
+			$tarrif[0][0]['message'] = 'Tarrif does not exist for this Tollplaza';
+		}
+		
 		$postload[0]['terrif'] = $tarrif;
+		
 		
 		$postload[0]['calculation'] = $this->calculation_model->revenue_tcd($tcd[0], $tarrif[0]);
 		/*?><pre> <?php echo print_r(array($tarrif));exit;*/

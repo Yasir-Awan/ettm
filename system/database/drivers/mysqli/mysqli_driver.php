@@ -528,7 +528,13 @@ class CI_DB_mysqli_driver extends CI_DB {
 
 		return implode(', ', $this->qb_from);
 	}
-
+	function next_result()
+	{
+		if (is_object($this->conn_id))
+		{
+			return mysqli_next_result($this->conn_id);
+		}
+	}
 	// --------------------------------------------------------------------
 
 	/**

@@ -4,5 +4,6 @@
 	<script src="<?php echo base_url();?>assets/amcharts4/core.js"></script>
 	<script src="<?php echo base_url();?>assets/amcharts4/charts.js"></script>
 	<script src="<?php echo base_url();?>assets/amcharts4/animated.js"></script>
-	
+	<script src="<?php echo base_url();?>assets/back/js/odometer.js"></script>
+
 	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places,drawing&key=<?php echo $key;?>"></script>
