@@ -29,9 +29,6 @@
                                                 <div class="weighdate col-md-4">
                                                     <input type="text" id="day" name="day" class="form-control" placeholder="Select Date" >
                                                 </div>
-
-                                                
-                                            
                                         </div>
                                         </form>
                                     </div>
@@ -39,11 +36,15 @@
                                 <div class='list' id='list'>
                                     <div class="data-tables datatable-dark">
                                         <div class="row" style="margin-bottom:1%;">
-                                            <div class="col-md-12">
-                                                <?php if($weighstation){?>
-                                                    <a href="<?php echo base_url()?>admin/daily_weighstation_pdf/<?php echo $weigh;?>/<?php echo $weighstation[0]['date'];?>" class="btn btn-success btn-sm pull-right" target="__blank"><i class="fa fa-file-pdf-o" aria-hidden="true"></i> &nbsp;Generate PDF</a>
-                                                <?php } ?>
-                                            </div>
+                                            <div class="col-md-10"></div>
+                                            <?php if($weighstation){?>
+                                                <div class="col-md-1" style="padding-right: 0.5rem;">
+                                                <a href="<?php echo base_url()?>admin/timeslice_weighstation_pdf/<?php echo $weigh;?>/<?php echo $weighstation[0]['date'];?>" class="btn btn-danger btn-sm pull-right" target="__blank"><i class="fa fa-file-pdf-o" aria-hidden="true"></i> &nbsp;TIME </a>
+                                                </div>
+                                                <div class="col-md-1">
+                                                <a href="<?php echo base_url()?>admin/daily_weighstation_pdf/<?php echo $weigh;?>/<?php echo $weighstation[0]['date'];?>" class="btn btn-danger btn-sm pull-right" target="__blank"><i class="fa fa-file-pdf-o" aria-hidden="true"></i> &nbsp;DAILY </a>
+                                                </div>
+                                            <?php } ?>
                                         </div>
                                         <table id="dataTable3" class="text-center">
                                             <thead class="text-capitalize">
@@ -62,12 +63,8 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php if($weighstation){
-                                                  
+                                                <?php if($weighstation){                                                  
                                                     foreach($weighstation as $row){
-
-                                                          
-
                                                 ?>
                                                  <tr>
                                                     <td><?php echo date('d-m-Y',strtotime($row['date']));?></td>
@@ -79,8 +76,7 @@
                                                     <td><?php echo round($row['exces_weight'],2);?></td>
                                                     <td><?php echo $row['percent_overload'];?>&nbsp; %</td>
                                                     <td><?php echo $row['fine'];?></td>
-                                                    <td><?php if($row['status'] == 2){echo "Overload";}else{echo "Ok";}?></td>
-                                                    
+                                                    <td><?php if($row['status'] == 2){echo "Overload";}else{echo "Ok";}?></td>    
                                                 </tr> 
                                                 <?php    }
                                                 }?>

@@ -8,7 +8,7 @@ class database_model extends CI_Model
 		parent::__construct();
 		//$this->load->library('form_validation');
 		//$this->load->helper('form');
-		date_default_timezone_set('Asia/Karachi');
+		//date_default_timezone_set('Asia/Karachi');
 	}
 		
 	public function get_select($select, $table, $where){

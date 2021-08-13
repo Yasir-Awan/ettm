@@ -10,26 +10,23 @@
                                         <a class="tab  nav-link " id="asset" data-toggle="tab" href="#assets" role="tab" aria-controls="assets" aria-selected="false" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/assets/','displaying_assets');">Assets</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="tab nav-link" id="installed_items" data-toggle="tab" href="#installed" role="tab" aria-controls="installs" aria-selected="false" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/installed/','displaying_installed');">Installed Equip</a>
+                                        <a class="tab nav-link" id="installed_items" data-toggle="tab" href="#installed" role="tab" aria-controls="installs" aria-selected="false" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/installed/','displaying_installed');">Installed Equipment</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="tab nav-link" id="installed_subitem" data-toggle="tab" href="#installed_subitems" role="tab" aria-controls="subitem_installs" aria-selected="false" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/installed_subitems/','displaying_installed_subitems');">Installed Cmp</a>
-                                    </li>
-                                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 
-                                    <li class="nav-item">
-                                        <a class="tab nav-link " id="item-tab" data-toggle="tab" data-target="#item" href="#" role="tab" aria-controls="home" aria-selected="true" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/items/','displaying_items');">Equip</a>
+                                        <a class="tab nav-link" id="installed_subitem" data-toggle="tab" href="#installed_subitems" role="tab" aria-controls="subitem_installs" aria-selected="false" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/installed_subitems/','displaying_installed_subitems');">Installed Cmponent</a>
                                     </li>
 
                                     <li class="nav-item">
-                                        <a class="tab nav-link " id="subitem-tab" data-toggle="tab" data-target="#subitem" href="#" role="tab" aria-controls="subitems" aria-selected="true" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/subitems/','displaying_subitems');">Comp</a>
+                                        <a class="tab nav-link " id="item-tab" data-toggle="tab" data-target="#item" href="#" role="tab" aria-controls="home" aria-selected="true" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/items/','displaying_items');">Equipment</a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a class="tab nav-link " id="subitem-tab" data-toggle="tab" data-target="#subitem" href="#" role="tab" aria-controls="subitems" aria-selected="true" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/subitems/','displaying_subitems');">Component</a>
                                     </li>
                                     
                                     <li class="nav-item">
                                         <a class="tab  nav-link" id="site" data-toggle="tab" href="#sites" role="tab" aria-controls="sites" aria-selected="false" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/sites/','displaying_sites');">Sites</a>
                                     </li>
-                                    <!-- <li class="nav-item">
-                                        <a class="tab nav-link" id="location" data-toggle="tab" href="#locations" role="tab" aria-controls="locations" aria-selected="false" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/locations/','displaying_locations');">Locations</a>
-                                    </li> -->
                                     <li class="nav-item">
                                         <a class="tab nav-link" id="supplier" data-toggle="tab" href="#suppliers" role="tab" aria-controls="suppliers" aria-selected="false" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/suppliers/','displaying_suppliers');">Suppliers</a>
                                     </li>
@@ -64,9 +61,6 @@
                                     <div class="tab-pane fade " id="sites" role="tabpanel" aria-labelledby="site-tab">
                                     <div id='displaying_site'></div>
                                     </div>
-                                    <!-- <div class="tab-pane fade" id="locations" role="tabpanel" aria-labelledby="location-tab">
-                                    <div id='displaying_locations'></div>
-                                    </div> -->
                                     <div class="tab-pane fade" id="suppliers" role="tabpanel" aria-labelledby="supplier-tab">
                                     <div id='displaying_suppliers'></div>
                                     </div>
@@ -88,30 +82,14 @@
                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <div class="modal-body" style="padding:unset;">
-              <div class="mt-5" id="adding_assets" style="width:auto;">
+              <div  id="adding_assets" style="width:auto;padding:unset;">
               </div>  
             </div>
             
         </div>
     </div>
 </div>
-<!-- <div class="modal fade" id="assets_add">
-    <div class="modal-dialog ">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Assets</h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-            </div>
-            <div class="modal-body">
-              <div id="adding_assets"></div>
-              </div>  
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div> -->
+
     <script>
     var base_url = '<?php echo base_url(); ?>';
     var user_type = 'inventory';
@@ -123,16 +101,12 @@
         $("[data-toggle='toggle']").bootstrapToggle();
     });
     $('body').on('click','a.paginate_button',function(){
-    //alert();
        $("[data-toggle='toggle']").bootstrapToggle('destroy'); 
         $("[data-toggle='toggle']").bootstrapToggle();
-        
     });
      $('a.paginate_bustton').on('click',function(){
-    //alert('here');
 });
      $('body').on('change', 'input[name=toggle]', function (){
-    
     var mode = $(this).prop('checked');
     var id=$( this ).val();
     $.ajax({
@@ -141,19 +115,15 @@
       cache       : false,
       contentType : false,
       processData : false,
-      
       success:function(data)
       { 
                 var obj = data;
                 console.log(data);
                 if(obj == 'true'){
-                    
                     notify('Active Successfully','success','top','right');
                 }else{
                     notify('Inactive Successfully','danger','top','right');
-                }
-                //progress.html('');
-            
+                }            
       }
     });
   });
@@ -181,81 +151,17 @@
             });
         }); 
 
-
-
         $(document).ready(function(){
             $('#asset').click();
         }); 
 </script>
-<!-- js for assets START -->
-<!-- <script>
-$('body').on('click', '#asset', function (event){
-   var list = event.target.id;
-    var mode = $(this).prop('checked');
-    var id=$( this ).val();
- 
-            $.ajax({ 
-            url: "<?php echo base_url();?>inventory/assets/list",
-            cache       : false,
-            contentType : false,
-            processData : false,
-            beforeSend: function() {
-                var top = '200';
-                $('#displaying_assets').html('<div style="text-align:center;width:100%;position:relative;top:'+top+'px; min-height:300px;"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>'); // change submit button text
-            },
-            success: function(data) {
-                //console.log(data);
-                $('#displaying_assets').html(data);
-                //  $('#dataTable_7').DataTable();
-                  $("[data-toggle='toggle']").bootstrapToggle('destroy')                 
-                    $("[data-toggle='toggle']").bootstrapToggle();
-                                
-            },
-            error: function(e) {
-                console.log(e)
-            }
-            });
-        });
-</script> -->
-<!-- js for assets  END -->
-<!-- js for installed START -->
-<!-- <script>
-$('body').on('click', '#installed_items', function (event){
-   var list = event.target.id;
-    var mode = $(this).prop('checked');
-    var id=$( this ).val();
- 
-            $.ajax({ 
-            url: "<?php echo base_url();?>inventory/installed_inventory/list",
-            cache       : false,
-            contentType : false,
-            processData : false,
-            beforeSend: function() {
-                var top = '200';
-                $('#displaying_installed').html('<div style="text-align:center;width:100%;position:relative;top:'+top+'px; min-height:300px;"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>'); // change submit button text
-            },
-            success: function(data) {
-                //console.log(data);
-                $('#displaying_installed').html(data);
-                //  $('#dataTable_7').DataTable();
-                  $("[data-toggle='toggle']").bootstrapToggle('destroy')                 
-                    $("[data-toggle='toggle']").bootstrapToggle();
-                                
-            },
-            error: function(e) {
-                console.log(e)
-            }
-            });
-        });
-</script> -->
-<!-- js for installed  END -->
+
 <!-- js for sites START -->
 <script>
 $('body').on('click', '#site', function (event){
    var list = event.target.id;
     var mode = $(this).prop('checked');
     var id=$( this ).val();
- 
             $.ajax({ 
             url: "<?php echo base_url();?>inventory/sites/list",
             cache       : false,
@@ -266,12 +172,10 @@ $('body').on('click', '#site', function (event){
                 $('#displaying_site').html('<div style="text-align:center;width:100%;position:relative;top:'+top+'px; min-height:300px;"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>'); // change submit button text
             },
             success: function(data) {
-                //console.log(data);
                 $('#displaying_site').html(data);
                  $('#dataTable3').DataTable();
                   $("[data-toggle='toggle']").bootstrapToggle('destroy')                 
-                    $("[data-toggle='toggle']").bootstrapToggle();
-                                
+                    $("[data-toggle='toggle']").bootstrapToggle();               
             },
             error: function(e) {
                 console.log(e)
@@ -280,159 +184,3 @@ $('body').on('click', '#site', function (event){
         });
 </script>
 <!-- js for sites  END -->
-<!-- js for locations START -->
-<!-- <script>
-$('body').on('click', '#location', function (event){
-   var list = event.target.id;
-    var mode = $(this).prop('checked');
-    var id=$( this ).val();
- 
-            $.ajax({ 
-            url: "<?php echo base_url();?>inventory/locations/list",
-            cache       : false,
-            contentType : false,
-            processData : false,
-            beforeSend: function() {
-                var top = '200';
-                $('#displaying_locations').html('<div style="text-align:center;width:100%;position:relative;top:'+top+'px; min-height:300px;"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>'); // change submit button text
-            },
-            success: function(data) {
-                //console.log(data);
-                $('#displaying_locations').html(data);
-                //  $('#dataTable4').DataTable();
-                  $("[data-toggle='toggle']").bootstrapToggle('destroy')                 
-                    $("[data-toggle='toggle']").bootstrapToggle();                               
-            },
-            error: function(e) {
-                console.log(e)
-            }
-            });
-        });
-</script> -->
-<!-- js for locations END -->
-
-<!-- js for suppliers START -->
-<!-- <script>
-$('body').on('click', '#supplier', function (event){
-   var list = event.target.id;
-    var mode = $(this).prop('checked');
-    var id=$( this ).val();
- 
-            $.ajax({ 
-            url: "<?php echo base_url();?>inventory/suppliers/list",
-            cache       : false,
-            contentType : false,
-            processData : false,
-            beforeSend: function() {
-                var top = '200';
-                $('#displaying_suppliers').html('<div style="text-align:center;width:100%;position:relative;top:'+top+'px; min-height:300px;"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>'); // change submit button text
-            },
-            success: function(data) {
-                //console.log(data);
-                $('#displaying_suppliers').html(data);
-                 $('#dataTable_4').DataTable();
-                  $("[data-toggle='toggle']").bootstrapToggle('destroy')                 
-                    $("[data-toggle='toggle']").bootstrapToggle();                               
-            },
-            error: function(e) {
-                console.log(e)
-            }
-            });
-        });
-</script> -->
-<!-- js for suppliers END -->
-
-<!-- js for T.S.Ps START -->
-<!-- <script>
-$('body').on('click', '#support_provider', function (event){
-   var list = event.target.id;
-    var mode = $(this).prop('checked');
-    var id=$( this ).val();
- 
-            $.ajax({ 
-            url: "<?php echo base_url();?>inventory/tsp/list",
-            cache       : false,
-            contentType : false,
-            processData : false,
-            beforeSend: function() {
-                var top = '200';
-                $('#displaying_support_providers').html('<div style="text-align:center;width:100%;position:relative;top:'+top+'px; min-height:300px;"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>'); // change submit button text
-            },
-            success: function(data) {
-                //console.log(data);
-                $('#displaying_support_providers').html(data);
-                 $('#dataTable_5').DataTable();
-                  $("[data-toggle='toggle']").bootstrapToggle('destroy')                 
-                    $("[data-toggle='toggle']").bootstrapToggle();                               
-            },
-            error: function(e) {
-                console.log(e)
-            }
-            });
-        });
-</script> -->
-<!-- js for T.S.Ps END -->
-
-<!-- js for Manufacturers START -->
-<!-- <script>
-$('body').on('click', '#manufacturer', function (event){
-    
-   var list = event.target.id;
-    var mode = $(this).prop('checked');
-    var id=$( this ).val();
- 
-            $.ajax({ 
-            url: "<?php echo base_url();?>inventory/manufacturers/list",
-            cache       : false,
-            contentType : false,
-            processData : false,
-            beforeSend: function() {
-                var top = '200';
-                $('#displaying_manufacturer').html('<div style="text-align:center;width:100%;position:relative;top:'+top+'px; min-height:300px;"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>'); // change submit button text
-            },
-            success: function(data) {
-                //console.log(data);
-                $('#displaying_manufacturer').html(data);
-                 
-                  $("[data-toggle='toggle']").bootstrapToggle('destroy')                 
-                    $("[data-toggle='toggle']").bootstrapToggle();                               
-            },
-            error: function(e) {
-                console.log(e)
-            }
-            });
-        });
-</script> -->
-<!-- js for Manufacturers END -->
-
-<!-- js for Installed_subItems START -->
-<!-- <script>
-$('body').on('click', '#installed_subitem', function (event){
-    
-   var list = event.target.id;
-    var mode = $(this).prop('checked');
-    var id=$( this ).val();
- 
-            $.ajax({ 
-            url: "<?php echo base_url();?>inventory/installed_sub_inventory/list",
-            cache       : false,
-            contentType : false,
-            processData : false,
-            beforeSend: function() {
-                var top = '200';
-                $('#displaying_installed_subitems').html('<div style="text-align:center;width:100%;position:relative;top:'+top+'px; min-height:300px;"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>'); // change submit button text
-            },
-            success: function(data) {
-                //console.log(data);
-                $('#displaying_installed_subitems').html(data);
-                 
-                  $("[data-toggle='toggle']").bootstrapToggle('destroy')                 
-                    $("[data-toggle='toggle']").bootstrapToggle();                               
-            },
-            error: function(e) {
-                console.log(e)
-            }
-            });
-        });
-</script> -->
-<!-- js for Installed_Sub items END -->

@@ -16,7 +16,7 @@
 										<div class="logo"> <img src="<?php echo base_url() ?>assets/back/images/icon/logo.png" height="50%" width="100%" alt="logo"></div>
 									</div>
 									<div class="iv-right col-9 text-md-right">
-										<div class"row"><div class="col-md-12"><span><h4 class="text-md-center" style="color: #030a10;">DAILY SITE REPORT (DSR) SUMMARY FOR N.H.A</h4></span></div></div>
+										<div class"row"><div class="col-md-12 bg-warning"><span><h4 class="text-md-right" style="color: #030a10;">DAILY SITE REPORT (DSR) SUMMARY FOR N.H.A</h4></span></div></div>
 										<div class"row"><div class="col-md-6" style="float:left"><span class="text-left" style="font-size: 0.95rem;color: #030a10;float: left;margin-left: 20%;">DATE</span><span style="font-size: 0.95rem;color: #030a10;margin-right: 10%;"><?php echo date('d-m-Y',strtotime($date));?></span><br/><span class="text-left" style="font-size: 0.95rem;color: #030a10;float: left;margin-left: 20%;">PLAZA NAME</span><span style="font-size: 0.95rem;color: #030a10;margin-right: 10%;"><?php echo $plaza_name;?></span><br/><span class="text-left" style="font-size: 0.95rem;color: #030a10;float: left;margin-left: 20%;">PREPARED BY</span><span style="font-size: 0.95rem;color: #030a10;margin-right: 10%;"><?php echo $supervisor_name;?></span><br/></div><div class="col-md-6 form_group" style="float:right"><span class="text-left" style="font-size: 0.95rem;color: #030a10;float: left;margin-left: 20%;">DESIGNATION</span><span style="font-size: 0.95rem;color: #030a10;margin-right: 10%;"><?php if($supervisor_id == 12 || $supervisor_id == 13 || $supervisor_id == 15){ echo "Technical Manager"; } elseif($supervisor_id == 20){ echo "Technician"; } elseif($supervisor_id == 14 || $supervisor_id == 16 || $supervisor_id == 17 || $supervisor_id == 18 || $supervisor_id == 19 || $supervisor_id == 22 || $supervisor_id == 23) { echo 'Site Incharge';} else { echo "Supervisor";};?></span><br/><span class="text-left" style="font-size: 0.95rem;color: #030a10;float: left;margin-left: 20%;">PHONE</span><span style="font-size: 0.95rem;color: #030a10;margin-right: 10%;"><?php echo $phone ;?></span><br/><span class="text-left" style="font-size: 0.95rem;color: #030a10;float: left;margin-left: 20%;">OMC</span><span style="font-size: 0.95rem;color: #030a10;margin-right: 10%;"><?php echo $omc_name;?></span><br/></div></div><!--row-->
 									</div>
 								</div>
@@ -139,9 +139,10 @@
 													<tr class="text-capitalize"><th class="text-left" style="width: ; min-width: px;">Employee</th><th class="text-center" style="width:;">Attendance</th><th>Planned Holiday</th></tr>
 												</thead>
 												<tbody>
-													<?php $a=0; foreach($dsr_staff as $s){ if(!empty($s)){	?>
+													<?php $a=0; if(isset($dsr_staff)){ foreach($dsr_staff as $s){ if(!empty($s)){	?>
+													
 													<tr><td><?php echo $s['name'];?></td><td><?php if($s['as_status'] == 2) echo 'Absent'; elseif($s['as_status'] == 1) echo 'Leave'; elseif($s['as_status'] == 3) echo 'Present'; ?></td><td><?php if (!empty($s['as_holidayfrom'])) { echo 'From '.$s['as_holidayfrom'].' To '.$s['as_holidayto']; };?></td></tr>
-													<?php $a++; } } ?>
+													<?php $a++; } } } ?>
 												</tbody>
 											</table>
 										</div>

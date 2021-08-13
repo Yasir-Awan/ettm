@@ -7,8 +7,72 @@ class Inventory_model extends CI_MODEL
     }
     function getsites()
     {
-      $sites = $this->db->get('sites')->result_array();
+      if($this->session->userdata('role')==1||$this->session->userdata('role')==2){
+      $sites = $this->db->select('*')->get('sites')->result_array();
+      }
+    if($this->session->userdata('role')==3){
+      $sites = $this->db->select('*')->where('route', 3)->get('sites')->result_array();
+      }
+      if($this->session->userdata('role')==4){
+        $sites = $this->db->select('*')->where('route', 4)->get('sites')->result_array();
+        }
       return $sites;
+    }
+    function GetSitesByType($para='')
+    {
+      if($this->session->userdata('role')==1||$this->session->userdata('role')==2){
+        $sites = $this->db->get_where('sites',array('site_type'=>$para))->result_array();
+      }
+      if($this->session->userdata('role')==3){
+        $sites = $this->db->get_where('sites',array('site_type'=>$para, 'route' => 3))->result_array();
+      }
+      if($this->session->userdata('role')==5){
+        $sites = $this->db->get_where('sites',array('site_type'=>$para, 'route' => 5))->result_array();
+      }
+      return $sites;
+    }
+    function GetSitesWhereInventoryIsInstalled($para1)
+    {
+      $inventory = $this->db->select('*')->group_by('site')->get('installed_inventory')->result_array();
+      $siteId = array();
+      foreach($inventory as $row)
+      {
+        $siteId [] = $row['site'];
+      }
+      $site = array();
+      foreach($siteId as $id)
+      {
+        if($para1==1){
+          $site[] = $this->db->select('*')->where('id', $id)->where('site_type!=', 2)->get('sites')->result_array();
+          // $this->db->get_where('sites',array('id'=>$id,'site_type' => 1))->result_array();
+        }
+        if($para1==2){
+          $site[] = $this->db->get_where('sites',array('id'=>$id,'site_type' => 2))->result_array();
+        }
+      }
+
+      $sites = array();
+      foreach($site as $row){
+        if(!empty($row[0]['route'])){
+        if($this->session->userdata('role')==5 && $row[0]['route']==5){
+          $sites[] = $row[0];
+        }
+        elseif($this->session->userdata('role')==3 && $row[0]['route']==3){
+          $sites[] = $row[0];
+        }elseif($this->session->userdata('role')==1 || $this->session->userdata('role')==2){
+          $sites[] = $row[0];
+        }
+        else{
+          $sites[] = " ";
+        }
+      }
+      }
+      return $sites;
+    }
+    function GetSpecificSite($para='')
+    {
+      $specificSite = $this->db->select('*')->where('id', $para)->get('sites')->result_array();
+      return $specificSite;
     }
     function get_Items()
     {
@@ -41,29 +105,81 @@ class Inventory_model extends CI_MODEL
     }
     function get_assets()
     {
-      $assets = $this->db->select('*')->group_by('name')->order_by('add_date','desc')->get('assets')->result_array();
+      if($this->session->userdata('role')==3){
+      $assets = $this->db->select('*')->where('route', 3)->group_by('name')->order_by('add_date','desc')->get('assets')->result_array();
+      }
+      if($this->session->userdata('role')==5){
+        $assets = $this->db->select('*')->where('route', 5)->group_by('name')->order_by('add_date','desc')->get('assets')->result_array();
+        }
+      if($this->session->userdata('role')==1 || $this->session->userdata('role')==2){
+        $assets = $this->db->select('*')->where('route', 1)->group_by('name')->order_by('add_date','desc')->get('assets')->result_array();
+        }
       return $assets;
     }
     function getExpandedAsset($para1="")
     {
       $ast =  $this->db->select('*')->where('name', $para1)->get('assets')->result_array();
-      $expandedAssets =  $this->db->select('*')->where('name', $para1)->group_by('set_no')->order_by('add_date','desc')->get('assets')->result_array();
-      // echo "<pre>"; print_r($expandedAssets); exit;
-      // $this->db->select('*')->order_by('id','desc')->group_by('set_no')->get('assets')->result_array();
+      if($this->session->userdata('role')==5){
+        $expandedAssets =  $this->db->select('*')->where('route', 5)->where('name', $para1)->group_by('set_no')->order_by('add_date','desc')->get('assets')->result_array();
+      }
+      if($this->session->userdata('role')==3){
+        $expandedAssets =  $this->db->select('*')->where('route', 3)->where('name', $para1)->group_by('set_no')->order_by('add_date','desc')->get('assets')->result_array();
+      }
+      if($this->session->userdata('role')==1 || $this->session->userdata('role')==2){
+        $expandedAssets =  $this->db->select('*')->where('route', 1)->where('name', $para1)->group_by('set_no')->order_by('add_date','desc')->get('assets')->result_array();
+      }
       return $expandedAssets;
     }
 
     function get_installed()
     {
-      $installs = $this->db->select('*')->order_by('action_date','desc')->get('installed_inventory')->result_array();
-      
+      if($this->session->userdata('role')==3){
+        $installs = $this->db->select('*')->where('route', 3)->order_by('action_date','desc')->get('installed_inventory')->result_array();
+      }
+      if($this->session->userdata('role')==5){
+        $installs = $this->db->select('*')->where('route', 5)->order_by('action_date','desc')->get('installed_inventory')->result_array();
+      }
+      if($this->session->userdata('role')==1 || $this->session->userdata('role')==2){
+        $installs = $this->db->select('*')->where('route', 1)->order_by('action_date','desc')->get('installed_inventory')->result_array();
+      }
+      return $installs;
+    }
+
+    function installed_inventory($para='')
+    {
+      if($this->session->userdata('role')==3)
+      {
+        $site = $this->db->get_where('sites',array('route' => 3))->result_array();
+        $installs = $this->db->select('*')->where('site', $site[0]['id'])->get('installed_inventory')->result_array();
+      }
+      if($this->session->userdata('role')==5)
+      {
+        $site = $this->db->get_where('sites',array('route' => 5))->result_array();
+        $installs = $this->db->select('*')->where('site', $site[0]['id'])->get('installed_inventory')->result_array();
+        
+      }
+      if(empty($para) && $this->session->userdata('role')!=3 && $this->session->userdata('role')!=4)
+      {
+      $installs = $this->db->select('*')->where('site', 12)->get('installed_inventory')->result_array();
+      }
+      if(!empty($para))
+      {
+        $installs = $this->db->select('*')->where('site', $para)->get('installed_inventory')->result_array();
+      }
       return $installs;
     }
 
     function get_installed_subitems()
     {
-      $sub_installs = $this->db->select('*')->order_by('action_date','desc')->get('installed_subitems')->result_array();
-      
+      if($this->session->userdata('role')==5){
+        $sub_installs = $this->db->select('*')->where('route', 5)->order_by('action_date','desc')->get('installed_subitems')->result_array();
+      }
+      if($this->session->userdata('role')==3){
+        $sub_installs = $this->db->select('*')->where('route', 3)->order_by('action_date','desc')->get('installed_subitems')->result_array();
+      }
+      if($this->session->userdata('role')==1|| $this->session->userdata('role')==2){
+        $sub_installs = $this->db->select('*')->where('route', 1)->order_by('action_date','desc')->get('installed_subitems')->result_array();
+      }
       return $sub_installs;
     }
 
@@ -103,4 +219,25 @@ class Inventory_model extends CI_MODEL
     $subItems = $this->db->get_where('sub_items',array('item_id'=>$para1))->result_array(); 
     return $subItems;
   }
+  function Inventory_Report($para1='')
+  {
+    $report_data = $this->db->select('*')->where('site', $para1)->order_by('action_date','desc')->get('installed_inventory')->result_array();
+    return $report_data;
+  }
+  function Site_Locations($para1='')
+  {
+    $locations = $this->db->select('*')->where('site', $para1)->get('locations')->result_array();
+    return $locations;
+  }
+  function specific_item_report($para1='',$para2)
+  {
+    $locations = $this->db->select('*')->where('site', $para1)->get('locations')->result_array();
+    return $locations;
+  }
+  function get_faulty_data()
+  {
+    $faulty_data = $this->db->select('*')->get('faulty_equipment_list')->result_array();
+    return $faulty_data;
+  }
+  
 }

@@ -24,7 +24,7 @@
 		</div>
 		<div class="card-body">
 			<div class="card-chart">
-				<?php if($dtr){ include("dtr_graph.php"); }else{ if(isset($message_dtr)) echo $message_dtr; } ?>
+				<?php if(isset($dtr)){ include("dtr_graph.php"); }else{ echo $message_dtr;}  ?>
 			</div>
 		</div>
 	</div>

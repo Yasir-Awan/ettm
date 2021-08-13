@@ -1,14 +1,69 @@
-<div class="table-responsive ">
-
-
-  <span align='center'><h4 style="color: #030a10;" class='mb-3 mt-3'>Installed Item Comprihensive Detail</h4></span>
-  <br><br>
-<div class"row">
-<?php foreach($selected_installed as $asset) {?>
-
+<div class="table-responsive">
 <table class="table table-borderless">
 <thead>
-<span align='center'><h5 style="color: #030a10; ">Asset Core Information</h5></span>
+<?php foreach($selected_assets as $asset) {
+   $site = $this->db->get_where('sites',array('id' => $asset['site']))->result_array();
+   $assetName = $this->db->get_where('items',array('id' => $asset['name']))->result_array();?>   
+  <span align='center'><h1 style="color: #030a10;font-family: cursive;" class='mb-3 mt-3'><?php echo $site[0]['name'];?></h1></span>
+  <?php if($installed_components){ ?>
+  <?php $totalComponents = count($installed_components);
+          $i = 0;
+        if($i <  4){ ?>
+          <tr >
+        <?php for($i; $i<4; $i++){ 
+            $compName = $this->db->get_where('sub_items', array('id' => $installed_components[$i]['subitem_id']))->result_array();
+            if(!empty($compName)){
+            ?>
+                  <th colspan="2" ><a href="#" style="font-family: cursive;"> <?php echo $compName[0]['name']; ?></a> 
+                  <?php if($installed_components[$i]['transaction_type']==3 || $installed_components[$i]['transaction_type']==9 || $installed_components[$i]['transaction_type']==14){ ?> 
+                  <i class="fa fa-check"  style="color:green;"></i>
+                  <?php } else {?>
+                    <i class="fa fa-close"  style="color:red;"></i>
+                  <?php } ?>   
+              </th> 
+                  <?php }
+             } ?>
+          </tr>
+      <?php }
+              if($i > 3 && $i < 8){ ?>
+                <tr>
+              <?php for($i; $i<8; $i++){ 
+                  $compName = $this->db->get_where('sub_items', array('id' => $installed_components[$i]['subitem_id']))->result_array();
+                  if(!empty($compName)){
+                  ?>
+                        <th colspan="2" ><a href="#" style="font-family: cursive;"> <?php echo $compName[0]['name']; ?></a> 
+                        <?php if($installed_components[$i]['transaction_type']==3 || $installed_components[$i]['transaction_type']==9 || $installed_components[$i]['transaction_type']==14){ ?> 
+                        <i class="fa fa-check"  style="color:green;"></i>
+                        <?php } else {?>
+                          <i class="fa fa-close"  style="color:red;"></i>
+                        <?php } ?>   
+                    </th> 
+                        <?php }
+               } ?>
+                </tr>
+            <?php }
+                          if($i > 7 && $i < 12){ ?>
+                            <tr>
+                          <?php for($i; $i<12; $i++){ 
+                              $compName = $this->db->get_where('sub_items', array('id' => $installed_components[$i]['subitem_id']))->result_array();
+                              if(!empty($compName)){
+                              ?>
+                                    <th colspan="2" ><a href="#" style="font-family: cursive;"> <?php echo $compName[0]['name']; ?></a> 
+                                    <?php if($installed_components[$i]['transaction_type']==3 || $installed_components[$i]['transaction_type']==9 || $installed_components[$i]['transaction_type']==14){ ?> 
+                                    <i class="fa fa-check"  style="color:green;"></i>
+                                    <?php } else {?>
+                                      <i class="fa fa-close"  style="color:red;"></i>
+                                    <?php } ?>   
+                                </th> 
+                                    <?php }
+                           } ?>
+                            </tr>
+                        <?php }
+        } ?> 
+  <br><br>
+<div class"row">
+
+<span align='center'><h5 style="color: #030a10;font-family:'lato', sans-serif;"><?php echo $assetName[0]['name']; ?></h5></span>
         <div class="row"> 
         <div class="col-md-6">
         </div>
@@ -16,64 +71,49 @@
         <!-- <span class="btn btn-success pull-right btn-xs btn-labeled " id="cancel_reason" name="asset_edit" onclick="ajax_html('<?php echo base_url().'inventory/asset_edit/'.$asset['id'];?>','edit_asset_contents');" data-toggle="modal" data-target="#assets-edit" style='margin-right:-260px;'> <i class="fa fa-edit"> </i> &nbsp; Edit</span> -->
         </div>             
         <div class="col-md-2">
-                    <span class="btn btn-danger btn-xs  fas fa-trash-alt" style='margin-left:235px;' onclick="delete_confirm_tab('Really want to delete This','<?php echo base_url().'inventory/installed_inventory/delete/'.$asset['id'];?>')"> 
+                    <span class="btn btn-danger btn-md  fas fa-trash-alt" style="margin-left:18rem;margin-top:-50px;" onclick="delete_confirm_tab('Really want to delete This','<?php echo base_url().'inventory/installed_inventory/delete/'.$asset['identification_no'];?>')"> 
                     Delete</span>
                     </div> 
                     </div>              
 </thead>
 <tbody>
     <tr>
-    
-<?php 
-// echo "<pre>"; print_r($selected_assets); 
-
-//echo "<pre>"; print_r($selected_asset_history);
-?>
-        
-      <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Asset Name:</span></th>
-      <?php $assetName = $this->db->get_where('items',array('id' => $asset['name']))->result_array();?>
-      <td><span style="font-size: 0.80rem;color: #030a10;margin-left:-20px;"><?php echo $assetName[0]['name'];?></span></td>
-      <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Asset Description:</span></th>
-      <?php $assetName = $this->db->get_where('items',array('id' => $asset['name']))->result_array();?>
-      <td style="width:45%"><span style="font-size: 0.80rem;color: #030a10;margin-left:;"><?php echo $assetName[0]['description'];?></span></td>
-      <th><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Product Model No:</span></th>
-      <td><span style="font-size: 0.80rem;color: #030a10;margin-left:-15px ;"><?php echo $asset['product_model_no'];?></span></td>
-      
-      
+      <th scope="row"><span class="text-left" style=" color:#08842c;float:left;">Description:</span></th>
+      <td ><span style="color:#030a10;font-weight:750;font-family:'lato', sans-serif;"><?php echo $assetName[0]['description'];?></span></td>
+      <th scope="row"><span class="text-left" style="color: #08842c;float: left;margin-left: ;">Name:</span></th>
+      <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $assetName[0]['name'];?></span></td>
+      <th><span  style="color:#08842c;">Purchase Cost:</span></th>
+      <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['cost_price'];?></span></td>
+      <th scope="row"><span style="color:#08842c;float:left;">Purchase On:</span></th>
+      <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo date("F j, Y",strtotime($asset['purchased_on']))?></span></td>
     </tr> 
     <tr>
-    <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left:;">Idendtification Number:</span></th>
-      <td><span style="font-size: 0.80rem;color: #030a10;margin-left:;"><?php echo $asset['identification_no'];?></span></td>
-    <th><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Cost Price:</span></th>
-      <td><span style="font-size: 0.80rem;color: #030a10;margin-left: ;"><?php echo $asset['cost_price'];?></span></td>
-      <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Supplier:</span></th>
+    <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Serial:</span></th>
+      <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['serial_no'];?></span></td>
+      <th><span class="text-left" style="color:#08842c;float:left;">Model:</span></th>
+      <td><span style="margin-left:-15px;font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['product_model_no'];?></span></td>
+      <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Supplier:</span></th>
       <?php $supplierName = $this->db->get_where('suppliers',array('id' => $asset['supplier']))->result_array();?>
-      <td><span style="font-size: 0.80rem;color: #030a10;margin-left:;"><?php echo $supplierName[0]['name'];?></span></td>
-      <th><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Manufecturer:</span></th>
+      <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $supplierName[0]['name'];?></span></td>
+      <th><span class="text-left" style="color:#08842c;float:left;">Manufecturer:</span></th>
       <?php $manufacturer = $this->db->get_where('manufacturers',array('id' => $asset['manufacturer']))->result_array();?>
-      <td><span style="font-size: 0.80rem;color: #030a10;margin-left: ;"><?php echo $manufacturer[0]['name'];?></span></td>
-
-      
+      <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $manufacturer[0]['name'];?></span></td>    
     </tr> 
     <tr>
-    <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Site:</span></th>
-      <?php $site = $this->db->get_where('sites',array('id' => $asset['site']))->result_array();?>
-      <td><span style="font-size: 0.80rem;color: #030a10;margin-left:;"><?php echo $site[0]['name'];?></span></td>
-    <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Purchased On:</span></th>
-      <?php $site = $this->db->get_where('sites',array('id' => $asset['site']))->result_array();?>
-      <td><span style="font-size: 0.80rem;color: #030a10;margin-left:;"><?php echo date("F j, Y",strtotime($asset['purchased_on']))?></span></td>
-      <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Warranty Type:</span></th>&nbsp
+    <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Site:</span></th>
+      <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $site[0]['name'];?></span></td>
+      <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Warranty Type:</span></th>&nbsp
       <?php $supplierName = $this->db->get_where('suppliers',array('id' => $asset['supplier']))->result_array();?>
-      <td> <span style="font-size: 0.80rem;color: #030a10;margin-left:;"> <?php  if($asset['warranty_type']==0) { echo " Have no Warranty."; } if($asset['warranty_type']==1) { echo " Replacement Warranty." ; } if($asset['warranty_type']==2) { echo " Repairing Warranty." ; } ?></span> </td>
-      <th><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left:;">Warranty Duration:</span></th>
-      <td><span style="font-size: 0.80rem;color: #030a10;margin-right: ;"><?php echo $asset['warranty_duration'];?></span></td>
-      
-      
+      <td> <span style="font-weight:750;font-family:'lato', sans-serif;"> <?php  if($asset['warranty_type']==0) { echo " Have no Warranty."; } if($asset['warranty_type']==1) { echo " Replacement Warranty." ; } if($asset['warranty_type']==2) { echo " Repairing Warranty." ; } ?></span> </td>
+      <th><span class="text-left" style="color:#08842c;float: left;">Warranty Duration:</span></th>
+      <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['warranty_duration'];?></span></td>
+      <th scope="row"><span class="text-left" style="color:#08842c;float:left;">This asset Added on:</span></th>
+      <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo date('F j, Y, g:i a',$asset['add_date']);?></span></td>
     </tr> 
     <tr>
-    <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Added by User Type:</span></th>
-      <td><span style="font-size: 0.80rem;color: #030a10;margin-left:;"> <?php  if($asset['user_type']==1) { echo "Admin"; } if($asset['user_type']==2) { echo "Supervisor" ; } if($asset['user_type']==3) { echo "Member" ; } ?></span> </td>
-    <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Added by User Name:</span></th>
+    <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Added by User Type:</span></th>
+      <td><span style="font-weight:750;font-family:'lato', sans-serif;"> <?php  if($asset['user_type']==1) { echo "Admin"; } if($asset['user_type']==2) { echo "Supervisor" ; } if($asset['user_type']==3) { echo "Member" ; } ?></span> </td>
+    <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Added by User Name:</span></th>
       <?php 
       if($asset['user_type']==1) 
       {
@@ -88,13 +128,15 @@
         $userName = $this->db->get_where('member',array('id' => $asset['checkin_by']))->result_array();
       } 
       ?>
-      <td><span style="font-size: 0.80rem;color: #030a10;margin-left:;"> <?php   echo $userName[0]['fname']." ".$userName[0]['lname'];  ?></span> </td>
-      <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">This asset Added on:</span></th>
-      <td><span style="font-size: 0.80rem;color: #030a10;margin-left:;"><?php echo date('F j, Y, g:i a',$asset['add_date']);?></span></td>
+      <td><span style="font-weight:750;font-family:'lato', sans-serif;"> <?php   echo $userName[0]['fname']." ".$userName[0]['lname'];  ?></span> </td>
+      <th><span  style="color:#08842c;">Asset Ratting:</span></th>
+      <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['asset_comment'];?></span></td>
+      <th><span  style="color:#08842c;">Id No:</span></th>
+      <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['identification_no'];?></span></td>
     </tr> 
   </tbody>
-</table>
-<?php } ?>        
+  </table>      
+<?php } ?> 
  </row>
 </div>
 <br>
@@ -105,13 +147,14 @@
 <table class="table table-borderless">
 <thead>
 <tr>
-    <span align='center'><h5 style="color: #030a10; ">Asset Current Status</h5></span>  
-</tr>             
+    <span align='center'><h3 style="color: #030a10;font-family:'lato', sans-serif;">Equipment Current Status</h3></span>  
+</tr> 
+<br>            
 </thead>
 <tbody>
     <tr>
-    <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Current Status</span></th>
-      <?php 
+    <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Current Status</span></th>
+      <?php
       if($selected_assets[0]['action_status']==0) 
       {
         $actionStatus = "Brand New";  
@@ -149,11 +192,10 @@
         $actionStatus = "Faulty";
       } 
       ?>
-      <td> <span style="font-size: 0.80rem;color: #030a10;margin-left:-25px;"> <?php   echo $actionStatus;  ?></span> </td>
+      <td> <span style="font-weight:750;font-family:'lato', sans-serif;color: #030a10;margin-left:-25px;"> <?php   echo $actionStatus;  ?></span> </td>
         <?php if($selected_assets[0]['action_status']==0){?>
       <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;"><?php   echo "No action performed on this Asset.";  ?></span></th>
         <?php } ?>
-        
         <?php 
               foreach($selected_installed_transaction as $transaction){
                 if($transaction['transaction_type']==1){
@@ -725,21 +767,17 @@
     </tr>
       <?php }
                         /** Transaction Type 6 END */
-      ?>
-  <?php } ?>     
+       } ?>     
   </tbody>
 </table>
 <br>
 <br>
 <br>
 <br>
-
                 <div class="row ">
                     <div class="col-md-12">
-                    <span align='center'><h5 style="color: #030a10; ">Asset History</h5></span>
-                    </div>
-                  
-                     
+                    <span align='center'><h5 style="color: #030a10; ">Equipment History</h5></span>
+                    </div>  
                 </div>
           <!-- <div class="table-responsive " style=""> -->
             <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
@@ -758,18 +796,7 @@
                       <!-- <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Office: activate to sort column ascending" style="width: auto;">Action</th> -->
                     </tr>
                   </thead>
-                  <tfoot align='center'>
-                    <tr>
-                       <th rowspan="1" colspan="1">Sr#</th>
-                       <th rowspan="1" colspan="1">Name</th>
-                       <th rowspan="1" colspan="1">Transaction</th>
-                       <th rowspan="1" colspan="1">Asset Site</th>
-                       <th rowspan="1" colspan="1">Transaction Performed by</th>
-                       <th rowspan="1" colspan="1">Transaction Add Date</th>
-                       <th rowspan="1" colspan="1">Transaction Added by</th>
-                       <!-- <th rowspan="1" colspan="1">Action</th> -->
-                    </tr>
-                  </tfoot>
+
                   <?php if($install_transactions) { ?>
                   <tbody align='center'>  
                     <?php $counter=1; ?>

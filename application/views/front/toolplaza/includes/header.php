@@ -207,6 +207,21 @@
               <p>Dashboard</p>
             </a>
           </li>
+          
+          <?php if($tpsupervisor[0]['role'] == 0 || $tpsupervisor[0]['role'] == 1 || $tpsupervisor[0]['role'] == 2 || $tpsupervisor[0]['role'] == 4){ ?>
+          <li <?php if($page_name == 'traffic_conter'){?>class="active"<?php } ?>>
+            <a href="<?php echo base_url()?>toolplaza/traffic_counting">
+              <i class="now-ui-icons education_atom"></i>
+              <p>Traffic Counter</p>
+            </a>
+          </li>
+          <li <?php if($page_name == 'traffic_entry'){?>class="active"<?php } ?>>
+            <a href="<?php echo base_url()?>toolplaza/Traffic_View">
+              <i class="now-ui-icons education_atom"></i>
+              <p>Traffic Entry</p>
+            </a>
+          </li>
+          <?php } ?>
           <!-- <li <?php if($page_name == 'faulty'){?>class="active"<?php } ?>>
             <a href="<?php echo base_url()?>toolplaza/faulty_equipment_list">
               <i class="now-ui-icons education_atom"></i>

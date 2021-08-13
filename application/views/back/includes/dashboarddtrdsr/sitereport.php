@@ -82,18 +82,19 @@
 														<td><?php echo $j; ?></td>
 														<td><?php echo $toll['name']; ?></td>								
 														<td><?php echo $toll['incharge']; ?></td>
-														<td><?php echo $toll['omc_name']; ?></td>
-														<?php if($toll['dsr'] != 'DSR Does not exist'){ ?>
-														<td><?php foreach($toll['lane_status'] as $lane){ foreach($lane as $plane){ if($plane && $plane != 'Ok') echo $plane.' ';} } ?></td>
-														<td><?php echo $toll['status_shutdown']; ?></td>
-														<td><?php echo $toll['mtr_status']; ?></td>
-														<td><?php echo $toll['mtr_archiving_status']; ?></td>
-														<td><?php if($toll['ptz_north_status'] != 'Ok'){ echo $toll['ptz_north_status'].' ';}  if($toll['ptz_south_status'] != 'Ok'){ echo $toll['ptz_south_status'].' ';} foreach($toll['camera_status'] as $lane){ foreach($lane as $plane){ if($plane && $plane != 'Ok') {echo $plane.' ';} } } ?></td>
-														<td><?php echo $toll['status_link_description']; ?></td>
-														<td><?php foreach($toll['not_present'] as $not){ if($not != 'present'){ echo '<p>'.$not.'</p>';} } ?></td>
-														<td><?php echo $toll['support_request'] ?></td>
-														<?php }if($toll['dsr'] == 'DSR Does not exist'){ ?>
-														<td colspan ="9" class="text-center"><?php echo $toll['dsr']; ?></td>
+														<?php if(isset($toll['dsr'])){ ?>
+															<td><?php if(isset($toll['dsr']['omc_name'])) echo $toll['dsr']['omc_name']; ?></td>
+														<?php if(isset($toll['dsr']['closed_lanes'])){ ?>
+															<td><?php  echo $toll['dsr']['closed_lanes'];}else{ echo 'OK';}  ?></td>
+															<td><?php echo $toll['dsr']['shut_down']; ?></td>
+															<td><?php echo $toll['dsr']['mtr_status']; ?></td>
+															<td><?php echo $toll['dsr']['mtr_archiving_status']; ?></td>
+															<td><?php if($toll['dsr']['inventory'][9]['status'] != ''){ echo $toll['dsr']['inventory'][9]['status'];}else{ echo 'OK';}?></td>
+															<td><?php echo $toll['dsr']['link']; ?></td>
+															<td><?php echo $toll['dsr']['absentee']; ?></td>
+															<td><?php echo $toll['dsr']['support_request'] ?></td>
+														<?php }else{ ?>
+														<td colspan ="9" class="text-center"><?php echo 'DSR Does Not Exist'; ?></td>
 														<?php } ?>
 													</tr>
 													<?php  $i++; $j++; } ?>
@@ -108,19 +109,23 @@
 										<div class="col-md-12">
 											<table class="table table-bordered table-hover text-right">
 												<thead>
-													<tr> <th>Toll Plaza</th> <th>Boom Arm</th> <th>Boom Mechanical</th> <th>OHLS</th> <th>Thermal Printer</th> <th>TCT with Keyboard</th> <th>Lane PC</th> <th>Traffic Light</th> <th>PFD</th></tr>
+													
+													<tr> <th>Tollplaza</th><?php $i=0; $j = $i+1; foreach($inventory as $inv){ ?>
+														<th><?php echo $inv['name']; ?></th>
+														<?php  $i++; $j++;  } ?></tr>
+													
 												</thead>
 												<tbody>
-													<?php $i=0; $j = $i+1; foreach($toolplaza as $n){ ?>
+													<?php $k = 0; foreach($toolplaza as $toll){ ?>
 													<tr>
-														<td><?php echo $n['name']; ?></td>
-														<?php if($n['dsr'] !='DSR Does not exist'){ ?>
-														<td><?php foreach($n['inventory_boom_arm_status'] as $lane){ foreach($lane as $plane){ if($plane && $plane != 'Ok') echo $plane.' ';} }?></td> <td><?php foreach($n['inventory_boom_mechanical_status'] as $lane){ foreach($lane as $plane){ if($plane && $plane != 'Ok') echo $plane.' ';} }?></td>  <td><?php foreach($n['inventory_ohls_status'] as $lane){ foreach($lane as $plane){ if($plane && $plane != 'Ok') echo $plane.' ';} }?></td> <td><?php foreach($n['inventory_thermal_printer_status'] as $lane){ foreach($lane as $plane){ if($plane && $plane != 'Ok') echo $plane.' ';} }?></td>  <td><?php foreach($n['inventory_tct_status'] as $lane){ foreach($lane as $plane){ if($plane && $plane != 'Ok') echo $plane.' ';} }?></td>  <td><?php foreach($n['inventory_lanepc_status'] as $lane){ foreach($lane as $plane){ if($plane && $plane != 'Ok') echo $plane.' ';} }?></td>  <td><?php foreach($n['inventory_traffic_light_status'] as $lane){ foreach($lane as $plane){ if($plane && $plane != 'Ok') echo $plane.' ';} }?></td>  <td><?php foreach($n['inventory_pfd_status'] as $lane){ foreach($lane as $plane){ if($plane && $plane != 'Ok') echo $plane.' ';} }?></td>
-														<?php }if($n['dsr'] == 'DSR Does not exist'){ ?>
-														<td colspan="8" class="text-center"><?php echo $n['dsr']; ?></td>
-														<?php } ?>
+														
+														<th><?php echo $toll['name'] ?></th>
+														<?php if(isset($toll['dsr'])){$l = 0; foreach($toll['dsr']['inventory'] as $inv){ ?>
+														<td><?php if($inv['status'] != '') echo $inv['status']; else echo 'OK'; ?></td>
+														<?php }$l++;}else{ 
+															?><td class="text-center" colspan = '<?php echo $j?>'> <?php echo 'DSR Does Not Exist'; ?> </td> <?php } ?>
 													</tr>
-													<?php  $i++; $j++;  } ?>
+													<?php $k++;} ?>
 												</tbody>
 											</table>
 										</div>

@@ -434,15 +434,9 @@
                 </div>
               </div>
             </div>   
-     <?php }
-      
- ?>
+     <?php } ?>
         
-         
-              
-
-
-
+   
             <div class="form-group repairing_tsp" style='display:none;'>
              <div class='row'>
                 <div class='col-md-4'>
@@ -638,6 +632,17 @@ $('body').on('change', "#repair_type", function (){
   if(repair_type == 1)
   {
     $('.repair_cmpny').show('slow');
+  }
+});
+$('body').on('change', "#replace_company", function (){
+  let repair_type = this.value;
+  if(repair_type == 2)
+  {
+    $('.repair_cmpny').hide('slow');
+  }
+  if(repair_type == 1)
+  {
+    $('.repairing_tsp').show('slow');
   }
 });
 </script>

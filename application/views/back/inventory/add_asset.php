@@ -1,10 +1,8 @@
 <?php echo form_open(base_url()."inventory/add_asset_do/",array('id' => 'create_assetsss'));?>
                    <!-- Form Textual inputs start -->
-        <div class="col-12 mt-0">
+        <div class="col-12">
          <div class="card">
-           <div class="card-body">
-                <fieldset style="margin-top: -55px;">
-               <legend>Core Information<hr></legend>                        
+           <div class="card-body">                    
                <div class="form-group">
               <div class='row'>
                   <div class='col-md-3'>
@@ -26,8 +24,7 @@
                     <option value=10>Consumeable Items</option>
                     <option value=11>Furniture</option>
                     <option value=12>IT Assets</option>
-                    <option value=13>Tools</option> 
-                    
+                    <option value=13>Tools</option>
                     </select>
                   </div>
               </div>
@@ -40,12 +37,20 @@
                     </div>
                     <div class='col-md-4' >
                     <select class="form-control required" name="asset_name" id="asset_name" placeholder="Select Asset Name">
-                    <!-- <option value=""><?php echo "Select Asset Name";?></option> -->
                     </select>
-                    <!-- <input type="hidden" class="form-control" name="quantity" id="quantity"  value="1" > -->
                     </div>
                    </div>
                 </div>
+
+                <div class='row'>
+                    <div class='col-md-3'>
+                    <label for="example-text-input" class="col-form-label" data-original-title="" title="">Rating</label>
+                    </div>
+                    <div class='col-md-4' >
+                    <input type="text" class="form-control" name="asset_comment" id="asset_comment" placeholder="" value="">
+                    </select>
+                    </div>
+                   </div>
 
                 <div class='row'>
                  <div class='col-md-3'>
@@ -56,7 +61,8 @@
                <input type="number" min="0" max="12" oninput="toggle_componets()" class="form-control required" id="quantity" name="quantity" placeholder="Enter Quantity" min="1"> 
                </div>
                <div class='col-md-3'>
-               <span class="btn btn-primary btn-md childmodal" style="display:none;" data-toggle="modal" data-target="#margla">Have Components Click to add their Details</span>
+               <span class="btn btn-primary btn-md childmodal" style="display:none;" id="cmp_btn" data-toggle="modal" data-target="#margla">Component Details</span>
+               <input type="text" class="btn-btn-primary" id='display_msg' value="Components Collected" style="display:none;" readonly>
                 </div>
                </div> 
                 <div class="item_serialNo" id="item_serialNo" style="display:none;">
@@ -85,8 +91,7 @@
                     <?php } ?>
                     </select>
                     </div>
-                    <div class='col-md-2 pull-left' style="">
-                    <!-- <button type="button" style="background-color: transparent;margin-left: -20px; color: blue;border: none;" class="btn btn-primary" data-toggle="modal" data-target="#modal-b">Add</button>   -->
+                    <div class='col-md-2 pull-left'>
                     </div>
                   </div>
 
@@ -98,8 +103,7 @@
                     <div class='col-md-4'>
                     <input type="text" class="form-control" id="mfg_date" name="mfg_date" placeholder="Choose Date">
                     </div>
-                    <div class='col-md-2 pull-left' style="">
-                    <!-- <button type="button" style="background-color: transparent;margin-left: -20px; color: blue;border: none;" class="btn btn-primary" data-toggle="modal" data-target="#modal-b">Add</button>   -->
+                    <div class='col-md-2 pull-left'>
                     </div>
                   </div>
 
@@ -115,8 +119,7 @@
                   </div>
 
         </div> <!-- form group END --> 
-              
-              <legend>Extended Information <hr></legend>                              
+                                         
               <br>
                 <div class="form-group">
                   <div class='row'>
@@ -132,13 +135,25 @@
                     <?php } ?>
                     </select>
                     </div>
-                    <div class='col-md-2 pull-left' style="">
-                    <!-- <button type="button" style="background-color: transparent;margin-left: -20px; color: blue;border: none;" class="btn btn-primary" data-toggle="modal" data-target="#modal-b">Add</button>   -->
-                    </div>
                   </div>
 
-  
-                    <div class="row">
+                  <div class="row">
+                       <div class='col-md-3'>
+                       <label class="col-form-label" data-original-title="" title="">Site Type</label>
+                       <span class="asterisk" data-original-title="" title="">*</span>
+                       </div>
+                       <div class='col-md-4'>
+                       <select class="form-control required"  tabindex="-1"  name="site_type" id="site_type">
+                          <option value="">Select Site Type</option>
+                          <option value="1">Toll Plaza</option>
+                          <option value="2">Weigh Station</option>
+                          <option value="3">Head Quarter</option>
+                      </select>
+                       </div>
+                       <div class='col-md-2'></div>
+                     </div>
+
+                    <div class="row siteid" style="display:none;">
                        <div class='col-md-3'>
                        <label class="col-form-label" data-original-title="" title="">Site</label>
                        <span class="asterisk" data-original-title="" title="">*</span>
@@ -151,7 +166,6 @@
                                     <?php } ?>
                       </select>
                        </div>
-                       <div class='col-md-2'></div>
                      </div>
                 
                       <div class="row">
@@ -162,9 +176,7 @@
                          <div class='col-md-4'>
                          <input type="text" class="form-control required" id="purchase_date" name="purchase_date" placeholder="Choose Date">
                          </div>
-                         <div class='col-md-2'>
-                         <!-- <a style='line-height:45px;' class="clear-date-time" data-date-field="date-field" data-remote="true" href="#" data-original-title="" title="">Reset Date</a> -->
-                         </div>
+
                        </div>
                      
                       <div class="row">
@@ -173,9 +185,6 @@
                          </div>
                          <div class='col-md-4'>
                          <input type="text" class="form-control" id="po_no" name="po_no" placeholder="Order Number">
-                         </div>
-                         <div class='col-md-2'>
-                         <!-- <a style='line-height:45px;' class="clear-date-time" data-date-field="date-field" data-remote="true" href="#" data-original-title="" title="">Reset Date</a> -->
                          </div>
                        </div>
                      
@@ -218,10 +227,10 @@
        </div><!-- form gorup END  -->
                </div>
                </div>
-             </fieldset> <!--Form Textual inputs END -->
+ <!--Form Textual inputs END -->
            <br>
            <input type="hidden" name="additional_data" id="additional_data" val=""/>
-        <button type="button" class="btn btn-primary pull-left  mb-3" onclick="creatAssetform_submit('create_assetsss');">Create Asset</button>
+        <button type="button" class="btn btn-primary pull-left  mb-3" id="asset_btn" onclick="creatAssetform_submit('create_assetsss');">Create Asset</button>
           <?php echo form_close();?>
     <!-- Modal for Edit Asset START -->
     <div class="modal fade" id="margla" style="margin-left:2%;">
@@ -249,9 +258,7 @@
             endDate: endYear
            })
           });
-          </script>
 
-<script>
           $(document).ready(function(){
           var endYear = new Date(new Date().getFullYear(), 11, 31);
           $("#mfg_date").datepicker({
@@ -261,9 +268,7 @@
             endDate: endYear
            })
           });
-          </script>
 
-       <script>
            $('body').on('change', "#warranty_type", function (){    
              var warranty_type = this.value;
             //  console.log(issuance_type);
@@ -276,12 +281,11 @@
                $('.warranty_duration').hide('slow');
             }     
           });
-        </script>
-        <script>
-           $('#itemtype').change(function (){    
-            var itemType = this.value;
+
+          $('#site_type').change(function (){    
+            var siteType = this.value;
              $.ajax({ 
-              url: "<?php echo base_url() ?>inventory/asset_type/"+itemType,
+              url: "<?php echo base_url() ?>inventory/SitesByType/"+siteType,
               cache       : false,
               contentType : false,
               processData : false,
@@ -292,10 +296,10 @@
               success: function(data) {
                   items = JSON.parse(data);
                   console.log(items);
-                  $('.item_name').show('slow');
-                  $('#asset_name').empty().append('<option value="">Choose Option</option>');
-                  items.items.forEach(item => {
-                  $('#asset_name').append('<option value="'+item.id+'">'+ item.name  +'</option>');
+                  $('.siteid').show('slow');
+                  $('#site_id').empty().append('<option value="">Select Site</option>');
+                  items.forEach(item => {
+                  $('#site_id').append('<option value="'+item.id+'">'+ item.name  +'</option>');
                   });                
                 },
               error: function(e) {
@@ -303,17 +307,32 @@
               }
           });
         });
-        </script>
 
-<script>
+           $('#itemtype').change(function (){    
+            var itemType = this.value;
+             $.ajax({ 
+              url: "<?php echo base_url() ?>inventory/asset_type/"+itemType,
+              cache       : false,
+              contentType : false,
+              processData : false,
+              beforeSend: function() { },
+              success: function(data) {
+                  items = JSON.parse(data);
+                  $('.item_name').show('slow');
+                  $('#asset_name').empty().append('<option value="">Choose Option</option>');
+                  items.items.forEach(item => {
+                  $('#asset_name').append('<option value="'+item.id+'">'+ item.name  +'</option>');
+                  });                
+                },
+              error: function(e) { }
+          });
+        });
+
 function ajax_html_for_comp_assets(url,id){
   var loading_set = '<div class="col-md-2"><div class="stat"><div class="stat-icon" style="color:#fa8564"><i class="fa fa-refresh fa-spin"></i></div></div></div>';
   var list = $('#'+id);
-  // alert('in function');
   $.ajax({
     url: url,
-    // method:"post",
-    // data:,
     beforeSend: function() {
       list.html(loading_set);
     },
@@ -321,34 +340,24 @@ function ajax_html_for_comp_assets(url,id){
       list.html('');
       list.html(data).fadeIn();
     },
-    error: function(e) {
-      //notify('An error occurred. Please refresh page and try again.','danger','bottom','right');
-    }
+    error: function(e) { }
   });
 }
-</script>
 
-        <script>
           var itemName;
           $('#asset_name').change(function (){    
              itemName = this.value;
           });
            function toggle_componets(){
             var x = document.getElementById("quantity").value;
-            // alert(x);
-            // alert(itemName);
              $.ajax({ 
               url: "<?php echo base_url() ?>inventory/equip_has_comp_or_not/"+itemName+"/"+x,
               cache       : false,
               contentType : false,
               processData : false,
-              beforeSend: function() {
-                // var top = '200';
-                // $('#asset_name').html('<div style="text-align:center;width:100%;position:relative;top:'+top+'px; min-height:300px;"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>'); 
-              },
+              beforeSend: function() { },
               success: function(data) {
                 data = JSON.parse(data);
-                // alert(data);
                 if(data!=0){
                        $('.item_serialNo').hide('slow');
                        $('.childmodal').show('slow');
@@ -356,39 +365,24 @@ function ajax_html_for_comp_assets(url,id){
               if(data == ''){
                   $('.childmodal').hide('slow');
                   $('.item_serialNo').show('slow');
-                  // $('#asset_name').empty();
                   $('.item_serialNo').html('');
                   for(var i=0; i<x; i++) {
                     var div = '<div class="row"><div class="col-md-3"><label class="col-form-label" data-original-title="" title="">Equipment Serial No</label></div><div class="col-md-4"><input type="text" name="equip_serial_no[]" style="" placeholder="Serial No"  class="form-control required itemSerial"></div></div>';  
                   $('.item_serialNo').append(div);
-            //       let divId = document.getElementById(Id);
-            //  itemSerial = divId.getElementsByClassName("equipSerial");
-            //  itemSerial = itemSerial[0].value;
                   };                
-              }  
-                  // console.log(items);
-                  // $('.item_name').show('slow');
-                  // $('#asset_name').empty();
-                  // items.items.forEach(item => {
-                  // $('#asset_name').append('<option value="'+item.id+'">'+ item.name  +'</option>');
-                  // });                
+              }            
                 },
-              error: function(e) {
-              //  console.log(e)
-              }
+              error: function(e) { }
           });
         }
 
         $('body').on('click','.childmodal',function(){
-          // alert('yasir');
           var qty = $('#quantity').val();
           var url = "<?php echo base_url() ?>inventory/add_asset_components/"+itemName+"/"+qty;
           var id = 'multiple_components';
             ajax_html_for_comp_assets(url,id);
         });
-    </script>
 
-<script>
      var sendToServer = [];
   function asset_component_form_submit()
   {
@@ -431,7 +425,6 @@ function ajax_html_for_comp_assets(url,id){
              eSerial = itemSerial[0].value;
              componentsId = divId.getElementsByClassName("componentId");
              compSerial = divId.getElementsByClassName("compSerial");
-            //  console.log(compSerial);
              compModel = divId.getElementsByClassName("compModel");
              compManufacturer = divId.getElementsByClassName("compManufacturer");
              compMfg = divId.getElementsByClassName("compMfg");
@@ -440,7 +433,6 @@ function ajax_html_for_comp_assets(url,id){
              compCost = divId.getElementsByClassName("compCost");
              
              if(compSerial.length>0){
-
               for (var cmpSerialIndex = 0; cmpSerialIndex < compSerial.length; cmpSerialIndex++) {
                 compId = $("#"+compSerial[cmpSerialIndex].id).data('compId');
                 console.log($("#"+compSerial[cmpSerialIndex].id).val());
@@ -464,10 +456,14 @@ function ajax_html_for_comp_assets(url,id){
               console.log(Id++);
   }
   console.log('ready to send to server', sendToServer);
-  $("#margla").modal("hide");
+  $("#margla").modal("hide")
+  $("#cmp_btn").hide();
+  $("#display_msg").show();
 }
 
+var isBodyClicked = false;
 function creatAssetform_submit(form_id,noty,e){
+  
 var alerta = $('#form'); // alert div for show alert message
 var form = $('#'+form_id);
 var can = '';
@@ -483,7 +479,6 @@ var formdata = false;
 if (window.FormData){
   formdata = new FormData(form[0]);
 }
-// console.log(formdata);
 var a = 0;
 var req = 'This field required';
 var take = '';
@@ -545,11 +540,10 @@ form.find(".required").each(function(){
   }
   take = '';
 });
+if(isBodyClicked === false){
 if(can != 'no' || can =='no'){
-  //console.log(formdata);   
-//  alert( $('#additional_data').val());
+
   var test = JSON.stringify(sendToServer);
-  //alert(test);
   $.ajax({
     url: form.attr('action'), // form action url
     type: 'POST', // form submit method get/post
@@ -567,6 +561,7 @@ if(can != 'no' || can =='no'){
       },
       success: function(data) {
       var obj = JSON.parse(data);
+      isBodyClicked = true;
     if(!obj.response){
       var buttonp = $('.enterer');
       buttonp.removeClass('disabled');
@@ -595,6 +590,9 @@ if(can != 'no' || can =='no'){
     $("[href=#"+ih+"]").click();
   }
   return false;
+}
+}else{
+  notify('Create Asset Button be Clicked Only Once','danger','top','right');
 }
 }
     </script>

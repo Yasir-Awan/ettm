@@ -13,7 +13,6 @@
                       <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Name</th>
                       <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Current Status</th>
                       <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Office: activate to sort column ascending" style="width: auto;">Current Site</th>
-                      <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Custody of</th>
                     </tr>
                   </thead>
                   <tfoot>
@@ -22,28 +21,18 @@
                        <th rowspan="1" colspan="1">Name</th>
                        <th rowspan="1" colspan="1">Current Status</th>
                        <th rowspan="1" colspan="1">Current Site</th>
-                       <th rowspan="1" colspan="1">Custody of</th>
                     </tr>
                   </tfoot>
                   <tbody >
                   <?php
-                    //  echo "<pre>"; print_r($assets);
                      $counter = 0;
                      $id=1;
-                    //  $previousItem = $assets[0]['name'];
-                    //  $currentItem;
                       foreach($expanded_data['expanded_data'] as $asset)
                       {
                         $items = $this->db->get_where('assets',array('name'=>$asset['name']))->result_array();
                         $assetName = $this->db->get_where('items',array('id'=>$asset['name']))->result_array();
-                        // echo "<pre>"; print_r(count($items));
                         $counter++; 
-                       // $toolplaza_name = $this->db->get_where('toolplaza',array('id' =>$row['toolplaza']))->row()->name;
-                       // $support = $this->db->get_where('supporting_document',array('mtr_id' => $row['id']))->result_array();
-                    ?>
-
-                   <!-- <tbody class="hidebody" style="display:none;"></tbody> -->
-                                          
+                    ?>                                          
                   <tr role="row" class="odd" id="mainrow<?php echo $counter ?>" >
                       <td class="sorting_1">
                       <input type="checkbox" style="margin-left:15px; cursor:pointer;" onchange ="console.log(this.getAttribute('value'))" name="selection" id="ischecked" class="selection " value=<?php echo $asset['id'];?>>
@@ -123,25 +112,6 @@
                             echo $site[0]['name'];
                           ?>
                         </td>
-                      <td>
-                      <?php if($asset['action_status']==1){?>
-                         <?php if($asset['checkout_user_type']=="1"){ 
-                               $checkout_to = $this->db->get_where('admin',array('id' => $asset['checkout_to']))->result_array(); 
-                               echo $checkout_to[0]['fname']." ".$checkout_to[0]['lname']; 
-                              } ?>
-
-                         <?php if($asset['checkout_user_type']=="2"){ 
-                               $checkout_to = $this->db->get_where('member',array('id' => $asset['checkout_to']))->result_array();
-                               echo $checkout_to[0]['fname']." ".$checkout_to[0]['lname']; 
-                               } ?>
-
-                         <?php if($asset['checkout_user_type']=="3"){ 
-                               $checkout_to = $this->db->get_where('tpsupervisor',array('id' => $asset['checkout_to']))->result_array(); 
-                               //echo "<pre>"; print_r($checkout_to);// exit;
-                                 echo $checkout_to[0]['fname']." ".$checkout_to[0]['lname'];
-                               } ?>
-                       <?php } ?>
-                      </td>
                       </tr>
 
 
@@ -230,23 +200,6 @@
     </div>
 </div><!-- Modal for CheckOut END -->
 
-<!-- Modal for Retire  START -->
-<!-- <div class="modal fade" id="assets_retire">
-    <div class="modal-dialog ">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Retire Asset</h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-            </div>
-            <div class="modal-body">
-              <div id="retire_asset_contents">
-              </div>  
-            </div>
-        </div>
-    </div>
-</div> -->
-<!-- Modal for Retire END -->
-
 <!-- Modal for Extend Checkout  START -->
 <div class="modal fade" id="assets_extend_checkout">
     <div class="modal-dialog ">
@@ -277,55 +230,11 @@
             </div>
         </div>
     </div>
-</div><!-- Modal for Install END -->
-
-<!-- Modal for Repair START -->
-<!-- <div class="modal fade" id="assets_repair">
-    <div class="modal-dialog ">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Repair Start</h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-            </div>
-            <div class="modal-body">
-              <div id="start_repair_assets">
-              </div>  
-            </div>
-        </div>
-    </div>
-</div> -->
-<!-- Modal for start Repairing END -->
-
-<!-- Modal for End Repair START -->
-<!-- <div class="modal fade" id="assets_end_repair">
-    <div class="modal-dialog ">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Repair Complete</h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-            </div>
-            <div class="modal-body">
-              <div id="end_repair_assets">
-              </div>  
-            </div>
-        </div>
-    </div>
-</div> -->
-<!-- Modal for End Repairing END -->
-
-  
-  
+</div><!-- Modal for Install END -->  
   <!--**********************************************************-->
   <!--******************* MODAL WINDOWS END ********************-->
   <!--**********************************************************-->
- <!-- <script>
- $(document).ready(function(){
-   $('.submin').click(function(){
-     $('input[type="checkbox"]:unchecked').
-   })
-
- });
- </script> -->
+ 
   <script>
   function show_asset(url,id)
 {
@@ -459,10 +368,9 @@ if( filter_by == 2)
                 $('.hide_div').html('<div style="text-align:center;width:100%;position:relative;top:'+top+'px; min-height:300px;"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>'); // change submit button text
             },
             success: function(data) {
-                //console.log(data);
                 $('.hide_div').html(data); 
                  $('#dataTable').DataTable();
-                 $('.emptydiv').show();
+                 $('.action_button').hide();
                  $("[data-toggle='toggle']").bootstrapToggle('destroy')                 
                  $("[data-toggle='toggle']").bootstrapToggle();
             },

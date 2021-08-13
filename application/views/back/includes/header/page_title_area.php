@@ -21,7 +21,7 @@
 							<!-- admin button area START --> 
 							<li class="nav-item dropdown no-arrow pull-right">
 								<a class="nav-link dropdown-toggle" href="#" id="userDropdown" style='padding-right: unset; padding-left: unset;'  role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									<span class="mr-2 d-none d-lg-inline text-gray-600 small"> Admin</span>
+									<span class="mr-2 d-none d-lg-inline text-gray-600 small"><?php if($this->session->userdata('omcid')){echo "OMC";} if($this->session->userdata('adminid')){echo $this->session->userdata('fname')." ".$this->session->userdata('lname');} ?></span>
 									<img class="img-profile rounded-circle" style='width:20px; height:20px;' src="<?php echo base_url();?>assets/back/images/author/AdminLogo.png">
 								</a>
 								<!-- Dropdown - User Information -->
@@ -80,13 +80,13 @@
 							<!-- Notifications area END -->
                             <!-- Messages area START -->
                             <li class="nav-item dropdown no-arrow mx-1 pull-right">
-								<a class="nav-link dropdown-toggle" href="#" style='padding-right: unset; padding-left: unset;' id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									<i class="far fa-envelope fa-fw"></i>
+								<!-- <a class="nav-link dropdown-toggle" href="#" style='padding-right: unset; padding-left: unset;' id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<i class="far fa-envelope fa-fw"></i> -->
 									<!-- Counter - Messages -->
-									<span class="badge badge-danger badge-counter">7</span>
-								</a>
+									<!-- <span class="badge badge-danger badge-counter">7</span> -->
+								<!-- </a> -->
 								<!-- Dropdown - Messages -->
-								<div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
+								<!-- <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
 									<h6 class="dropdown-header">Message Center</h6>
 									<a class="dropdown-item d-flex align-items-center" href="#">
 										<div class="dropdown-list-image mr-3">
@@ -129,7 +129,7 @@
 										</div>
 									</a>
 									<a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
-								</div>
+								</div> -->
 							</li> 
 							<!-- Messages area END -->
 						</ul>

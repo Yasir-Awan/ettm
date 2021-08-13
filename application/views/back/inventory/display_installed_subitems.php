@@ -75,25 +75,23 @@
                       <th class="sorting_asc" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending" style="width: auto;">SR #</th>
                       <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Name</th>
                       <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Serial No</th>
-                      <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Part of</th>
                       <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Category</th>
                       <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Status</th>
                       <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Office: activate to sort column ascending" style="width: auto;">Site</th>
                       <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Location</th>
                     </tr>
                   </thead>
-                  <tfoot>
+                  <!-- <tfoot>
                     <tr>
                        <th rowspan="1" colspan="1">Sr #</th>
                        <th rowspan="1" colspan="1">Name</th>
                        <th rowspan="1" colspan="1">Serial No</th>
-                       <th rowspan="1" colspan="1">Part of</th>
                        <th rowspan="1" colspan="1">Category</th>
                        <th rowspan="1" colspan="1">Status</th>
                        <th rowspan="1" colspan="1">Site</th>
                        <th rowspan="1" colspan="1">Location</th>
                     </tr>
-                  </tfoot>
+                  </tfoot> -->
                   <tbody> 
                   <?php
                      $counter = 0;
@@ -118,7 +116,6 @@
                       </a>
                       </td>
                       <td><?php echo $install['serial_no'] ?></td>
-                      <td><span class='btn-primary btn-xs'><?php echo $item[0]['name']?></span></td>
                       <td><?php
                    if($subitem[0]['item_type']==1)
                    {
@@ -177,29 +174,51 @@
                       <td>
                          <?php 
                             if($install['transaction_type']=="0")
-                             {echo "Brand New";}
+                             {
+                               echo "Brand New";
+                             }
                              elseif($install['transaction_type']=="1")
-                             {echo "Checked Out";}
+                             {
+                               echo "Checked Out";
+                             }
                              elseif($install['transaction_type']=="2")
-                             {echo "Checked In";}
+                             {
+                               echo "Checked In";
+                             }
                              elseif($install['transaction_type']=="3")
-                             {echo "Installed";} 
+                             {
+                               echo "  &nbsp&nbsp&nbsp Installed in "." &nbsp&nbsp&nbsp<br><span class='btn-primary btn-xs'>".$item[0]['name']."  </span>" ?> 
+                            <?php } 
                              elseif($install['transaction_type']=="4")
-                             {echo "Repairing Mode";}
+                             {
+                               echo "Repairing Mode";
+                             }
                              elseif($install['transaction_type']=="5")
-                             {echo "Repaired";} 
+                             {
+                               echo "Repaired";
+                             } 
                              elseif($install['transaction_type']=="6")
-                             {echo "Retired";}
+                             {
+                               echo "Retired";
+                             }
                              elseif($install['transaction_type']=="9")
-                             {echo "Re Installed"; } 
+                             {
+                               echo "Re Installed";
+                             } 
                              elseif($install['transaction_type']=="10")
-                             { echo "Faulty Equipment"; }                                 
+                             {
+                              echo "  &nbsp&nbsp&nbsp Faulty in "." &nbsp&nbsp&nbsp<br><span class='btn-primary btn-xs'>".$item[0]['name']."  </span>" ?> 
+                           <?php }                                 
+                            
                               elseif($install['transaction_type']=="11")
-                             { echo " Faulty Component";}                                 
-                              elseif($install['transaction_type']=="12")
-                              {echo "Replaced";} 
-                              elseif($install['transaction_type']=="13")
-                              {echo "Repairing Mode";} ?>
+                             {
+                              echo "  &nbsp&nbsp&nbsp Faulty in "." &nbsp&nbsp&nbsp<br><span class='btn-primary btn-xs'>".$item[0]['name']."  </span>" ?> 
+                           <?php }                                 
+                            
+                                                          elseif($install['transaction_type']=="12")
+                             {
+                              echo "  &nbsp&nbsp&nbsp Replaced in "." &nbsp&nbsp&nbsp<br><span class='btn-primary btn-xs'>".$item[0]['name']."  </span>" ?> 
+                           <?php } ?>
                       </td>
                       <td>
                       <?php 

@@ -55,6 +55,11 @@
                                                             <span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: 20%;">Date</span><span style="font-size: 0.80rem;color: #030a10;margin-right: 10%;"><?php echo date("F, Y",strtotime($dtr[0]['for_month']));?></span>
                                                         <?php } ?>-->
                                                     </div>
+                                                    <?php if(isset($dtr[0]['toll_delay'])){ ?>
+                                                    <div class="col-md-12">
+                                                        <span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: 20%;">Delay Reason</span><span style="font-size: 0.80rem;color: #030a10;margin-right: 10%;"><?php echo $dtr[0]['toll_delay']; ?></span>
+                                                    </div>
+                                                    <?php } ?>
                                                 </row>
                                             </div>
                                         </div>

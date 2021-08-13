@@ -76,7 +76,7 @@
                 <div class='col-md-4' >
                   <select class="form-control required" name="site_id" id="site_id" placeholder="Select Asset Name" style="margin-left:-140px;">
                   <?php $data = $this->db->get_where('sites',array('id' => $supervisor[0]['site']))->result_array();?>
-                        <option value="<?php echo $supervisor[0]['site'];?>"><?php echo $data[0]['name'];?></option>
+                        <option value="<?php echo $data[0]['id'];?>"><?php echo $data[0]['name'];?></option>
                     <?php foreach($sites as $site){?>
                     <option value="<?php echo $site['id'] ?>"><?php echo $site['name'];?></option>
                     <?php } ?> 

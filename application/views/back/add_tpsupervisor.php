@@ -29,6 +29,8 @@
       	<option value="0">Supervisor</option>
       	<option value="1">Site Incharge</option>
       	<option value="2">Technical Manager</option>
+        <option value="3">Weighstation Supervisor</option>
+        <option value="4">Weighstation Technician</option>
       </select>
       
     </div>

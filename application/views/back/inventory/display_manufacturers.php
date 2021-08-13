@@ -28,7 +28,7 @@
                       <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Action</th>
                     </tr>
                   </thead>
-                  <tfoot align="center">
+                  <!-- <tfoot align="center">
                     <tr>
                        <th rowspan="1" colspan="1">SR #</th>
                        <th rowspan="1" colspan="1">NAME</th>
@@ -36,7 +36,7 @@
                        <th rowspan="1" colspan="1">Comments</th>
                        <th rowspan="1" colspan="1">ACTION</th>
                     </tr>
-                  </tfoot>
+                  </tfoot> -->
                   <tbody align="center" >
                   <?php
                         $counter = 0;

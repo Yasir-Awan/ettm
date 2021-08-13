@@ -1,7 +1,9 @@
 <!-- footer area start-->
         <footer>
             <div class="footer-area">
+            <?php if($this->session->userdata('adminid')!=22){ ?>
                 <p>© Copyright 2019. All right reserved.</p>
+            <?php } ?>
             </div>
         </footer>
         <!-- footer area end-->
@@ -730,10 +732,14 @@ $(document).ready(function() {
     <script src="<?php echo base_url();?>assets/datatables/responsive.bootstrap.min.js"></script>
     <script src="<?php echo base_url();?>assets/back/js/scripts.js"></script>
     <script src="<?php echo base_url();?>assets/ajax_method.js"></script>
-    <script src="<?php echo base_url()?>assets/back/summernote/summernote.min.js"></script>
+    <script src="<?php echo base_url();?>assets/back/summernote/summernote.min.js"></script>
     <script src="<?php echo base_url()?>assets/back/bootbox/bootbox.min.js"></script>
     <script src="<?php echo base_url()?>assets/back/bootstrap-toggle-master/js/bootstrap-toggle.min.js"></script>
     <script src="<?php echo base_url()?>assets/front/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js" type="text/javascript"></script> 
+    <script src="<?php echo base_url(); ?>assets/back/js/jquery.timepicker.min.js"></script>
+    <?php if(isset($page_assets['js'])) echo $page_assets['js'];?>
+
 </body>
 
 </html>
+

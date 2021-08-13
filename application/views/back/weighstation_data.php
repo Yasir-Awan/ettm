@@ -1,11 +1,22 @@
 <?php include('includes/header.php'); ?>
 <style>
-
 /*----------------------------------------*/
 /*  12.  Dashboard v.1.0 income
 /*----------------------------------------*/
 .income-monthly{
   background:linear-gradient(to bottom, #b52ea4 0%, #f13800 100%);
+}
+.overloaded-motorway {
+    background: linear-gradient(to bottom, #f31c50 0%, #e6929a 100%);
+}
+.total-motorway {
+    background: linear-gradient(to bottom, #785ce6 0%, #ce6e52 100%);
+}
+.overload-percent{
+background: linear-gradient(to bottom, #7e801b 0%, #d1d42c 100%);
+}
+.average-overloaded {
+    background: linear-gradient(to bottom, #16847f 0%, rgb(59, 234, 210) 100%);
 }
 .orders-monthly{
   background:linear-gradient(to bottom, #ad6c7c 0%, rgb(216, 0, 255) 100%);
@@ -90,87 +101,100 @@
                 <div class="income-order-visit-user-area">
                                     
                     <div class="row">
-                        <div class="col-lg-3" style="padding-left:5px; padding-right:5px;">
+                       <table class="table" style="width:74%; border-collapse: separate;border: solid #d4320d 5px;border-radius: 6px;">
+                        <tr>
+                          <td colspan="4" style="padding:0" class="text-center">
+                            <span class="text-center" style="font-weight:900;color:purple; font-size: 28px;">National Highways</span>
+                          </td>
+                        </tr>
+                        <tr>
+
+                          <td style="width: 25%;padding: 0.25rem;">
                             <div class="income-dashone-total income-monthly shadow-reset nt-mg-b-30">
-                                <div class="income-title">
-                                    <div class="main-income-head">
-                                        <h2>Total <i class="fa fa-truck pull-right" style="font-size: 30px;" aria-hidden="true"></i></h2>
-                                        
-                                    </div>
-                                </div>
-                                <div class="income-dashone-pro">
-                                    <div class="income-rate-total">
-                                        <div class="price-adminpro-rate">
-                                            <h3><div id="total_month" class="odometer" style="font-size:20px"><?php echo $month_count[0]['total_vehicles_m'];?></div></h3>
-                                        </div>
-                                        <div class="price-graph">
-                                            <span id="sparkline1"></span>
+                                    <div class="income-title">
+                                        <div class="main-income-head">
+                                            <h2>Total Weighed<i class="fa fa-truck pull-right" style="font-size: 30px;" aria-hidden="true"></i></h2>
+                                            
                                         </div>
                                     </div>
-                                   <div class="income-range low-value-cl">
-                                        <p class="month"><?php echo $month_count[0]['date'];?></p>
-                                        <!-- <span class="income-percentange">33% <i class="fa fa-level-down"></i></span> -->
+                                    <div class="income-dashone-pro">
+                                        <div class="income-rate-total">
+                                            <div class="price-adminpro-rate">
+                                                <h3><div id="total_month_h" class="odometer" style="font-size:20px" data-min-integer-len="4" data-format="d"><?php echo $month_count[0]['total_vehicles_m_h'];?></div></h3>
+                                            </div>
+                                            <div class="price-graph">
+                                                <span id="sparkline1"></span>
+                                            </div>
+                                        </div>
+                                       <div class="income-range low-value-cl">
+                                            <p class="month"><?php echo $month_count[0]['date'];?></p>
+                                            <!-- <span class="income-percentange">33% <i class="fa fa-level-down"></i></span> -->
+                                        </div>
+                                        <div class="clear"></div>
                                     </div>
-                                    <div class="clear"></div>
+                            </div>
+                            
+                          </td>
+                          <td style="width: 25%;padding: 0.25rem;">
+                             <div class="income-dashone-total orders-monthly shadow-reset nt-mg-b-30">
+                                    <div class="income-title">
+                                        <div class="main-income-head">
+                                            <h2>Overloaded <i class="fa fa-truck pull-right" style="font-size: 30px;" aria-hidden="true"></i></h2>
+                                            <!-- <div class="main-income-phara order-cl">
+                                                <p>Annual</p>
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                    <div class="income-dashone-pro">
+                                        <div class="income-rate-total">
+                                            <div class="price-adminpro-rate">
+                                                <h3><div id="overload_month_h" class="odometer" style="font-size:20px" data-min-integer-len="4" data-format="d"><?php echo $month_count[0]['overloaded_m_h'];?></div></h3>
+                                            </div>
+                                            <div class="price-graph">
+                                                <span id="sparkline6"></span>
+                                            </div>
+                                        </div>
+                                        <div class="income-range low-value-cl">
+                                            <p class="month"><?php echo $month_count[0]['date'];?></p>
+                                            <!-- <span class="income-percentange">33% <i class="fa fa-level-down"></i></span> -->
+                                        </div>
+                                        <div class="clear"></div>
+                                    </div>
+                             </div>
+                       
+                          </td>
+                          <td style="width: 25%;padding: 0.25rem;">
+                              <div class="income-dashone-total overload-percent shadow-reset nt-mg-b-30">
+                            <div class="income-title">
+                                <div class="main-income-head">
+                                    <h2>Overload <i class="fa fa-percent" style="font-size: 16px;" aria-hidden="true"></i><i class="fa fa-truck pull-right" style="font-size: 30px;" aria-hidden="true"></i></h2>
+                                    
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-3" style="padding-left:5px; padding-right:5px;">
-                            <div class="income-dashone-total orders-monthly shadow-reset nt-mg-b-30">
-                                <div class="income-title">
-                                    <div class="main-income-head">
-                                        <h2>Overloaded <i class="fa fa-truck pull-right" style="font-size: 30px;" aria-hidden="true"></i></h2>
-                                        <!-- <div class="main-income-phara order-cl">
-                                            <p>Annual</p>
-                                        </div> -->
+                            <div class="income-dashone-pro">
+                                <div class="income-rate-total">
+                                    <div class="price-adminpro-rate">
+                                        <h3><div id="overload_avg" class="odometer" style="font-size:20px" data-min-integer-len="3" data-format="(,ddd).dd"><?php echo @round($month_count[0]['overloaded_m_h'] * 100 / $month_count[0]['total_vehicles_m_h'],2);?></div></h3>
+                                    </div>
+                                    <div class="price-graph">
+                                        <span id="sparkline1"></span>
                                     </div>
                                 </div>
-                                <div class="income-dashone-pro">
-                                    <div class="income-rate-total">
-                                        <div class="price-adminpro-rate">
-                                            <h3><div id="overload_month" class="odometer" style="font-size:20px"><?php echo $month_count[0]['overloaded_m'];?></div></h3>
-                                        </div>
-                                        <div class="price-graph">
-                                            <span id="sparkline6"></span>
-                                        </div>
-                                    </div>
-                                    <div class="income-range low-value-cl">
-                                        <p class="month"><?php echo $month_count[0]['date'];?></p>
-                                        <!-- <span class="income-percentange">33% <i class="fa fa-level-down"></i></span> -->
-                                    </div>
-                                    <div class="clear"></div>
+                               <div class="income-range low-value-cl">
+                                    <p class="month"><?php echo $month_count[0]['date'];?></p>
+                                    <!-- <span class="income-percentange">33% <i class="fa fa-level-down"></i></span> -->
                                 </div>
+                                <div class="clear"></div>
                             </div>
                         </div>
-                        <div class="col-lg-3" style="padding-left:5px; padding-right:5px;">
-                            <div class="income-dashone-total visitor-monthly shadow-reset nt-mg-b-30">
-                                <div class="income-title">
-                                    <div class="main-income-head">
-                                        <h2>Fined <img src="<?php echo base_url()?>assets/images/currencylogo.png" class="pull-right" style="max-width:25%;"/></h2>
-                                        <!-- <div class="main-income-phara visitor-cl">
-                                            <p>Today</p>
-                                        </div> -->
-                                    </div>
-                                </div>
-                                <div class="income-dashone-pro">
-                                    <div class="income-rate-total">
-                                        <div class="price-adminpro-rate">
-                                            <h3><div id="fine_month" class="odometer" style="font-size:20px">00000<?php //echo $month_count[0]['fined_m'];?></div></h3>
-                                        </div>
-                                        <div class="price-graph">
-                                            <span id="sparkline2"></span>
-                                        </div>
-                                    </div>
-                                    <div class="income-range low-value-cl">
-                                        <p class="month"><?php echo $month_count[0]['date'];?></p>
-                                        <!-- <span class="income-percentange">33% <i class="fa fa-level-down"></i></span> -->
-                                    </div>
-                                    <div class="clear"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3" style="padding-left:5px; padding-right:5px;">
-                            <div class="income-dashone-total user-monthly shadow-reset nt-mg-b-30">
+                          
+                    </td>
+                      
+                      </tr>
+                      <tr>
+                        <td style="width: 25%;padding: 0.25rem;">
+                            
+                               <div class="income-dashone-total user-monthly shadow-reset nt-mg-b-30">
                                 <div class="income-title">
                                     <div class="main-income-head">
                                         <h2>Due Fine <img src="<?php echo base_url()?>assets/images/currencylogo.png" class="pull-right" style="max-width:25%;"/></h2>
@@ -182,7 +206,7 @@
                                 <div class="income-dashone-pro">
                                     <div class="income-rate-total">
                                         <div class="price-adminpro-rate">
-                                            <h3><div id="without_fine" class="odometer" style="font-size:20px"><?php echo ($month_count[0]['without_fine'] * 1000);?></div></h3>
+                                            <h3><div id="without_fine" class="odometer" style="font-size:20px" data-min-integer-len="4" data-format="d"><?php echo ($month_count[0]['without_fine'] * 1000);?></div></h3>
                                         </div>
                                         <div class="price-graph">
                                             <span id="sparkline5"></span>
@@ -195,8 +219,131 @@
                                     <div class="clear"></div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        
+                      </td >
+                      <td style="width: 25%;padding: 0.25rem;">
+                          <div class="income-dashone-total visitor-monthly shadow-reset nt-mg-b-30">
+                                    <div class="income-title">
+                                        <div class="main-income-head">
+                                            <h2>Fine Collected <img src="<?php echo base_url()?>assets/images/currencylogo.png" class="pull-right" style="max-width:25%;"/></h2>
+                                            <!-- <div class="main-income-phara visitor-cl">
+                                                <p>Today</p>
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                    <div class="income-dashone-pro">
+                                        <div class="income-rate-total">
+                                            <div class="price-adminpro-rate">
+                                                <h3><div id="fine_month" class="odometer" style="font-size:20px" data-min-integer-len="4" data-format="d"><?php echo $month_count[0]['fined_m'];?></div></h3>
+                                            </div>
+                                            <div class="price-graph">
+                                                <span id="sparkline2"></span>
+                                            </div>
+                                        </div>
+                                        <div class="income-range low-value-cl">
+                                            <p class="month"><?php echo $month_count[0]['date'];?></p>
+                                            <!-- <span class="income-percentange">33% <i class="fa fa-level-down"></i></span> -->
+                                        </div>
+                                        <div class="clear"></div>
+                                    </div>
+                             </div>
+                       
+                      </td>
+                      <td style="width: 25%;padding: 0.25rem;">
+                         <div class="income-dashone-total average-overloaded  shadow-reset nt-mg-b-30">
+                                <div class="income-title">
+                                    <div class="main-income-head">
+                                        <h2>Average Overload <i class="fa fa-percent" style="font-size: 16px;" aria-hidden="true"></i><i class="fa fa-truck pull-right" style="font-size: 30px;" aria-hidden="true"></i></h2>
+                                        <!-- <div class="main-income-phara order-cl">
+                                            <p>Annual</p>
+                                        </div> -->
+                                    </div>
+                                </div>
+                                <div class="income-dashone-pro">
+                                    <div class="income-rate-total">
+                                        <div class="price-adminpro-rate">
+                                            <h3><div id="avg_percent" class="odometer" style="font-size:20px" data-min-integer-len="3" data-format="(,ddd).dd"><?php echo round($month_count[0]['sum_percentage'] / $month_count[0]['overloaded_m_h'],2);?></div></h3>
+                                        </div>
+                                        <div class="price-graph">
+                                            <span id="sparkline6"></span>
+                                        </div>
+                                    </div>
+                                    <div class="income-range low-value-cl">
+                                        <p class="month"><?php echo $month_count[0]['date'];?></p>
+                                        <!-- <span class="income-percentange">33% <i class="fa fa-level-down"></i></span> -->
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                          </div>
+                     
+                      </td>
+                    </tr>
+                    </table>
+                      <table class="table" style="width:24%; margin-left: 0.5%; border-collapse: separate;border: solid #b20fbd 5px;border-radius: 6px;">
+                          <tr>
+                          <td colspan="4" style="padding:0" class="text-center">
+                            <span class="text-center" style="font-size: 28px;font-weight:900;color:#1224a0;">Motorway</span>
+                          </td>
+                        </tr>
+                          <tr>
+                              <td style="width: 25%;padding: 0.25rem;">
+                                  <div class="income-dashone-total total-motorway shadow-reset nt-mg-b-30">
+                                    <div class="income-title">
+                                        <div class="main-income-head">
+                                            <h2>Total Weighed<i class="fa fa-truck pull-right" style="font-size: 30px;" aria-hidden="true"></i></h2>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="income-dashone-pro">
+                                        <div class="income-rate-total">
+                                            <div class="price-adminpro-rate">
+                                                <h3><div id="total_month_m" class="odometer" style="font-size:20px" data-min-integer-len="4" data-format="d"><?php echo $month_count[0]['total_vehicles_m_m'];?></div></h3>
+                                            </div>
+                                            <div class="price-graph">
+                                                <span id="sparkline1"></span>
+                                            </div>
+                                        </div>
+                                       <div class="income-range low-value-cl">
+                                            <p class="month"><?php echo $month_count[0]['date'];?></p>
+                                            <!-- <span class="income-percentange">33% <i class="fa fa-level-down"></i></span> -->
+                                        </div>
+                                        <div class="clear"></div>
+                                    </div>
+                                  </div>
+                                
+                              </td>
+                          </tr>
+                          <tr>
+                            <td style="width: 25%;padding: 0.25rem;">
+                              <div class="income-dashone-total overloaded-motorway shadow-reset nt-mg-b-30">
+                                  <div class="income-title">
+                                      <div class="main-income-head">
+                                          <h2>Overloaded <i class="fa fa-truck pull-right" style="font-size: 30px;" aria-hidden="true"></i></h2>
+                                          <!-- <div class="main-income-phara order-cl">
+                                              <p>Annual</p>
+                                          </div> -->
+                                      </div>
+                                  </div>
+                                  <div class="income-dashone-pro">
+                                      <div class="income-rate-total">
+                                          <div class="price-adminpro-rate">
+                                              <h3><div id="overload_month_m1" class="odometer" style="font-size:20px" data-min-integer-len="4" data-format="d"><?php echo $month_count[0]['overloaded_m_m'];?></div></h3>
+                                          </div>
+                                          <div class="price-graph">
+                                              <span id="sparkline6"></span>
+                                          </div>
+                                      </div>
+                                      <div class="income-range low-value-cl">
+                                          <p class="month"><?php echo $month_count[0]['date'];?></p>
+                                          <!-- <span class="income-percentange">33% <i class="fa fa-level-down"></i></span> -->
+                                      </div>
+                                      <div class="clear"></div>
+                                  </div>
+                              </div>
+                            </td>
+                          </tr>
+                      </table>
+                    
                     
                 </div>
                 <div class="row">
@@ -215,7 +362,7 @@
                                 </div>
                                 
                                 <div class='list' id='list'>
-                                        <table id="dataTable3" class="text-center" style="width:100% !important;">
+                                        <table id="dataTablewlist" class="text-center" style="width:100% !important;">
                                             <thead class="text-capitalize">
                                                 <tr>
                                                     <th>No</th>
@@ -242,13 +389,18 @@
                                                     <td><?php echo $counter;?></td>
                                                     <td class="text-info" style="font-weight: 600;"><?php echo $row['name'];?></td>
                                                     <td class="text-success"><span id="date_<?php echo $row['id']?>"><?php echo date("F j, Y",strtotime($row['date']));?></span></td>
-                                                    <td  style="font-size: 16px;min-width:60px;"><div id="total_<?php echo $row['id']?>" class="odometer"><?php echo $row['total_vehicles'];?></div></td>
-                                                    <td  style="font-size: 16px;"><div id="overloaded_<?php echo $row['id']?>" class="odometer"><?php echo $row['overloaded'];?></div></td>
-                                                    <td  style="font-size: 16px;min-width:60px;"><div id="fined_<?php echo $row['id']?>" class="odometer"><?php echo $row['fined'];?></div></td>
+                                                    <td  style="font-size: 16px;min-width:60px;"><span id="total_<?php echo $row['id']?>" class="odometer"  data-min-integer-len="4" data-format="d"><?php echo $row['total_vehicles'];?></span></td>
+                                                    <td  style="font-size: 16px;"><span id="overloaded_<?php echo $row['id']?>" class="odometer"  data-min-integer-len="4" data-format="d"><?php echo $row['overloaded'];?></span></td>
+                                                    <td  style="font-size: 16px;min-width:60px;"><span id="fined_<?php echo $row['id']?>" class="odometer"  data-min-integer-len="4" data-format="d"><?php echo $row['fined'];?></span></td>
                                                     <td class="text-info"> <span id="update_<?php echo $row['id']?>"><?php if($row['last_updated']){echo date("F j, Y, g:i a",$row['last_updated']);}else{echo "<span class='badge badge-danger'>Not triggered</span>";}?></span></td>
                                                     <td id="connectivity_status_<?php echo $row['id'];?>"><?php if($row['con_status'] == 0){?><span class="fa fa-exclamation-triangle" style="color: red;font-size:25px;" data-toggle="tooltip" data-placement="top" title="Not Connected"></span><?php }else{?><span class="fa fa-check-square" style="color: green;font-size:25px;" data-toggle="tooltip" data-placement="top" title="Connected"></span><?php } ?></td>
-                                                    <td><a href="<?php echo base_url().'admin/weighstation_daily_report/by_weighstation/'.$row['id'];?>" class="btn-xs btn-success fa fa-calendar">&nbsp;Daily</a>&nbsp; <a href="<?php echo base_url().'admin/weighstation_monthly_report/by_weighstation/'.$row['id'];?>" class="btn-xs btn-info fa fa-calendar">&nbsp; Monthly</a></td>
-                                                    
+                                                    <td>
+                                                    <a href="<?php echo base_url().'admin/weighstation_daily_report/by_weighstation/'.$row['id'];?>" class="btn-xs btn-success fa fa-calendar">&nbsp;Daily</a>
+                                                    &nbsp; 
+                                                    <a href="<?php echo base_url().'admin/weighstation_monthly_report/by_weighstation/'.$row['id'];?>" class="btn-xs btn-info fa fa-calendar">&nbsp; Monthly</a>
+                                                    &nbsp;
+                                                    <a href="<?php echo base_url().'admin/weighstation_summary_report/by_weighstation/'.$row['id'];?>" class="btn-xs btn-warning fa fa-calendar">&nbsp; Summary</a>
+                                                    </td>
                                                 </tr> 
                                                 <?php    }
                                                 }?>
@@ -278,23 +430,48 @@
  
     
 </script>
+<script src="<?php echo base_url();?>assets/back/js/odometer.js"></script>
+<script>
+  var k = 0;
+  var odometers = document.querySelectorAll(".odometer");
 
+  for (var i = 0, len = odometers.length; i < len; ++i) {
+    var it = odometers[i];
+    var desc = it.parentNode.querySelector(".desc");
+    var valuee = it.textContent || it.innerText; 
+    var format = it.getAttribute("data-format");
+    var minIntegerLen = it.getAttribute("data-min-integer-len");
+    if (minIntegerLen) {
+      minIntegerLen = parseInt(minIntegerLen);
+    } else {
+      minIntegerLen = 0;
+    }
+    if (!format) {
+      //desc.textContent = "real value";
+    } else {
+      try {
+         od = new Odometer({
+            el: it,
+            value: valuee,
+             format: format,
+              minIntegerLen: minIntegerLen
+          });
+        
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+  }
+
+
+</script>
  <script>
 
 
 
     $(document).ready(function(){
-        $('#dataTable3').DataTable();
-        window.odometerOptions = {
-  format: '(ddd).dd'
-};
-        jackpotOdometer = new Odometer({
-          //value: startValue,
-          format: '(,ddd).dd'
-        });
-    })
-
-
+        $('#dataTablewlist').DataTable({"pageLength": 25});
+    });
       var timer =  setInterval(function(){
     
         $.ajax({   
@@ -323,9 +500,13 @@
                      
                 }); 
                 //alert(obj.monthly[0].total_vehicles_m);
-                $('#total_month').html(obj.monthly[0].total_vehicles_m);
-                     $('#overload_month').html(obj.monthly[0].overloaded_m);
+                     $('#total_month_h').html(obj.monthly[0].total_vehicles_m_h);
+                     $('#overload_month_h').html(obj.monthly[0].overloaded_m_h);
+                     $('#total_month_m').html(obj.monthly[0].total_vehicles_m_m);
+                     $('#overload_month_m').html(obj.monthly[0].overloaded_m_m);
                      $('#fine_month').html(obj.monthly[0].fined_m);
+                     $('#overload_avg').html((obj.monthly[0].overloaded_m_h * 100 / obj.monthly[0].total_vehicles_m_h).toFixed(2));
+                     $('#avg_percent').html((obj.monthly[0].sum_percentage / obj.monthly[0].overloaded_m_h).toFixed(2));
                      $('#without_fine').html(obj.monthly[0].without_fine * 1000);
                      $('.month').html(obj.monthly[0].date);
                      $('[rel=tooltip]').tooltip('disable')
@@ -336,10 +517,7 @@
                console.log(e)
            }
        }); 
-        
     },30000); 
-
     </script>
-
-        <!-- footer area start-->
+    <!-- footer area start-->
    <?php include('includes/footer.php')?>       

@@ -17,7 +17,7 @@ class Cronjobs extends CI_Controller{
         }
 
         $getfile =  str_replace('-', '',date('d-m-Y'));
-        $weigh = $this->db->get_where('weighstation',array('status' => 1))->result_array();
+        $weigh = $this->db->get_where('weighstation',array('status' => 1,'software_type' => 1))->result_array();
         
         if($weigh){
             foreach ($weigh as $row) {
@@ -36,7 +36,7 @@ class Cronjobs extends CI_Controller{
                     $dir = "ftp://".$row['address']."/";
                 }
                 if($row['type'] == 2){
-                  $conn_id = ftp_connect($row['address']);
+                  $conn_id = ftp_connect($row['address'],21,5);
   
                 }elseif($row['type'] == 1){
                     //$fp = @fsockopen($row['address'], 80, $errno, $errstr,5);
@@ -46,7 +46,7 @@ class Cronjobs extends CI_Controller{
                
                 if ($row['type'] == 2 && !$conn_id) {
                     $this->db->where('id',$row['id']);
-                    $this->db->update('weighstation',array('con_status' => 0));
+                    $this->db->update('weighstation',array('con_status' => 0,'last_updated' => time()));
                 } else {
                     $file = $dir.$getfile.".dat";
                     $file1 = $dir.$getfile.".inf";
@@ -160,9 +160,13 @@ class Cronjobs extends CI_Controller{
                             }
                            
                         }
+                        $this->db->where('id', $row['id']);
+                        $this->db->update('weighstation', array('last_updated' => time(),'con_status' => 1));
+                    
+                    
                     }else{
                             $this->db->where('id',$row['id']);
-                            $this->db->update('weighstation',array('con_status' => 0,'last_updated' => time()));
+                            $this->db->update('weighstation',array('con_status' => 1,'last_updated' => time()));
                     
                     }
                 }
@@ -173,9 +177,7 @@ class Cronjobs extends CI_Controller{
                     $ins_data = array_values(array_slice($ins_data, $c));
                     if($ins_data){
                        $this->db->insert_batch('weighstation_data', $ins_data);  
-                        $this->db->where('id', $row['id']);
-                        $this->db->update('weighstation', array('last_updated' => time(),'con_status' => 1));
-                    }
+                       }
                  
                 } 
             }

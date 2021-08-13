@@ -93,8 +93,33 @@
       }
     });
   });
+  $('body').on('change', 'input[name=toggle2]', function (){
+    
+    var mode= $(this).prop('checked');
+    var id=$( this ).val();
+    $.ajax({
+      type:'POST',
+      url:'<?php echo base_url()?>admin/weighstation/camera_publish_set/' + id + '/' +mode,
+      cache       : false,
+      contentType : false,
+      processData : false,
+      
+      success:function(data)
+      {
+                var obj = data;
+                console.log(data);
+                if(obj == 'true'){ 
+                    notify('Active Successfully','success','top','right');
+                }else{
+                    notify('Inactive Successfully','danger','top','right');
+                }
+                //progress.html('');
+      }
+    });
+  });
 $(document).ready(function(){
             $.ajax({ 
+            
             url: "<?php echo base_url();?>admin/weighstation/list",
             cache       : false,
             contentType : false,
@@ -109,16 +134,12 @@ $(document).ready(function(){
                  $('#dataTable3').DataTable();
                   $("[data-toggle='toggle']").bootstrapToggle('destroy')                 
                     $("[data-toggle='toggle']").bootstrapToggle();
-                                
             },
             error: function(e) {
                 console.log(e)
             }
             });
-        
-        
         });
-    
 </script>
 <div class="modal fade" id="weighAdd">
     <div class="modal-dialog">

@@ -1,9 +1,9 @@
 
-           <div class="row ">
+           <div class="row" style="width: -webkit-fill-available;">
                 <div class="col-sm-12 pl-1 pr-1">
                   <!-- Add Assets & Action Button Start -->
                  
-                    <div class='row mb-1 mt-1'>
+                    <div class='row mb-1 mt-1 action_button'>
                       <div class='col-md-4'>
                       <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
                         <button type="button" class="btn btn-primary btn-sm" style='line-height: 0.5;' name="submit" >Action</button>
@@ -76,18 +76,10 @@
                       <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Name</th>
                       <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Current Status</th>
                       <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Office: activate to sort column ascending" style="width: auto;">Current Site</th>
-                      <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Custody of</th>
+                      <!-- <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Custody of</th> -->
                     </tr>
                   </thead>
-                  <tfoot>
-                    <tr>
-                       <th rowspan="1" colspan="1">Sr #</th>
-                       <th rowspan="1" colspan="1">Name</th>
-                       <th rowspan="1" colspan="1">Current Status</th>
-                       <th rowspan="1" colspan="1">Current Site</th>
-                       <th rowspan="1" colspan="1">Custody of</th>
-                    </tr>
-                  </tfoot>
+
                   <tbody >
                   <?php
                     //  echo "<pre>"; print_r($assets);
@@ -104,7 +96,8 @@
                        // $toolplaza_name = $this->db->get_where('toolplaza',array('id' =>$row['toolplaza']))->row()->name;
                        // $support = $this->db->get_where('supporting_document',array('mtr_id' => $row['id']))->result_array();
                     ?>
-                    <?php if(count($items)>1){?>                           
+                    <?php if(count($items)>1){?> 
+                                        
                   <tr role="row" class="odd " id="mainrow<?php echo $counter ?>" >
                       <td class="sorting_1">
                       <i class="far fa-caret-square-down" data-toggle="collapse" data-parent="tbody<?php echo $counter ?>"  data-target="#collapseme" style="cursor:pointer;" onclick="expandCollapse(this,'expanded_asset')">
@@ -187,7 +180,7 @@
                             echo $site[0]['name'];
                           ?>
                         </td>
-                      <td>
+                      <!-- <td>
                       <?php if($asset['action_status']==1){?>
                          <?php if($asset['checkout_user_type']=="1"){ 
                                $checkout_to = $this->db->get_where('admin',array('id' => $asset['checkout_to']))->result_array(); 
@@ -205,7 +198,7 @@
                                  echo $checkout_to[0]['fname']." ".$checkout_to[0]['lname'];
                                } ?>
                        <?php } ?>
-                      </td>
+                      </td> -->
                       </tr>
                      
                       
@@ -295,7 +288,7 @@
                             echo $site[0]['name'];
                           ?>
                         </td>
-                      <td>
+                      <!-- <td>
                       <?php if($asset['action_status']==1){?>
                          <?php if($asset['checkout_user_type']=="1"){ 
                                $checkout_to = $this->db->get_where('admin',array('id' => $asset['checkout_to']))->result_array(); 
@@ -313,7 +306,7 @@
                                  echo $checkout_to[0]['fname']." ".$checkout_to[0]['lname'];
                                } ?>
                        <?php } ?>
-                      </td>
+                      </td> -->
                       </tr>
 
                               <?PHP } ?>
@@ -618,7 +611,6 @@ if( filter_by == 2)
         });
    // }
   });</script>
-
 <script>$('body').on('change', '#site', function (){
     var site = this.value;
     //if(tollplaza){
@@ -680,22 +672,7 @@ if( filter_by == 2)
                 $('#expandedDataTable33').DataTable({
                   "destroy": true
                 });
-			          //tr.after(data).fadeIn();
-                // console.log(document.getElementById('tbody2'));
-                // let tbdy = 1;
-                // let sitecounter=0;
-                //   data.expanded_data.forEach(asset => {
-                //     // console.log(asset.id);
-                //     var row = '<tr role="row" class="trow'+tr.id+'" id="trow'+tr.id+'" class="collapse out" ><td><input style="margin-left:15px; cursor:pointer;" name="selection" id="ischecked" class="selection " value='+asset.id+' type="checkbox"></td><td> <a href="#" onclick=show_asset("<?php echo base_url().'inventory/selected_asset/list/'?>'+asset.id+'","display_selected_asset")>'+data.naam+'</a></td><td>'+data.action_status[sitecounter]+'</td><td>'+data.sites[sitecounter++]+'</td><td></td></tr>'
-                //      $('#'+tr.id).after(row);
-                     
-                //       if(assetName.className==='fa-caret-square-up'){
-                //       $('.fa-caret-square-up').slideToggle();
-                //     //   // console.log(assetName.className);
-                //     //   assetName.className.addEventListener('click',collapse());
-                //      }
-                //      tbdy++;
-                //   });  
+ 
                 },
               error: function(e) {
               //  console.log(e)

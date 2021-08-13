@@ -120,6 +120,7 @@ var height = $( window ).height();
 								},
 								success: function(data) {
 								var obj = JSON.parse(data);
+								// console.log(obj); return false;
 							
 							if(!obj.response){
 								var buttonp = $('.enterer');
@@ -314,7 +315,12 @@ var height = $( window ).height();
 	
 
 		$(document).on('click', '.paginate_button', function(e){
-		 			$('#dataTable').DataTable();
+					 $('#dataTable').DataTable();
+					 if ($('[data-toggle="toggle"]').length) {
+						$("[data-toggle='toggle']").bootstrapToggle('destroy'); 
+						$("[data-toggle='toggle']").bootstrapToggle(); 
+						
+				  }
 					 if(typeof bootstrapToggle === 'function'){
 						$("[data-toggle='toggle']").bootstrapToggle('destroy'); 
 						$("[data-toggle='toggle']").bootstrapToggle(); 

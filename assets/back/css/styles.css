@@ -135,8 +135,8 @@
 }
 
 .slimScrollBar {
-    background: #2942fa!important;
-    opacity: 0.1!important;
+    background: #ffff!important;
+    opacity: 1.1!important;
 }
 
 .sidebar-header {
@@ -2839,4 +2839,5 @@ table.dataTable thead td {
 /*-------------------- END Offset Sidebar ------------------- */
 
 /*---------------------Inventory Page styling start-------------------------*/
+/*---------------------Inventory Page styling end-------------------------*/
 

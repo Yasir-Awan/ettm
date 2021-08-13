@@ -674,10 +674,20 @@ class Inventory extends CI_Controller
 			$this->load->view('back/inventory/display_sites',$this->page_data);	
 		}
 		elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('sites');
 			$this->db->where('site', $para2);
 			$this->db->delete('locations');
+			$this->db->where('site', $para2);
+			$this->db->delete('installed_inventory');
+			$this->db->where('site', $para2);
+			$this->db->delete('installed_subitems');
+			$this->db->where('site', $para2);
+			$this->db->delete('assets');
+			$this->db->where('site', $para2);
+			$this->db->delete('sub_assets');
+			$this->db->where('site', $para2);
+			$this->db->delete('asset_transaction');
+			$this->db->where('id', $para2);
+			$this->db->delete('sites');
 			echo json_encode(array('response' => true, 'message' => 'Deleted successfully','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page/')); exit;
 		}elseif ($para1 == 'site_publish_set') {
             $article = $para2;
@@ -760,7 +770,9 @@ class Inventory extends CI_Controller
 	  if($this->form_validation->run() == TRUE)
 	  {  
 		 $data = array(
-			 'name' => $this->input->post('site_name')
+			'name' => $this->input->post('site_name'),
+			'site_type' => $this->input->post('site_type'),
+			'route' => $this->input->post('route')
 			 );
 		 $this->db->insert('sites',$data);
 		 $site_id = $this->db->insert_id();
@@ -1320,36 +1332,69 @@ public function manufacturers($para1 = '' , $para2 = '', $para3 =''){
 		if($para1 == 'list')
 		{
 			$this->page_data['installs'] = $this->Inventory_model->get_installed();
-			foreach($this->page_data['installs'] as $install){	
-				if($install['transaction_type']==11){
-					$faulty_comp = $this->db->get_where('sub_items',array('id' => $install['subitem_id']))->result_array();
-					$this->page_data['faulty_comp_name'] = $faulty_comp[0]['name'];
-					$this->page_data['faulty_component'] = $faulty_comp ;
-				}	
-				if($install['transaction_type']==12){
-					$installed_comp = $this->db->get_where('installed_subitems',array('installed_id' => $install['id'],'transaction_type' => $install['transaction_type']))->result_array();
-					$compName = $this->db->get_where('sub_items',array('id' => $installed_comp[0]['subitem_id'],))->result_array();
-					$this->page_data['faulty_comp_name'] = $compName[0]['name'];
-					$this->page_data['faulty_component'] = $compName ;
+			$sites = $this->Inventory_model->getsites();
+			$items = $this->Inventory_model->get_Items();
+			$locations = $this->Inventory_model->get_locations();
+			$siteNames = array();
+			$itemNames = array();
+			$locationNames = array();
+			foreach($this->page_data['installs'] as $install){
+				foreach($sites as $names){
+					if($names['id']==$install['site']){
+						$siteNames[] = $names['name'];
+					break;
+					}
 				}
-				if($install['transaction_type']==13){
-					$faulty_comp = $this->db->get_where('sub_items',array('id' => $install['subitem_id']))->result_array();
-					$this->page_data['faulty_comp_name'] = $faulty_comp[0]['name'];
-					$this->page_data['faulty_component'] = $faulty_comp ;
+				foreach($items as $item){
+					if($item['id']==$install['name']){
+						$itemNames[] = $item['name'];
+					break;
+					}
 				}
-				if($install['transaction_type']==14){
-					$faulty_comp = $this->db->get_where('sub_items',array('id' => $install['subitem_id']))->result_array();
-					$this->page_data['faulty_comp_name'] = $faulty_comp[0]['name'];
-					$this->page_data['faulty_component'] = $faulty_comp ;
-				}	
-				if($install['transaction_type']==15){
-					$faulty_comp = $this->db->get_where('sub_items',array('id' => $install['subitem_id']))->result_array();
-					$this->page_data['faulty_comp_name'] = $faulty_comp[0]['name'];
-					$this->page_data['faulty_component'] = $faulty_comp ;
+				foreach($locations as $location){
+					if($location['id']==$install['location']){
+						$locationNames[] = $location['location'];
+					break;
+					}
+				}
+				// $itemNames[] = $this->db->get_where('items',array('id'=>$install['name']))->result_array();
+				// $siteNames[] = $this->db->get_where('sites',array('id'=>$install['site']))->result_array();
+				// $locationNames[] = $this->db->get_where('locations',array('id' => $install['location']))->result_array();
+				if($install['have_sub_items']==1){	
+						if($install['transaction_type']==11){
+							$faulty_comp = $this->db->get_where('sub_items',array('id' => $install['subitem_id']))->result_array();
+							$this->page_data['faulty_comp_name'] = $faulty_comp[0]['name'];
+							$this->page_data['faulty_component'] = $faulty_comp ;
+						}	
+						if($install['transaction_type']==12){
+							// $installed_comp = $this->db->get_where('installed_subitems',array('installed_id' => $install['id'],'transaction_type' => $install['transaction_type']))->result_array();
+							$compName = $this->db->get_where('sub_items',array('id' => $installed_comp[0]['subitem_id'],))->result_array();
+							$this->page_data['faulty_comp_name'] = $compName[0]['name'];
+							$this->page_data['faulty_component'] = $compName ;
+						}
+						if($install['transaction_type']==13){
+							$faulty_comp = $this->db->get_where('sub_items',array('id' => $install['subitem_id']))->result_array();
+							$this->page_data['faulty_comp_name'] = $faulty_comp[0]['name'];
+							$this->page_data['faulty_component'] = $faulty_comp ;
+						}
+						if($install['transaction_type']==14){
+							$faulty_comp = $this->db->get_where('sub_items',array('id' => $install['subitem_id']))->result_array();
+							$this->page_data['faulty_comp_name'] = $faulty_comp[0]['name'];
+							$this->page_data['faulty_component'] = $faulty_comp ;
+						}	
+						if($install['transaction_type']==15){
+							$faulty_comp = $this->db->get_where('sub_items',array('id' => $install['subitem_id']))->result_array();
+							$this->page_data['faulty_comp_name'] = $faulty_comp[0]['name'];
+							$this->page_data['faulty_component'] = $faulty_comp ;
+						}
 				}		  
 			}
-			$this->page_data['sites'] = $this->Inventory_model->getsites();
-			$this->page_data['items'] = $this->Inventory_model->get_Items();
+			$this->page_data['sites'] = $sites;
+			$this->page_data['items'] = $items;
+			$this->page_data['siteNames'] = $siteNames;
+			$this->page_data['itemNames'] = $itemNames;
+			$this->page_data['locationNames'] = $locationNames;
+			// echo "<pre>"; print_r($this->page_data); exit;
 			$this->page_data['asset_transactions'] = $this->Inventory_model->get_asset_transactions();
 			$this->load->view('back/inventory/display_installed', $this->page_data);	
 		}
@@ -1357,15 +1402,16 @@ public function manufacturers($para1 = '' , $para2 = '', $para3 =''){
 			$this->db->where('alert_type', 1);
 			$this->db->where('ref_id', $para2);
 			$this->db->delete('notifications');
-			$this->db->where('installed_id', $para2);
+			$this->db->where('identification_no', $para2);
 			$this->db->delete('asset_transaction');
-			$this->db->where('installed_id', $para2);
+			$installed_subitems = $this->db->select('*')->where('identification_no', $para2)->get('installed_subitems')->result_array();
+			$this->db->where('installed_id', $installed_subitems[0]['installed_id']);
 			$this->db->delete('installed_subitems');
-			$this->db->where('installed_id', $para2);
+			$this->db->where('identification_no', $para2);
 			$this->db->delete('faulty_equipment_list');
-			$this->db->where('installed_id', $para2);
-			$this->db->delete('serial_no');
-			$this->db->where('id', $para2);
+			// $this->db->where('identification_no', $para2);
+			// $this->db->delete('serial_no');
+			$this->db->where('identification_no', $para2);
 			$this->db->delete('installed_inventory');
 			echo json_encode(array('response' => true, 'message' => 'Deleted successfully','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page/')); exit;
 		}elseif ($para1 == 'assets_publish_set') {
@@ -1393,11 +1439,22 @@ public function manufacturers($para1 = '' , $para2 = '', $para3 =''){
 		if($para1 == 'list')
 		{
 			$this->page_data['selected_installed'] = $this->db->select('*')->where('id', $para2)->order_by('id','desc')->limit(1)->get('installed_inventory')->result_array();
-			$this->page_data['selected_installed_transaction'] = $this->db->select('*')->where('installed_id', $para2)->where('installed_id', $para2)->order_by('id','desc')->limit(1)->get('asset_transaction')->result_array();
+			$this->page_data['selected_installed_transaction'] = $this->db->select('*')->where('installed_id', $para2)->order_by('id','desc')->limit(1)->get('asset_transaction')->result_array();
 			$this->page_data['selected_assets'] = $this->db->get_where('assets',array('id' => $this->page_data['selected_installed'][0]['asset_id']))->result_array();		
-			$installed_transactions = $this->db->select('*')->where('installed_id', $para2)->where('is_sub_item', 1)->order_by('id','desc')->get('asset_transaction')->result_array();
-				//    echo "<pre>"; print_r($installed_transactions); exit;
+			$this->page_data['installed_components'] = $this->db->get_where('installed_subitems',array('installed_id' => $this->page_data['selected_installed'][0]['id']))->result_array();
+			$installed_transactions = $this->db->select('*')->where('installed_id', $para2)->order_by('id','desc')->get('asset_transaction')->result_array();
 			$this->page_data['install_transactions'] = $installed_transactions;
+			$this->load->view('back/inventory/display_selected_installs',$this->page_data);	
+		}
+		if($para1 == 'listfromdashboard')
+		{
+			$this->page_data['selected_installed'] = $this->db->select('*')->where('identification_no', $para2)->order_by('id','desc')->limit(1)->get('installed_inventory')->result_array();
+			$this->page_data['selected_installed_transaction'] = $this->db->select('*')->where('identification_no', $para2)->order_by('id','desc')->limit(1)->get('asset_transaction')->result_array();
+			$this->page_data['selected_assets'] = $this->db->get_where('assets',array('id' => $this->page_data['selected_installed'][0]['asset_id']))->result_array();
+			$this->page_data['installed_components'] = $this->db->get_where('installed_subitems',array('installed_id' => $this->page_data['selected_installed'][0]['id']))->result_array();		
+			$installed_transactions = $this->db->select('*')->where('identification_no', $para2)->order_by('id','desc')->get('asset_transaction')->result_array();
+			$this->page_data['install_transactions'] = $installed_transactions;
+			// echo "<pre>"; print_r($this->page_data['selected_installed']); exit;
 			$this->load->view('back/inventory/display_selected_installs',$this->page_data);	
 		}
 	}
@@ -1410,14 +1467,6 @@ public function assets($para1 = '' , $para2 = '', $para3 =''){
 	}
 	if($para1 == 'list')
 	{
-		// $site_related_assets = $this->db->get_where('installed_inventory',array('site' => 7))->result_array();
-        // foreach($site_related_assets as $row){
-		// 	$sra = array(
-		// 		'asset' => $row['asset_id'],
-		// 		'site' => $row['site'],                
-		// 		 );
-		// 		 $this->db->insert('site_related_assets',$sra);
-		// }
 		$this->page_data['assets'] = $this->Inventory_model->get_assets();
 		foreach($this->page_data['assets'] as $asset){	
 			if($asset['action_status']==11){
@@ -1626,14 +1675,6 @@ public function add_asset_components($para1='',$para2='',$para3='')
 		$this->page_data['quantity'] = $para2;
 		$this->load->view('back/inventory/add_asset_components', $this->page_data);
 	 }
-	//  public function add_asset_components_do($para1='',$para2='',$para3='')
-	// {  
-	// 	if(!$this->session->userdata('adminid'))
-	// 	{
-	// 		return redirect('admin/login');
-	// 	}
-	// 	// echo "<pre>"; print_r($_POST);
-	//  }
 
 	public function add_asset()
 	{  
@@ -1641,12 +1682,17 @@ public function add_asset_components($para1='',$para2='',$para3='')
 		{
 			return redirect('admin/login');
 		}
+		// echo "sabar Karo!" ; exit;
 		$this->page_data['sites'] = $this->Inventory_model->getsites();
 		$this->page_data['suppliers'] = $this->Inventory_model->get_suppliers();
 		$this->page_data['items'] = $this->Inventory_model->get_Items();
-		//$this->page_data['locations'] = $this->Inventory_model->get_locations();
 		$this->page_data['manufacturers'] = $this->Inventory_model->get_manufacturers();
 		$this->load->view('back/inventory/add_asset', $this->page_data);
+	 }
+
+	 public function SitesByType($para1=''){
+		$sites = $this->Inventory_model->GetSitesByType($para1);
+		echo json_encode($sites);
 	 }
 	 
 	 public function add_asset_do()
@@ -1669,6 +1715,10 @@ public function add_asset_components($para1='',$para2='',$para3='')
 		  {
 			 $eSerialCounter = 0;
 			 $oldTabNumber=1;
+			 $route = '';
+			 if($this->session->userdata('role')==3){ $route = 3; }
+			 if($this->session->userdata('role')==4){ $route = 4; }
+			 if($this->session->userdata('role')==1 || $this->session->userdata('role')==2){ $route = 1; }
 			 $quantity = $this->input->post('quantity');
 			 $cost = $this->input->post('asset_price');
 			 $unit_cost = $cost/$quantity;
@@ -1700,12 +1750,14 @@ public function add_asset_components($para1='',$para2='',$para3='')
 						 'mfg_date'=> $this->input->post('mfg_date'),
 						 'cost_price' => $unit_cost,
 						 'supplier' => $this->input->post('supplier_id'),
+						 'route' => $route,
 						 'site' => $this->input->post('site_id'),
 						 'purchased_on' => $this->input->post('purchase_date'),
 						 'po_no' => $this->input->post('po_no'),
 						 'warranty_type' => $this->input->post('warranty_type'),
 						 'warranty_duration' => $this->input->post('warranty_duration'),
 						 'have_sub_assets'=>0,
+						 'asset_comment' => $this->input->post('asset_comment'),
 						 'user_type' => '1',
 						 'checkin_by' => $this->session->userdata('adminid'),
 						 'add_date' => time()
@@ -1721,21 +1773,16 @@ public function add_asset_components($para1='',$para2='',$para3='')
 						 $query = $this->db->get('assets');  // Produces: SELECT MAX(set_no) as age FROM assets
 						 $setNO = $query->row()->set_no;
 						 $setNO = $setNO+1;
-						 // echo "<pre>"; print_r($setNO); exit;
 				 $array = json_decode($this->input->post('additional_data'), true);
-				 // echo "<pre>"; print_r($array); exit;
+				//  echo "<pre>"; print_r($array); exit;
 				 foreach($array as $arr)
 				 {
-					 // echo "<pre>"; print_r($arr['tabNumber']);
-					 
 					 if($oldTabNumber==$arr['tabNumber'])
 					 {
-						 
 						 if($setNO==0)
 						 {
 							 $setNO=1;
 						 }
-						 // echo "<pre>"; print_r($setNO); exit;
 						 $data = array(
 							 'item_type' => $this->input->post('item_type'),
 							 'name' => $this->input->post('asset_name'),
@@ -1754,6 +1801,7 @@ public function add_asset_components($para1='',$para2='',$para3='')
 							 'comp_serial'=> $arr['componentSerial'],
 							 'supplier' => $this->input->post('supplier_id'),
 							 'equip_or_comp'=>1,
+							 'route'=>$route,
 							 'site' => $this->input->post('site_id'),
 							 'purchased_on' => $this->input->post('purchase_date'),
 							 'po_no' => $this->input->post('po_no'),
@@ -1763,13 +1811,12 @@ public function add_asset_components($para1='',$para2='',$para3='')
 							 'warranty_duration' => $this->input->post('warranty_duration'),
 							 'user_type' => '1',
 							 'have_sub_assets'=>1,
+							 'asset_comment' => $this->input->post('asset_comment'),
 							 'checkin_by' => $this->session->userdata('adminid'),
 							 'add_date' => time()
 					 ); 
-					 // echo "<pre>"; print_r($data);
 					 $this->db->insert('assets',$data);
 					 $ref_id[] = $this->db->insert_id();
-		 
 					 }
 					 if($oldTabNumber!=$arr['tabNumber'])
 					 {
@@ -1781,7 +1828,6 @@ public function add_asset_components($para1='',$para2='',$para3='')
 						 {
 							 $setNO=1;
 						 }
-						 
 						 $data = array(
 						 'item_type' => $this->input->post('item_type'),
 						 'name' => $this->input->post('asset_name'),
@@ -1800,6 +1846,7 @@ public function add_asset_components($para1='',$para2='',$para3='')
 						 'comp_serial'=> $arr['componentSerial'],
 						 'supplier' => $this->input->post('supplier_id'),
 						 'equip_or_comp'=>1,
+						 'route'=>$route,
 						 'site' => $this->input->post('site_id'),
 						 'purchased_on' => $this->input->post('purchase_date'),
 						 'po_no' => $this->input->post('po_no'),
@@ -1808,19 +1855,16 @@ public function add_asset_components($para1='',$para2='',$para3='')
 						 'warranty_type' => $this->input->post('warranty_type'),
 						 'warranty_duration' => $this->input->post('warranty_duration'),
 						 'have_sub_assets'=>1,
+						 'asset_comment' => $this->input->post('asset_comment'),
 						 'user_type' => '1',
 						 'checkin_by' => $this->session->userdata('adminid'),
 						 'add_date' => time()
 					 );
 					 $this->db->insert('assets',$data);
 					 $ref_id[] = $this->db->insert_id();
-					 // echo "<pre>"; print_r($data);
 					 }
 					 $oldTabNumber=$arr['tabNumber'];
-					 // $equipSerial = $this->input->post('equip_serial_no');
-					 // $eSerialCounter++;
 				 }	
-				 // exit;	 
 			 }
 				 foreach($ref_id as $id)
 				 {
@@ -1840,18 +1884,17 @@ public function add_asset_components($para1='',$para2='',$para3='')
 							 'notification_msg' => 'A new Asset Added by Admin.'                
 								 );
 								 $counter++;
-						 $this->db->insert('notifications', $data11); 
+						 	$this->db->insert('notifications', $data11); 
 					 }
-				 }
-		 
-			 if($this->input->post('quantity')>1)
-			 {			     
-				 echo json_encode(array('response' => true, 'message' =>'Asset Stock Created Successfully','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
-			 }
-			 if($this->input->post('quantity')==1)
-			 {
-				 echo json_encode(array('response' => true, 'message' =>'Asset Created Successfully','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
-			 }
+				 }		 
+					if($this->input->post('quantity')>1)
+					{			     
+						echo json_encode(array('response' => true, 'message' =>'Asset Stock Created Successfully','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
+					}
+					if($this->input->post('quantity')==1)
+					{
+						echo json_encode(array('response' => true, 'message' =>'Asset Created Successfully','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
+					}
 		 }
 	  } 
 	  else
@@ -2526,51 +2569,39 @@ public function add_asset_components($para1='',$para2='',$para3='')
 			  $installs = $this->page_data['installs'];
 			//   echo "<pre>"; print_r($installs); exit;
 			$alreadyGivenSerialNo = array();
-			  $data = array();
+			//   $data = array();
 			  foreach($installs as $install)
 			  {
-				  $data[] = $this->db->get_where('assets',array('id' => $install))->result_array();  
+				  $data = $this->db->get_where('assets',array('id' => $install))->result_array();    
 			  }
-				//  echo "<pre>"; print_r($data); exit;
-				 
-				 
-					$alreadyGivenSerialNo = $this->db->get_where('assets',array('set_no' => $data[0][0]['set_no']))->result_array();
-					// $oldSerials= array();
-					// foreach($alreadyGivenSerialNo as $ags)
-		   			// {
-					// 	   $oldSerials[] = $ags['serial_no'];
-					// }
+			//   echo "<pre>"; print_r($data); exit;
+					$alreadyGivenSerialNo = $this->db->get_where('assets',array('set_no' => $data[0]['set_no']))->result_array();
 					$this->page_data['alreadyGivenSerialNo'] = $alreadyGivenSerialNo; 
-				 
-				//  echo "<pre>"; print_r($oldSerials); exit;
-
-				 $components = array();
-			  	 $data2 = array();
-			  foreach($data as $row)
+					$components = array();
+					$data2 = array();
+			  		// echo "<pre>"; print_r($alreadyGivenSerialNo); exit;
+			  foreach($alreadyGivenSerialNo as $row)
 			  {
 				//   $alreadyGivenSerialNo = $row['serial_no'];
-				  if($row[0]['have_sub_assets']==1){
-					  $data2 = $this->db->get_where('sub_items',array('item_id' => $row[0]['name']))->result_array();
-				  }
-					//   if($row[0]['action_status'] == "0" )
-					//   {
-					// 	  echo "Brand New Items selected You must Check Out them first."; exit;
-					// 	}
-						if($row[0]['action_status'] == "2" )
-					  {
-						  echo "Checked In Items selected You must Check Out them first."; exit;
-						}
-						if($row[0]['action_status'] == "4" )
-					  {
-						  echo "Repairing Mode Items selected You cannot install them."; exit;
-						}
-						if($row[0]['action_status'] == "6" )
-					  {
-						  echo "Retired Items Selected. You cannot Install them."; exit;
-					  }
-					  $items = $this->Inventory_model->getItemsBySetNo($para1=$row[0]['set_no']);
+					if($row['have_sub_assets']==1){
+						$data2[] = $this->db->get_where('sub_items',array('id' => $row['comp_id']))->result_array();
+					}
+					if($row['action_status'] == "2" )
+					{
+						echo "Checked In Items selected You must Check Out them first."; exit;
+					}
+					if($row['action_status'] == "4" )
+					{
+						echo "Repairing Mode Items selected You cannot install them."; exit;
+					}
+					if($row['action_status'] == "6" )
+					{
+						echo "Retired Items Selected. You cannot Install them."; exit;
+					}
+					  $items = $this->Inventory_model->getItemsBySetNo($para1=$row['set_no']);
 			  }
 			//   echo "<pre>"; print_r($items); exit;
+			//   echo "<pre>"; print_r($data2); exit;
 			  $this->page_data['data2'] = $data2;
 
 			  $data3 = array();
@@ -2586,7 +2617,8 @@ public function add_asset_components($para1='',$para2='',$para3='')
 			   $this->page_data['data'] = $data3; 		
 		   }
 		        $this->page_data['data1'] = $data;
-				$this->page_data['sites'] = $this->Inventory_model->getsites();
+				$this->page_data['sites'] = $this->db->get_where('sites',array('id' => $data[0]['site']))->result_array();
+				// echo "<pre>"; print_r($this->page_data['sites']); exit;
 				// $this->page_data['locations'] = $this->Inventory_model->get_locations();
 				$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
 			    $this->load->view('back/inventory/install',$this->page_data);	
@@ -2595,9 +2627,7 @@ public function add_asset_components($para1='',$para2='',$para3='')
 
 	 elseif ($para1 == 'install_do')
 	 {
-		//  echo "<pre>"; print_r($_POST); exit;
 		$locations = $this->input->post('location');
-		// echo "<pre>"; print_r($locations); exit;
 		if(empty($locations)){
 			echo json_encode(array('respose' => FALSE , 'message' => 'Please choose location'));exit;	
 		}
@@ -2615,522 +2645,239 @@ public function add_asset_components($para1='',$para2='',$para3='')
 		if($this->session->userdata('adminid'))
 		{
 			if($loc_Counter>1){
-	// 		if($this->input->post('repairing_company')=="1")
-	// 		{
-	// 				$this->page_data['assets_ids'] = explode(',', $_POST['asset_id']);
-	// 				$asset_ids = $this->page_data['assets_ids'];
-					
-	// 		        $install_id = array();
-	// 			    foreach ($locations as $location){
-	// 				$date = date("Y-m-d H:i:s");
-	// 				$asset = $this->db->get_where('assets',array('id' => $asset_ids[0]))->result_array();
-	// 			    // echo "<pre>"; print_r($asset); exit;
-	// 			  $assets_data = array(
-	// 				'checkout_to'=> "",
-	// 				'have_sub_assets'=> $asset[0]['have_sub_assets'],
-	// 				'action_status'=>'3',
-	// 				'checkout_user_type' =>"",
-	// 				'site'=>$this->input->post('site_id'),
-	// 				'add_date'=> time(),
-	// 			);
-	// 			 $this->db->where('id',$asset_ids[0]);
-	// 			 $this->db->update('assets',$assets_data);
-
-	// 			 $sra = array(
-	// 				'asset' => $asset_ids[0],
-	// 				'site'=>$this->input->post('site_id'),                
-	// 				 );
-	// 				 $this->db->insert('site_related_assets',$sra);
-
-	// 			 $installing_data = array(
-	// 				'asset_id' => $asset_ids[0],
-	// 				'item_type' => $asset[0]['item_type'],
-	// 				'name' => $asset[0]['name'],
-	// 				'have_sub_items'=> $asset[0]['have_sub_assets'],
-	// 				'transaction_type' => "3",
-	// 				'identification_no' => $this->Inventory_model->generate_id(), 
-	// 				'site' => $this->input->post('site_id'),
-	// 				'location' => $location,
-	// 				'company_type' => 1,
-	// 				'company_name' => $this->input->post('repairing_tsp'),
-	// 				'company_address' => $this->input->post('tsp_address'),
-	// 				'company_person_type' => $this->input->post('tsp_person_type'),
-	// 				'person_name' => $this->input->post('tsp_person'),
-	// 				'person_contact' => $this->input->post('tsp_person_contact'),
-	// 				'cost' => $this->input->post('cost'),
-	// 				'comments' => $this->input->post('install_comments'),
-	// 				'user_type' => "1",
-	// 				'user_name' => $this->session->userdata('adminid'),
-	// 				'action_date' => $date,
-	// 				);
-	// 			 $this->db->insert('installed_inventory',$installing_data);
-	// 			 $install_id = $this->db->insert_id('');
-
-	// 			 if($asset[0]['have_sub_assets']==1){
-	// 				$subitems = $this->db->get_where('sub_items',array('item_id' => $asset[0]['name']))->result_array();
-    //                  $installing_cost = "cost of main item".$this->input->post('cost') ;
-	// 				foreach($subitems as $subasset)
-	// 				{
-	// 					$installing_subitem_data = array(
-	// 						'asset_id' => $asset_ids[0],
-	// 						'installed_id'=> $install_id,
-	// 						'item_id' => $asset[0]['name'],
-	// 						'subitem_id' => $subasset['id'],
-	// 						'transaction_type' => "3", 
-	// 						'site' => $this->input->post('site_id'),
-	// 						'location' => $location,
-	// 						'company_type' => 1,
-	// 				        'company_name' => $this->input->post('repairing_tsp'),
-	// 				        'company_address' => $this->input->post('tsp_address'),
-	// 				        'company_person_type' => $this->input->post('tsp_person_type'),
-	// 				        'person_name' => $this->input->post('tsp_person'),
-	// 						'person_contact' => $this->input->post('tsp_person_contact'),
-	// 						'cost' => $installing_cost,
-	// 						'comments' => $this->input->post('install_comments'),
-	// 						'action_by_user_type' => "1",
-	// 						'action_by_user' => $this->session->userdata('adminid'),
-	// 						'action_date' => $date,
-	// 						);
-	// 						$this->db->insert('installed_subitems',$installing_subitem_data);
-	// 						$sub_install_id = $this->db->insert_id('');
-                            
-	// 						$asset_transaction_data = array(
-	// 							'asset_id' => $asset_ids[0],
-	// 							'installed_id' => $install_id,
-	// 							'item_id'=> $asset[0]['name'],
-	// 							'subitem_id'=> $subasset['id'],
-	// 							'is_sub_item' => 1,
-	// 							'installed_subitem_id' => $sub_install_id,
-	// 							'transaction_type' => "3",
-	// 							'site' => $this->input->post('site_id'),
-	// 							'location' => $location,
-	// 							'user_type' => "1",
-	// 							'added_by' => $this->session->userdata('adminid'),
-	// 							'action_date' => $date,
-	// 							'organisation_type' => 1,
-	// 							'organisation' => $this->input->post('repairing_tsp'),
-	// 							'organisation_address' => $this->input->post('tsp_address'),
-	// 							'repairing_person_type' => $this->input->post('tsp_person_type'),
-	// 							'person' => $this->input->post('tsp_person'),
-	// 							'person_contact' => $this->input->post('tsp_person_contact'),
-	// 							'cost' => $installing_cost,
-	// 							'action_comments' => $this->input->post('install_comments'),
-	// 							);
-	// 						 $this->db->insert('asset_transaction',$asset_transaction_data);
-	// 				}	
-	// 			 }
-	// 			 if($asset[0]['have_sub_assets']==0){
-
-	// 			 $data = array(
-	// 				'asset_id' => $asset_ids[0],
-	// 				'installed_id' => $install_id,
-	// 				'item_id'=> $asset[0]['name'],
-	// 				'have_sub_items' => 0,
-	// 				'transaction_type' => "3",
-	// 		        'site' => $this->input->post('site_id'),
-	// 				'location' => $location,
-	// 				'user_type' => "1",
-	// 				'added_by' => $this->session->userdata('adminid'),
-	// 				'action_date' => $date,
-	// 				'organisation_type' => 1,
-	// 				'organisation' => $this->input->post('repairing_tsp'),
-	// 				'organisation_address' => $this->input->post('tsp_address'),
-	// 				'repairing_person_type' => $this->input->post('tsp_person_type'),
-	// 				'person' => $this->input->post('tsp_person'),
-	// 				'person_contact' => $this->input->post('tsp_person_contact'),
-	// 				'cost' => $this->input->post('cost'),
-	// 			    'action_comments' => $this->input->post('install_comments'),
-	// 			    );
-	// 			 $this->db->insert('asset_transaction',$data);	
-	// 			}			 
-	// 		   } 
-	// 	   echo json_encode(array('response' => true, 'message' =>'Installation Successfull.','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
-	// 		}
-	// 		if($this->input->post('repairing_company')=="2")
-	// 		{
-	// 			$this->page_data['assets_ids'] = explode(',', $_POST['asset_id']);
-	// 			$asset_ids = $this->page_data['assets_ids'];
-				
-	// 		    foreach ($locations as $location){
-	// 			$date = date("Y-m-d H:i:s");
-	// 			$asset = $this->db->get_where('assets',array('id' => $asset_ids[0]))->result_array();
- 
-	// 			$assets_data = array(
-	// 				'checkout_to'=> "",
-	// 				'have_sub_assets'=> $asset[0]['have_sub_assets'],
-	// 				'action_status'=>'3',
-	// 				'checkout_user_type' =>"",
-	// 				'site'=>$this->input->post('site_id'),
-	// 				'add_date'=> time(),
-	// 			);
-	// 			 $this->db->where('id',$asset_ids[0]);
-	// 			 $this->db->update('assets',$assets_data);
-
-	// 			 $sra = array(
-	// 				'asset' => $asset_ids[0],
-	// 				'site'=>$this->input->post('site_id'),                
-	// 				 );
-	// 				 $this->db->insert('site_related_assets',$sra);
-
-	// 			 $installing_data = array(
-	// 				'asset_id' => $asset_ids[0],
-	// 				'item_type' => $asset[0]['item_type'],
-	// 				'name' => $asset[0]['name'],
-	// 				'have_sub_items'=> $asset[0]['have_sub_assets'],
-	// 				'transaction_type' => "3",
-	// 				'identification_no' => $this->Inventory_model->generate_id(), 
-	// 				'site' => $this->input->post('site_id'),
-	// 				'location' => $location,
-	// 				'company_type' => 2,
-	// 				'company_name' => $this->input->post('outer_company_name'),
-	// 				'company_address' => $this->input->post('outer_company_address'),
-	// 				'person_name' => $this->input->post('outsider_name'),
-	// 				'person_contact' => $this->input->post('outsider_contact'),
-	// 				'comments' => $this->input->post('install_comments'),
-	// 				'cost' => $this->input->post('cost'),
-	// 				'user_type' => "1",
-	// 				'user_name' => $this->session->userdata('adminid'),
-	// 				'action_date' => $date,
-	// 				);
-	// 			 $this->db->insert('installed_inventory',$installing_data);
-	// 			 $install_id = $this->db->insert_id('');
-
-	// 			 if($asset[0]['have_sub_assets']==1){
-					
-	// 				$subitems = $this->db->get_where('sub_items',array('item_id' => $asset[0]['name']))->result_array();
-	// 				$installing_cost = "cost of main item".$this->input->post('cost') ;
-	// 				foreach($subitems as $subasset){
-	
-	// 					$installing_subitem_data = array(
-	// 						'asset_id' => $asset_ids[0],
-	// 						'installed_id'=> $install_id,
-	// 						'item_id' => $asset[0]['name'],
-	// 						'subitem_id' => $subasset['id'],
-	// 						'transaction_type' => "3", 
-	// 						'site' => $this->input->post('site_id'),
-	// 						'location' => $location,
-	// 						'company_type' => 2,
-	// 						'company_name' => $this->input->post('outer_company_name'),
-	// 						'company_address' => $this->input->post('outer_company_address'),
-	// 						'person_name' => $this->input->post('outsider_name'),
-	// 						'person_contact' => $this->input->post('outsider_contact'),
-	// 						'comments' => $this->input->post('install_comments'),
-	// 						'cost' => $installing_cost,
-	// 						'comments' => $this->input->post('install_comments'),
-	// 						'action_by_user_type' => "1",
-	// 						'action_by_user' => $this->session->userdata('adminid'),
-	// 						'action_date' => $date,
-	// 						);
-	// 						$this->db->insert('installed_subitems',$installing_subitem_data);
-	// 						$sub_install_id = $this->db->insert_id('');
-                            
-	// 						$asset_transaction_data = array(
-	// 							'asset_id' => $asset_ids[0],
-	// 							'installed_id' => $install_id,
-	// 							'item_id'=> $asset[0]['name'],
-	// 							'subitem_id'=> $subasset['id'],
-	// 							'is_sub_item' => 1,
-	// 							'installed_subitem_id' => $sub_install_id,
-	// 							'transaction_type' => "3",
-	// 							'site' => $this->input->post('site_id'),
-	// 							'location' => $location,
-	// 							'user_type' => "1",
-	// 							'added_by' => $this->session->userdata('adminid'),
-	// 							'action_date' => $date,
-	// 							'organisation_type' => 2,
-	// 							'organisation' => $this->input->post('outer_company_name'),
-	// 							'organisation_address' => $this->input->post('outer_company_address'),
-	// 							'person' => $this->input->post('outsider_name'),
-	// 							'person_contact' => $this->input->post('outsider_contact'),
-	// 							'cost' => $installing_cost,
-	// 							'action_comments' => $this->input->post('install_comments'),
-	// 							);
-
-	// 						 $this->db->insert('asset_transaction',$asset_transaction_data);
-	// 				}	
-	// 			 }
-
-    //               if($asset[0]['have_sub_assets']==0){
-	// 			 $data = array(
-	// 				'asset_id' => $asset_ids[0],
-	// 				'installed_id' => $install_id,
-	// 				'item_id'=> $asset[0]['name'],
-	// 				'have_sub_items' => $asset[0]['have_sub_assets'],
-	// 				'transaction_type' => "3",
-	// 		        'site' => $this->input->post('site_id'),
-	// 				'location' => $location,
-	// 				'user_type' => "1",
-	// 				'added_by' => $this->session->userdata('adminid'),
-	// 				'action_date' => $date,
-	// 				'organisation_type' => 2,
-	// 				'organisation' => $this->input->post('outer_company_name'),
-	// 				'organisation_address' => $this->input->post('outer_company_address'),
-	// 				'person' => $this->input->post('outsider_name'),
-	// 				'person_contact' => $this->input->post('outsider_contact'),
-	// 				'cost' => $this->input->post('cost'),
-	// 			    'action_comments' => $this->input->post('install_comments'),
-	// 			    );
-	// 			 $this->db->insert('asset_transaction',$data);
-	// 			}
-	// 	   }
-	//    echo json_encode(array('response' => true, 'message' =>'Installation Successfull.','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
-	// 		}
-		}//end of locations greater than 1
-		if($loc_Counter=1)
-		{
-			// echo "yasir"; exit;
-			$comp_serial = $this->input->post('comp_serial');
-			$comp_model = $this->input->post('comp_model');
-
-			if($this->input->post('repairing_company')=="1")
+            echo "you cannot Install one Asset in diffrent locations at same time.";
+			}
+			//end of locations greater than 1
+			if($loc_Counter=1)
 			{
-					$this->page_data['assets_ids'] = explode(',', $_POST['asset_id']);
-					$asset_ids = $this->page_data['assets_ids'];
-					// echo "<pre>"; print_r($asset_ids); exit;
-					
-				  foreach ($asset_ids as $id){
-					$asset = $this->db->get_where('assets',array('id' => $id))->result_array();
-					$date = date("Y-m-d H:i:s");
+				$comp_serial = $this->input->post('comp_serial');
+				$comp_model = $this->input->post('comp_model');
+
+				if($this->input->post('repairing_company')=="1")
+				{
+						$this->page_data['assets_ids'] = explode(',', $_POST['asset_id']);
+						$asset_ids = $this->page_data['assets_ids'];
+						
+					foreach ($asset_ids as $id){
+						$asset = $this->db->get_where('assets',array('id' => $id))->result_array();
+						$date = date("Y-m-d H:i:s");
 
 
-					 $installing_data = array(
-						'asset_id' => $id,
-						'item_type' => $asset[0]['item_type'],
-						'name' => $asset[0]['name'],
-						'have_sub_items'=> $asset[0]['have_sub_assets'],
-						'transaction_type' => "3",
-						'identification_no' => $asset[0]['identification_no'], 
-						'serial_no'=> $this->input->post('equip_serial'),
-						'site' => $this->input->post('site_id'),
-						'location' => $locations[0],
-						'company_type' => 1,
-						'company_name' => $this->input->post('repairing_tsp'),
-						'company_address' => $this->input->post('tsp_address'),
-						'company_person_type' => $this->input->post('tsp_person_type'),
-						'person_name' => $this->input->post('tsp_person'),
-						'person_contact' => $this->input->post('tsp_person_contact'),
-						'cost' => $this->input->post('cost'),
-						'comments' => $this->input->post('install_comments'),
-						'user_type' => "1",
-						'user_name' => $this->session->userdata('adminid'),
-						'action_date' => $date,
-						);
-					 $this->db->insert('installed_inventory',$installing_data);
-					 $install_id = $this->db->insert_id('');
+						$installing_data = array(
+							'asset_id' => $id,
+							'item_type' => $asset[0]['item_type'],
+							'name' => $asset[0]['name'],
+							'have_sub_items'=> $asset[0]['have_sub_assets'],
+							'transaction_type' => "3",
+							'identification_no' => $asset[0]['identification_no'], 
+							'serial_no'=> $this->input->post('equip_serial'),
+							'route'=>$asset[0]['route'],
+							'site' => $this->input->post('site_id'),
+							'location' => $locations[0],
+							'company_type' => 1,
+							'company_name' => $this->input->post('repairing_tsp'),
+							'company_address' => $this->input->post('tsp_address'),
+							'company_person_type' => $this->input->post('tsp_person_type'),
+							'person_name' => $this->input->post('tsp_person'),
+							'person_contact' => $this->input->post('tsp_person_contact'),
+							'cost' => $this->input->post('cost'),
+							'comments' => $this->input->post('install_comments'),
+							'user_type' => "1",
+							'user_name' => $this->session->userdata('adminid'),
+							'action_date' => $date,
+							);
+						$this->db->insert('installed_inventory',$installing_data);
+						$install_id = $this->db->insert_id('');
 
-					//  $es_no = array(
-					// 	'equipment' => 1,
-					// 	'serial_no'=>$this->input->post('equip_serial'), 
-					// 	'asset_id'=>$id, 
-					// 	'installed_id'=>$install_id,                
-					// 	 );
-					// 	 $this->db->insert('serial_no',$es_no);
+						//  $es_no = array(
+						// 	'equipment' => 1,
+						// 	'serial_no'=>$this->input->post('equip_serial'), 
+						// 	'asset_id'=>$id, 
+						// 	'installed_id'=>$install_id,                
+						// 	 );
+						// 	 $this->db->insert('serial_no',$es_no);
 
-					 if($asset[0]['have_sub_assets']==1){
-					
-						$assetComponents = $this->db->get_where('assets',array('set_no' => $asset[0]['set_no']))->result_array();
-						$installing_cost = "Equipment Installing Cost".$this->input->post('cost') ;
-						$counter=0;
-						foreach($assetComponents as $subasset){
+						if($asset[0]['have_sub_assets']==1){
+						
+							$assetComponents = $this->db->get_where('assets',array('set_no' => $asset[0]['set_no']))->result_array();
+							$installing_cost = "Equipment Installing Cost".$this->input->post('cost') ;
+							$counter=0;
+							foreach($assetComponents as $subasset){
 
+								$assets_data = array(
+									'checkout_to'=> "",
+									'have_sub_assets'=> $subasset['have_sub_assets'],
+									'serial_no'=> $comp_serial[$counter],
+									'action_status'=>'3',
+									'checkout_user_type' =>"",
+									'site'=>$this->input->post('site_id'),
+									'add_date'=> time(),
+								);
+								$this->db->where('id',$id);
+								$this->db->update('assets',$assets_data);
+
+								$installing_subitem_data = array(
+									'asset_id' => $subasset['id'],
+									'installed_id'=> $install_id,
+									'item_id' => $subasset['name'],
+									'subitem_id' => $subasset['comp_id'],
+									'serial_no'=> $comp_serial[$counter],
+									'identification_no' => $subasset['identification_no'], 
+									'model_no'=>$comp_model[$counter],
+									'transaction_type' => "3", 
+									'route'=>$subasset['route'],
+									'site' => $this->input->post('site_id'),
+									'location' => $locations[0],
+									'company_type' => 1,
+									'company_name' => $this->input->post('repairing_tsp'),
+									'company_address' => $this->input->post('tsp_address'),
+									'company_person_type' => $this->input->post('tsp_person_type'),
+									'person_name' => $this->input->post('tsp_person'),
+									'person_contact' => $this->input->post('tsp_person_contact'),
+									'cost' => $installing_cost,
+									'comments' => $this->input->post('install_comments'),
+									'action_by_user_type' => "1",
+									'action_by_user' => $this->session->userdata('adminid'),
+									'action_date' => $date,
+									);
+
+									
+									$this->db->insert('installed_subitems',$installing_subitem_data);
+									$sub_install_id = $this->db->insert_id('');
+
+									$equipPurchaseCost = "Equipment Purchase CosT".$asset[0]['cost_price'];
+									$subAssetsData = array(
+										'asset_id' => $subasset['id'],
+										'installed_id'=> $install_id,
+										'item_id' => $subasset['name'],
+										'subitem_id' => $subasset['comp_id'],
+										'equipment_warranty'=>$subasset['warranty_type'],
+										'product_model_no' => $comp_model[$counter],
+										'cost_price' => $equipPurchaseCost,
+										'supplier' => $subasset['supplier'],
+										'manufacturer' => $subasset['manufacturer'],
+										'site' => $this->input->post('site_id'),
+										'purchased_on' => $subasset['purchased_on'],
+										'warranty_type' => $subasset['warranty_type'],
+										'warranty_duration' => $subasset['warranty_duration'],
+										'user_type' => '1',
+										'user' => $this->session->userdata('adminid'),
+										'action_date' => date("Y-m-d H:i:s")
+										);
+									$this->db->insert('sub_assets',$subAssetsData);				
+									$asset_transaction_data = array(
+										'asset_id' => $subasset['id'],
+										'installed_id' => $install_id,
+										'item_id'=> $subasset['name'],
+										'subitem_id'=> $subasset['comp_id'],
+										'is_sub_item' => 1,
+										'installed_subitem_id' => $sub_install_id,
+										'serial_no'=> $comp_serial[$counter],
+										'identification_no' => $subasset['identification_no'], 
+										'transaction_type' => "3",
+										'route'=>$subasset['route'],
+										'site' => $this->input->post('site_id'),
+										'location' => $locations[0],
+										'user_type' => "1",
+										'added_by' => $this->session->userdata('adminid'),
+										'action_date' => $date,
+										'organisation_type' => 1,
+										'organisation' => $this->input->post('repairing_tsp'),
+										'organisation_address' => $this->input->post('tsp_address'),
+										'repairing_person_type' => $this->input->post('tsp_person_type'),
+										'person' => $this->input->post('tsp_person'),
+										'person_contact' => $this->input->post('tsp_person_contact'),
+										'cost' => $installing_cost,
+										'action_comments' => $this->input->post('install_comments'),
+										);
+		
+									$this->db->insert('asset_transaction',$asset_transaction_data);
+									$counter++;
+							}	
+						}
+
+						if($asset[0]['have_sub_assets']==0){
 							$assets_data = array(
 								'checkout_to'=> "",
-								'have_sub_assets'=> $subasset['have_sub_assets'],
-								'serial_no'=> $comp_serial[$counter],
+								'have_sub_assets'=> $asset[0]['have_sub_assets'],
+								'serial_no'=> $this->input->post('equip_serial'),
 								'action_status'=>'3',
 								'checkout_user_type' =>"",
 								'site'=>$this->input->post('site_id'),
 								'add_date'=> time(),
 							);
-							 $this->db->where('id',$id);
-							 $this->db->update('assets',$assets_data);
+							$this->db->where('id',$id);
+							$this->db->update('assets',$assets_data);
 
-							$installing_subitem_data = array(
-								'asset_id' => $subasset['id'],
-								'installed_id'=> $install_id,
-								'item_id' => $subasset['name'],
-								'subitem_id' => $subasset['comp_id'],
-								'serial_no'=> $comp_serial[$counter],
-								'identification_no' => $subasset['identification_no'], 
-								'model_no'=>$comp_model[$counter],
-								'transaction_type' => "3", 
-								'site' => $this->input->post('site_id'),
-								'location' => $locations[0],
-								'company_type' => 1,
-								'company_name' => $this->input->post('repairing_tsp'),
-								'company_address' => $this->input->post('tsp_address'),
-								'company_person_type' => $this->input->post('tsp_person_type'),
-								'person_name' => $this->input->post('tsp_person'),
-								'person_contact' => $this->input->post('tsp_person_contact'),
-								'cost' => $installing_cost,
-								'comments' => $this->input->post('install_comments'),
-								'action_by_user_type' => "1",
-								'action_by_user' => $this->session->userdata('adminid'),
-								'action_date' => $date,
-								);
-								$this->db->insert('installed_subitems',$installing_subitem_data);
-								$sub_install_id = $this->db->insert_id('');
-
-								$equipPurchaseCost = "Equipment Purchase CosT".$asset[0]['cost_price'];
-								$subAssetsData = array(
-									'asset_id' => $subasset['id'],
-									'installed_id'=> $install_id,
-									'item_id' => $subasset['name'],
-									'subitem_id' => $subasset['comp_id'],
-									'equipment_warranty'=>$subasset['warranty_type'],
-									'product_model_no' => $comp_model[$counter],
-									'cost_price' => $equipPurchaseCost,
-									'supplier' => $subasset['supplier'],
-									'manufacturer' => $subasset['manufacturer'],
-									'site' => $this->input->post('site_id'),
-									'purchased_on' => $subasset['purchased_on'],
-									'warranty_type' => $subasset['warranty_type'],
-									'warranty_duration' => $subasset['warranty_duration'],
-									'user_type' => '1',
-									'user' => $this->session->userdata('adminid'),
-									'action_date' => date("Y-m-d H:i:s")
-									);
-								$this->db->insert('sub_assets',$subAssetsData);
-								
-								$asset_transaction_data = array(
-									'asset_id' => $subasset['id'],
-									'installed_id' => $install_id,
-									'item_id'=> $subasset['name'],
-									'subitem_id'=> $subasset['comp_id'],
-									'is_sub_item' => 1,
-									'installed_subitem_id' => $sub_install_id,
-									'serial_no'=> $comp_serial[$counter],
-									'identification_no' => $subasset['identification_no'], 
-									'transaction_type' => "3",
-									'site' => $this->input->post('site_id'),
-									'location' => $locations[0],
-									'user_type' => "1",
-									'added_by' => $this->session->userdata('adminid'),
-									'action_date' => $date,
-									'organisation_type' => 1,
-									'organisation' => $this->input->post('repairing_tsp'),
-									'organisation_address' => $this->input->post('tsp_address'),
-									'repairing_person_type' => $this->input->post('tsp_person_type'),
-									'person' => $this->input->post('tsp_person'),
-									'person_contact' => $this->input->post('tsp_person_contact'),
-									'cost' => $installing_cost,
-									'action_comments' => $this->input->post('install_comments'),
-									);
-	
-								 $this->db->insert('asset_transaction',$asset_transaction_data);
-								 $counter++;
-						}	
-					 }
-
-					 if($asset[0]['have_sub_assets']==0){
-
-						$assets_data = array(
-							'checkout_to'=> "",
-							'have_sub_assets'=> $asset[0]['have_sub_assets'],
+						$data = array(
+							'asset_id' => $asset_ids[0],
+							'installed_id' => $install_id,
+							'item_id'=> $asset[0]['name'],
+							'have_sub_items' => $asset[0]['have_sub_assets'],
 							'serial_no'=> $this->input->post('equip_serial'),
-							'action_status'=>'3',
-							'checkout_user_type' =>"",
-							'site'=>$this->input->post('site_id'),
-							'add_date'=> time(),
-						);
-						 $this->db->where('id',$id);
-						 $this->db->update('assets',$assets_data);
+							'identification_no' => $asset[0]['identification_no'], 
+							'transaction_type' => "3",
+							'route'=> $asset[0]['route'],
+							'site' => $this->input->post('site_id'),
+							'location' => $locations[0],
+							'user_type' => "1",
+							'added_by' => $this->session->userdata('adminid'),
+							'action_date' => $date,
+							'organisation_type' => 1,
+							'organisation' => $this->input->post('repairing_tsp'),
+							'organisation_address' => $this->input->post('tsp_address'),
+							'repairing_person_type' => $this->input->post('tsp_person_type'),
+							'person' => $this->input->post('tsp_person'),
+							'person_contact' => $this->input->post('tsp_person_contact'),
+							'cost' => $this->input->post('cost'),
+							'action_comments' => $this->input->post('install_comments'),
+							);
+						$this->db->insert('asset_transaction',$data);	
+						}			 
+				}
+			echo json_encode(array('response' => true, 'message' =>'Installation Successfull.','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
+				}
+				if($this->input->post('repairing_company')=="2")
+				{
+					$this->page_data['assets_ids'] = explode(',', $_POST['asset_id']);
+					$asset_ids = $this->page_data['assets_ids'];
+						foreach ($asset_ids as $id){
+						
+						$asset = $this->db->get_where('assets',array('id' => $id))->result_array();
+						$date = date("Y-m-d H:i:s");
 
-					 $data = array(
-						'asset_id' => $asset_ids[0],
-						'installed_id' => $install_id,
-						'item_id'=> $asset[0]['name'],
-						'have_sub_items' => $asset[0]['have_sub_assets'],
-						'serial_no'=> $this->input->post('equip_serial'),
-						'identification_no' => $asset[0]['identification_no'], 
-						'transaction_type' => "3",
-						'site' => $this->input->post('site_id'),
-						'location' => $locations[0],
-						'user_type' => "1",
-						'added_by' => $this->session->userdata('adminid'),
-						'action_date' => $date,
-						'organisation_type' => 1,
-						'organisation' => $this->input->post('repairing_tsp'),
-						'organisation_address' => $this->input->post('tsp_address'),
-						'repairing_person_type' => $this->input->post('tsp_person_type'),
-						'person' => $this->input->post('tsp_person'),
-						'person_contact' => $this->input->post('tsp_person_contact'),
-						'cost' => $this->input->post('cost'),
-						'action_comments' => $this->input->post('install_comments'),
-						);
-					 $this->db->insert('asset_transaction',$data);	
-					}			 
-			   }
-		   echo json_encode(array('response' => true, 'message' =>'Installation Successfull.','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
-			}
-			if($this->input->post('repairing_company')=="2")
-			{
-				$this->page_data['assets_ids'] = explode(',', $_POST['asset_id']);
-				$asset_ids = $this->page_data['assets_ids'];
-				// echo "<pre>"; print_r($asset_ids); exit;
-			  foreach ($asset_ids as $id){
-				$asset = $this->db->get_where('assets',array('id' => $id))->result_array();
-				$date = date("Y-m-d H:i:s");
+						$installing_data = array(
+										'asset_id' => $id,
+										'item_type' => $asset[0]['item_type'],
+										'name' => $asset[0]['name'],
+										'have_sub_items'=> $asset[0]['have_sub_assets'],
+										'transaction_type' => "3",
+										'identification_no' => $asset[0]['identification_no'],
+										'serial_no'=> $this->input->post('equip_serial'), 
+										'route'=> $asset[0]['route'],
+										'site' => $this->input->post('site_id'),
+										'location' => $locations[0],
+										'company_type' => 2,
+										'company_name' => $this->input->post('outer_company_name'),
+										'company_address' => $this->input->post('outer_company_address'),
+										'person_name' => $this->input->post('outsider_name'),
+										'person_contact' => $this->input->post('outsider_contact'),
+										'cost' => $this->input->post('cost'),
+										'comments' => $this->input->post('install_comments'),
+										'user_type' => "1",
+										'user_name' => $this->session->userdata('adminid'),
+										'action_date' => $date,
+										);
+								$this->db->insert('installed_inventory',$installing_data);
+								$install_id = $this->db->insert_id('');
 
-
-
-				//  $sra = array(
-				// 	'asset' => $id,
-				// 	'site'=>$this->input->post('site_id'),                
-				// 	 );
-				// 	 $this->db->insert('site_related_assets',$sra);
-
-
-				 $installing_data = array(
-					'asset_id' => $id,
-					'item_type' => $asset[0]['item_type'],
-					'name' => $asset[0]['name'],
-					'have_sub_items'=> $asset[0]['have_sub_assets'],
-					'transaction_type' => "3",
-					'identification_no' => $asset[0]['identification_no'],
-					'serial_no'=> $this->input->post('equip_serial'), 
-					'site' => $this->input->post('site_id'),
-					'location' => $locations[0],
-					'company_type' => 2,
-					'company_name' => $this->input->post('outer_company_name'),
-					'company_address' => $this->input->post('outer_company_address'),
-					'person_name' => $this->input->post('outsider_name'),
-					'person_contact' => $this->input->post('outsider_contact'),
-					'cost' => $this->input->post('cost'),
-					'comments' => $this->input->post('install_comments'),
-					'user_type' => "1",
-					'user_name' => $this->session->userdata('adminid'),
-					'action_date' => $date,
-					);
-				 $this->db->insert('installed_inventory',$installing_data);
-				 $install_id = $this->db->insert_id('');
-
-				//  $es_no = array(
-				// 	'equipment' => 1,
-				// 	'serial_no'=>$this->input->post('equip_serial'), 
-				// 	'asset_id'=>$id, 
-				// 	'installed_id'=>$install_id,                   
-				// 	);
-				//  $this->db->insert('serial_no',$es_no);
-
-
-				 if($asset[0]['have_sub_assets']==1){	
-					$assetComponents = $this->db->get_where('assets',array('set_no' => $asset[0]['set_no']))->result_array();
-					$installing_cost = "Equipment Installing Cost".$this->input->post('cost') ; 
+						if($asset[0]['have_sub_assets']==1){
+							$assetComponents = $this->db->get_where('assets',array('set_no' => $asset[0]['set_no']))->result_array();
+					
+					$installing_cost = "Equipment Installing Cost".$this->input->post('cost') ;
+					$counter = 0;
 					foreach($assetComponents as $subasset){
 
-						$assets_data = array(
-							'checkout_to'=> "",
-							'have_sub_assets'=> $subasset[0]['have_sub_assets'],
-							'action_status'=>'3',
-							'serial_no'=>$comp_serial[$counter],
-							'checkout_user_type' =>"",
-							'site'=>$this->input->post('site_id'),
-							'add_date'=> time(),
-						);
-						 $this->db->where('id',$subasset['id']);
-						 $this->db->update('assets',$assets_data);
-	
 						$installing_subitem_data = array(
 							'asset_id' => $subasset['id'],
 							'installed_id'=> $install_id,
@@ -3138,8 +2885,8 @@ public function add_asset_components($para1='',$para2='',$para3='')
 							'subitem_id' => $subasset['comp_id'],
 							'serial_no'=> $comp_serial[$counter],
 							'identification_no' => $subasset['identification_no'], 
-							'model_no'=>$comp_model[$counter],
-							'transaction_type' => "3", 
+							'model_no'=> $comp_model[$counter],
+							'transaction_type' => "3",
 							'site' => $this->input->post('site_id'),
 							'location' => $locations[0],
 							'company_type' => 2,
@@ -3155,6 +2902,32 @@ public function add_asset_components($para1='',$para2='',$para3='')
 							);
 							$this->db->insert('installed_subitems',$installing_subitem_data);
 							$sub_install_id = $this->db->insert_id('');
+
+							$asset_transaction_data = array(
+								'asset_id' => $subasset['id'],
+								'installed_id' => $install_id,
+								'item_id'=> $subasset['name'],
+								'subitem_id'=> $subasset['comp_id'],
+								'is_sub_item' => 1,
+								'installed_subitem_id' => $sub_install_id,
+								'serial_no'=> $comp_serial[$counter],
+								'identification_no' => $subasset['identification_no'], 
+								'transaction_type' => "3",
+								'site' => $this->input->post('site_id'),
+								'location' => $locations[0],
+								'user_type' => "1",
+								'added_by' => $this->session->userdata('adminid'),
+								'action_date' => $date,
+								'organisation_type' => 2,
+								'organisation' => $this->input->post('outer_company_name'),
+								'organisation_address' => $this->input->post('outer_company_address'),
+								'repairing_person_type' => 0,
+								'person' => $this->input->post('outsider_name'),
+								'person_contact' => $this->input->post('outsider_contact'),
+								'cost' => $installing_cost,
+								'action_comments' => $this->input->post('install_comments'),
+								);
+							 $this->db->insert('asset_transaction',$asset_transaction_data);
 
 							$equipPurchaseCost = "Equipment Purchase Cost".$asset[0]['cost_price'];
 							$subAssetsData = array(
@@ -3176,78 +2949,61 @@ public function add_asset_components($para1='',$para2='',$para3='')
 								'action_date' => date("Y-m-d H:i:s")
 								);
 							$this->db->insert('sub_assets',$subAssetsData);
+							 $assets_data = array(
+								'checkout_to'=> "",
+								'have_sub_assets'=> $subasset['have_sub_assets'],
+								'action_status'=>'3',
+								'serial_no'=>$comp_serial[$counter],
+								'checkout_user_type' =>"",
+								'site'=>$this->input->post('site_id'),
+								'add_date'=> time(),
+							);
+							 $this->db->where('id',$subasset['id']);
+							 $this->db->update('assets',$assets_data);
+							 $counter++;
+						}	
+						}
+						if($asset[0]['have_sub_assets']==0){
+							$assets_data = array(
+								'checkout_to'=> "",
+								'have_sub_assets'=> $asset[0]['have_sub_assets'],
+								'action_status'=>'3',
+								'serial_no'=>$this->input->post('equip_serial'),
+								'checkout_user_type' =>"",
+								'site'=>$this->input->post('site_id'),
+								'add_date'=> time(),
+							);
+							$this->db->where('id',$id);
+							$this->db->update('assets',$assets_data);
 
-
-							
-							$asset_transaction_data = array(
-								'asset_id' => $subasset['id'],
-								'installed_id' => $install_id,
-								'item_id'=> $subasset['name'],
-								'subitem_id'=> $subasset['comp_id'],
-								'is_sub_item' => 1,
-								'installed_subitem_id' => $sub_install_id,
-								'serial_no'=> $comp_serial[$counter],
-								'identification_no' => $subasset['identification_no'], 
-								'transaction_type' => "3",
-								'site' => $this->input->post('site_id'),
-								'location' => $locations[0],
-								'user_type' => "1",
-								'added_by' => $this->session->userdata('adminid'),
-								'action_date' => $date,
-								'organisation_type' => 2,
-								'organisation' => $this->input->post('outer_company_name'),
-								'organisation_address' => $this->input->post('outer_company_address'),
-								'person' => $this->input->post('outsider_name'),
-								'person_contact' => $this->input->post('outsider_contact'),
-								'cost' => $installing_cost,
-								'action_comments' => $this->input->post('install_comments'),
-								);
-
-							 $this->db->insert('asset_transaction',$asset_transaction_data);
-					}	
-				 }
-			     if($asset[0]['have_sub_assets']==0){
-
-					$assets_data = array(
-						'checkout_to'=> "",
-						'have_sub_assets'=> $asset[0]['have_sub_assets'],
-						'action_status'=>'3',
-						'serial_no'=>$this->input->post('equip_serial'),
-						'checkout_user_type' =>"",
-						'site'=>$this->input->post('site_id'),
-						'add_date'=> time(),
-					);
-					 $this->db->where('id',$id);
-					 $this->db->update('assets',$assets_data);
-
-
-				 $data = array(
-				'asset_id' => $id,
-				'installed_id' => $install_id,
-				'item_id'=> $asset[0]['name'],
-			    'have_sub_items' => $asset[0]['have_sub_assets'],
-				'transaction_type' => "3",
-				'site' => $this->input->post('site_id'),
-				'serial_no'=> $this->input->post('equip_serial'),
-				'identification_no' => $asset[0]['identification_no'], 
-				'location' => $locations[0],
-				'user_type' => "1",
-				'added_by' => $this->session->userdata('adminid'),
-				'action_date' => $date,
-				'organisation_type' => 2,
-				'organisation' => $this->input->post('outer_company_name'),
-				'organisation_address' => $this->input->post('outer_company_address'),
-				'person' => $this->input->post('outsider_name'),
-				'person_contact' => $this->input->post('outsider_contact'),
-				'cost' => $this->input->post('cost'),
-			  'action_comments' => $this->input->post('install_comments'),
-			  );
-			  $this->db->insert('asset_transaction',$data);
-			 }
-		   }
-	   echo json_encode(array('response' => true, 'message' =>'Installation Successfull.','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
-			}
-		}		
+							$data = array(
+							'asset_id' => $id,
+							'installed_id' => $install_id,
+							'item_id'=> $asset[0]['name'],
+							'have_sub_items' => $asset[0]['have_sub_assets'],
+							'transaction_type' => "3",
+							'route' => $asset[0]['route'],
+							'site' => $this->input->post('site_id'),
+							'serial_no'=> $this->input->post('equip_serial'),
+							'identification_no' => $asset[0]['identification_no'], 
+							'location' => $locations[0],
+							'user_type' => "1",
+							'added_by' => $this->session->userdata('adminid'),
+							'action_date' => $date,
+							'organisation_type' => 2,
+							'organisation' => $this->input->post('outer_company_name'),
+							'organisation_address' => $this->input->post('outer_company_address'),
+							'person' => $this->input->post('outsider_name'),
+							'person_contact' => $this->input->post('outsider_contact'),
+							'cost' => $this->input->post('cost'),
+						'action_comments' => $this->input->post('install_comments'),
+						);
+						$this->db->insert('asset_transaction',$data);
+						}
+				}
+				echo json_encode(array('response' => true, 'message' =>'Installation Successfull.','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
+				}
+			}		
 			}
 		}
 	}
@@ -3362,16 +3118,6 @@ public function add_asset_components($para1='',$para2='',$para3='')
 									$this->db->where('id',$id);
 								$this->db->update('installed_inventory',$installing_data);
 
-								// $subAsset_data = array
-								// (
-								// 'action_status' => "10",
-								// 'user_type' => "1",
-								// 'user' => $this->session->userdata('adminid'),
-								// 'action_date' => $date ,
-								// );
-								// $this->db->where('id',$repairing_start[0]['asset_id']);
-								// $this->db->update('sub_assets',$subAsset_data);
-
 								$installing_subitem_data = array(
 									'transaction_type' => 10,
 									'company_type'=>'',
@@ -3400,6 +3146,7 @@ public function add_asset_components($para1='',$para2='',$para3='')
 										'item_id' => $subasset['item_id'],
 										'is_sub_item' => 1,
 										'installed_subitem_id' => $subasset['id'],
+										'route' => $subasset['route'],
 										'site' => $subasset['site'],
 										'location' => $subasset['location'],
 										'faulty_time_omc' => $this->input->post('omc_name'),
@@ -3407,7 +3154,6 @@ public function add_asset_components($para1='',$para2='',$para3='')
 										'est_cost' => $overAllEstCost,
 										'comments' => $this->input->post('faulty_reason'),
 										);
-
 									$this->db->insert('faulty_equipment_list',$faulty_data);
 														
 									$asset_transaction_data = array(
@@ -3420,6 +3166,7 @@ public function add_asset_components($para1='',$para2='',$para3='')
 										'installed_subitem_id' => $subasset['id'],
 										'asset_id'=> $subasset['asset_id'],
 										'transaction_type' => "10",
+										'route' => $subasset['route'],
 										'site' => $subasset['site'],
 										'location' => $subasset['location'],
 										'faulty_time_omc' => $this->input->post('omc_name'),
@@ -3460,6 +3207,7 @@ public function add_asset_components($para1='',$para2='',$para3='')
 								'serial_no' => $repairing_start[0]['serial_no'],
 								'identification_no' => $repairing_start[0]['identification_no'],
 								'is_sub_item' => $repairing_start[0]['have_sub_items'],
+								'route' => $repairing_start[0]['route'],
 								'site' => $repairing_start[0]['site'],
 								'location' => $repairing_start[0]['location'],
 								'faulty_time_omc' => $this->input->post('omc_name'),
@@ -3469,6 +3217,10 @@ public function add_asset_components($para1='',$para2='',$para3='')
 								);
 
 							$this->db->insert('faulty_equipment_list',$faulty_data);
+							$qur = $this->db->last_query();  
+							echo $qur;
+							exit;
+
 
 						$data = array(
 						'installed_id' => $id,
@@ -3478,6 +3230,7 @@ public function add_asset_components($para1='',$para2='',$para3='')
 						'asset_id'=> $repairing_start[0]['asset_id'],
 						'have_sub_items' => $repairing_start[0]['have_sub_items'],
 						'transaction_type' => "10",
+						'route' => $repairing_start[0]['route'],
 						'site' => $repairing_start[0]['site'],
 						'location' => $repairing_start[0]['location'],
 						'faulty_time_omc' => $this->input->post('omc_name'),
@@ -3654,6 +3407,7 @@ elseif ($para1 == 'component_faulty_do')
 							'item_id' => $subasset['item_id'],
 							'is_sub_item' => 1,
 							'installed_subitem_id' => $subasset['id'],
+							'route' => $subasset['route'],
 							'site' => $subasset['site'],
 							'location' => $subasset['location'],
 							'faulty_time_omc' => $this->input->post('omc_name'),
@@ -3673,6 +3427,7 @@ elseif ($para1 == 'component_faulty_do')
 							'installed_subitem_id' => $subasset['id'],
 							'asset_id'=> $subasset['asset_id'],
 							'transaction_type' => "11",
+							'route' => $subasset['route'],
 							'site' => $subasset['site'],
 							'location' => $subasset['location'],
 							'faulty_time_omc' => $this->input->post('omc_name'),
@@ -3701,26 +3456,13 @@ elseif ($para1 == 'component_replace')
 		{
 			$data = $this->db->get_where('installed_subitems',array('id' => $component))->result_array();
 		}
-		//    echo "<pre>"; print_r($data); exit;
-		
-
-		// echo "<pre>"; print_r($subasset); exit;
-
 		$data2 = array();
 		foreach($data as $row)
 		{
-				// if($row['transaction_type'] == "10")
-				// {
-				// 	echo "Selected Component already faulty."; exit;
-				// }
 				if($row['transaction_type'] == "4")
 				{
 					echo "Selected Component already in repairing mode."; exit;
 				}
-				// if($row['transaction_type'] == "5")
-				// {
-				// 	echo "Selected Component's repairing recently completed."; exit;
-				// }
 				if($row['transaction_type'] == "6")
 				{
 					echo "Retired Component cannot be replaced."; exit;
@@ -3730,7 +3472,6 @@ elseif ($para1 == 'component_replace')
 					echo "Retired Component cannot be replaced."; exit;
 				}
 		}
-
 		foreach($data as $record){
 			$items = $this->db->get_where('items',array('id' => $record['item_id']))->result_array();
 			$this->page_data['equipment_name'] = $items[0]['name'];
@@ -3749,7 +3490,6 @@ elseif ($para1 == 'component_replace')
 		 $data3= $query->result_array();
 		 $this->page_data['data'] = $data3; 		
 	 }
-	//  echo "<pre>"; print_r($data3); exit;
 	 
 	 foreach($components as $component)
 	 {
@@ -3769,7 +3509,6 @@ elseif ($para1 == 'component_replace')
 		foreach($subasset as $row){
 			$startDate = $row['purchased_on'];
 			$s_date = date("Y-m-d", strtotime($startDate));
-			// echo $date; exit;
 			if($row['warranty_type']=='1'){
 			if($row['warranty_duration'] == '3 month'){
 				$date = strtotime(date("Y-m-d", strtotime($s_date)) . " +3 month");
@@ -4744,6 +4483,7 @@ elseif ($para1 == 'component_replace_do')
 							'installed_subitem_id' => $subasset['id'],
 							'asset_id'=> $subasset['asset_id'],
 							'transaction_type' => "12",
+							'route' => $subasset['route'],
 							'site' => $subasset['site'],
 							'location' => $subasset['location'],
 							'organisation_type' => "",
@@ -4850,6 +4590,7 @@ elseif ($para1 == 'component_replace_do')
 							'installed_subitem_id' => $subasset['id'],
 							'asset_id'=> $subasset['asset_id'],
 							'transaction_type' => "12",
+							'route' => $subasset['route'],
 							'site' => $subasset['site'],
 							'location' => $subasset['location'],
 							'organisation_type' => "",
@@ -4988,6 +4729,7 @@ elseif ($para1 == 'component_replace_do')
 							'installed_subitem_id' => $subasset['id'],
 							'asset_id'=> $subasset['asset_id'],
 							'transaction_type' => "12",
+							'route' => $subasset['route'],
 							'site' => $subasset['site'],
 							'location' => $subasset['location'],
 							'organisation_type' => 2,
@@ -5124,16 +4866,6 @@ elseif ($para1 == 'component_repair')
 				$subitems = $this->db->get_where('installed_subitems',array('id' => $install[0]['id']))->result_array();
 				foreach($subitems as $subasset){
 
-					// $subAsset_data = array
-					// (
-					// 'action_status' => "4",
-					// 'user_type' => "1",
-					// 'user' => $this->session->userdata('adminid'),
-					// 'action_date' => $date ,
-					// );
-					// $this->db->where('installed_id',$id);
-					// $this->db->update('sub_assets',$subAsset_data);
-
 					$installing_subitem_data = array(
 						'transaction_type' => 13,
 						'company_type'=>'3',
@@ -5163,6 +4895,7 @@ elseif ($para1 == 'component_repair')
 							'identification_no'=>$subasset['identification_no'],
 							'is_sub_item'=>1,
 							'transaction_type' => 13,
+							'route' => $subasset['route'],
 							'site' => $this->input->post('item_site'),
 							'location' => $this->input->post('item_location'),
 							'repair_type' => $this->input->post('repair_type'),
@@ -5303,6 +5036,7 @@ elseif ($para1 == 'component_repair')
 								'identification_no'=>$subasset['identification_no'],
 								'is_sub_item'=>1,
 								'transaction_type' => "13",
+								'route' => $subasset['route'],
 								'site' => $this->input->post('item_site'),
 								'location' => $this->input->post('item_location'),
 								'repair_type' => $this->input->post('repair_type'),
@@ -5438,6 +5172,7 @@ elseif ($para1 == 'component_repair')
 								'identification_no'=>$subasset['identification_no'],
 								'is_sub_item'=>1,
 								'transaction_type' => "13",
+								'route' => $subasset['route'],
 								'site' => $this->input->post('item_site'),
 								'location' => $this->input->post('item_location'),
 								'repair_type' => $this->input->post('repair_type'),
@@ -5647,6 +5382,7 @@ elseif ($para1 == 'component_repair')
 							'identification_no'=>$subasset['identification_no'],
 							'is_sub_item'=>1,
 							'transaction_type' => 4,
+							'route' => $subasset['route'],
 							'site' => $this->input->post('item_site'),
 							'location' => $this->input->post('item_location'),
 							'repair_type' => $this->input->post('repair_type'),
@@ -5677,6 +5413,7 @@ elseif ($para1 == 'component_repair')
 							'is_sub_item'=>0,
 							'have_sub_items'=>0,
 							'transaction_type' => 4,
+							'route' => $install[0]['route'],
 							'site' => $this->input->post('item_site'),
 							'location' => $this->input->post('item_location'),
 							'repair_type' => $this->input->post('repair_type'),
@@ -5777,6 +5514,7 @@ elseif ($para1 == 'component_repair')
 								'identification_no'=>$subasset['identification_no'],
 								'is_sub_item'=>1,
 								'transaction_type' => "4",
+								'route' => $subasset['route'],
 								'site' => $this->input->post('item_site'),
 								'location' => $this->input->post('item_location'),
 								'repair_type' => $this->input->post('repair_type'),
@@ -5796,8 +5534,7 @@ elseif ($para1 == 'component_repair')
 							 $this->db->insert('asset_transaction',$data);
 					}	
 				 }
-				 if($install[0]['have_sub_items']==0){
-												
+				 if($install[0]['have_sub_items']==0){		
 							$data = array(
 								'asset_id' => $install[0]['asset_id'],
 								'installed_id' => $id,
@@ -5807,6 +5544,7 @@ elseif ($para1 == 'component_repair')
 								'is_sub_item'=>0,
 								'have_sub_items'=>0,
 								'transaction_type' => "4",
+								'route' => $install[0]['route'],
 								'site' => $this->input->post('item_site'),
 								'location' => $this->input->post('item_location'),
 								'repair_type' => $this->input->post('repair_type'),
@@ -5911,6 +5649,7 @@ elseif ($para1 == 'component_repair')
 								'identification_no'=>$subasset['identification_no'],
 								'is_sub_item'=>1,
 								'transaction_type' => "4",
+								'route' => $subasset['route'],
 								'site' => $this->input->post('item_site'),
 								'location' => $this->input->post('item_location'),
 								'repair_type' => $this->input->post('repair_type'),
@@ -5939,6 +5678,7 @@ elseif ($para1 == 'component_repair')
 						'is_sub_item'=>0,
 						'have_sub_items'=>0,
 						'transaction_type' => "4",
+						'route' => $install[0]['route'],
 						'site' => $this->input->post('item_site'),
 						'location' => $this->input->post('item_location'),
 						'repair_type' => $this->input->post('repair_type'),
@@ -6076,7 +5816,7 @@ elseif ($para1 == 'end_repair')
 			$counter = 0;
 			foreach ($asset_ids as $id)
 			{
-				$repairing_start = $this->db->select('*')->order_by('id','desc')->get_where('asset_transaction',array('installed_id' => $id,'transaction_type'=> 4))->result_array();
+				$repairing_start = $this->db->select('*')->order_by('id','desc')->limit(1)->get_where('asset_transaction',array('installed_id' => $id,'transaction_type'=> 4))->result_array();
 			    $date = date("Y-m-d H:i:s");
 
 			$installing_data = array(
@@ -6087,7 +5827,7 @@ elseif ($para1 == 'end_repair')
 				);
 				$this->db->where('id',$id);
 		 $this->db->update('installed_inventory',$installing_data);
-		 if($repairing_start[0]['have_sub_items']==1){	
+		 if($repairing_start[0]['is_sub_item']==1){	
 			$subitems = $this->db->get_where('installed_subitems',array('installed_id' => $repairing_start[0]['installed_id']))->result_array();
 			foreach($subitems as $subasset){
 				$installing_subitem_data = array(
@@ -6101,6 +5841,194 @@ elseif ($para1 == 'end_repair')
 					'faulty_date' => '',
 					'est_cost' => '',
 					'comments' => $this->input->post('start_repair_reason'),
+					'action_by_user_type' => "1",
+					'action_by_user' => $this->session->userdata('adminid'),
+					'action_date' => $date,
+					);
+					// echo "<pre>"; print_r($installing_subitem_data); 
+					$this->db->where('id',$subasset['id']);
+					$this->db->update('installed_subitems',$installing_subitem_data);
+
+					$this->db->where('identification_no',$subasset['identification_no']);
+					$this->db->delete('faulty_equipment_list');
+										
+					$data = array(
+						'asset_id' => $subasset['asset_id'],
+						'installed_id' => $subasset['installed_id'],
+						'installed_subitem_id' => $subasset['id'],
+						'item_id' => $subasset['item_id'],
+						'subitem_id' => $subasset['subitem_id'],
+						'serial_no'=>$subasset['serial_no'],
+						'identification_no'=>$subasset['identification_no'],
+						'unit_repairing_cost'=>$this->input->post('repair_price'),
+						'is_sub_item'=>1,
+						'transaction_type' => "14",
+						'route' => $subasset['route'],
+						'site' => $subasset['site'],
+						'location' => $subasset['location'],
+						'user_type' => "1",
+						'added_by' => $this->session->userdata('adminid'),
+						'action_date' => $date,
+						'return_date' => $this->input->post('repair_completion'),
+						'action_comments' => $this->input->post('end_repair_comments'),
+						);
+						// echo "<pre>"; print_r($data); 
+					$this->db->insert('asset_transaction',$data);
+			}	
+			// exit;
+		 }
+		 if($repairing_start[0]['is_sub_item']==0){
+
+			$this->db->where('identification_no',$repairing_start[0]['identification_no']);
+			$this->db->delete('faulty_equipment_list');
+
+			$data = array(
+				'asset_id' => $install[0]['asset_id'],
+				'installed_id' => $id,
+				'installed_subitem_id' => $subasset['id'],
+				'item_id' => $subasset['item_id'],
+				'subitem_id' => $subasset['subitem_id'],
+				'serial_no'=>$subasset['serial_no'],
+				'identification_no'=>$subasset['identification_no'],
+				'unit_repairing_cost'=>$this->input->post('repair_price'),
+				'is_sub_item'=>0,
+				'transaction_type' => "14",
+				'route' => $subasset['route'],
+				'site' => $subasset['site'],
+				'location' => $subasset['location'],
+				'user_type' => "1",
+				'added_by' => $this->session->userdata('adminid'),
+				'action_date' => $date,
+				'return_date' => $this->input->post('repair_completion'),
+				'action_comments' => $this->input->post('end_repair_comments'),
+				);
+		}
+			$counter++;
+			// echo "<pre>"; print_r($data); exit;    
+			$assets_data = array('action_status'=>'9','site'=> $this->input->post('item_site'));
+			$this->db->where('id',$repairing_start[0]['asset_id']);
+			$this->db->update('assets',$assets_data);
+			$this->db->insert('asset_transaction',$data);
+			}
+			
+		 echo json_encode(array('response' => true, 'message' =>'Repairing Completed.','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
+			
+	 }
+	}
+}
+
+elseif ($para1 == 'component_end_repair')
+	{
+		// echo "inside component Repair"; exit;
+			$this->page_data['repairs'] = explode(',', $_POST['asset']);
+			$repairs = $this->page_data['repairs'];
+			$data = array();
+			foreach($repairs as $repair)
+			{
+				$data[] = $this->db->get_where('installed_subitems',array('id' => $repair))->result_array();
+			}
+		 	// echo "<pre>"; print_r($data); exit;
+			$data2 = array();
+			foreach($data as $row)
+			{
+					// if($row[0]['transaction_type'] !== 1 && $row[0]['transaction_type'] !== 4 && $row[0]['transaction_type'] !== 5 && $row[0]['transaction_type'] !== 6)
+					// {
+					// 	echo "Brand New item cannot be repair."; exit;
+					// }
+					// if($row[0]['transaction_type'] == "1")
+					// {
+					// 	echo "Checked Out item cannot be repair."; exit;
+					// }
+					if($row[0]['transaction_type'] == "14")
+					{
+						echo "Selected comp already reinstalled"; exit;
+					}
+					if($row[0]['transaction_type'] == "4")
+					{
+						echo "Selected item already in repairing mode."; exit;
+					}
+					if($row[0]['transaction_type'] == "5")
+					{
+						echo "Selected item's repairing recently completed."; exit;
+					}
+					if($row[0]['transaction_type'] == "6")
+					{
+						echo "Retire item cannot be repair."; exit;
+					}
+			}
+			$data3 = array();
+		 foreach($repairs as $repair)
+		 {
+			 $installing_names = $this->db->get_where('installed_subitems',array('id' => $repair))->result_array();
+			 $this->db->select('installed_subitems.subitem_id AS temp_id,sub_items.*');
+			 $this->db->from('installed_subitems');
+			 $this->db->join('sub_items','installed_subitems.subitem_id = sub_items.id');
+			 $this->db->where('installed_subitems.id',$repair);
+			 $query=$this->db->get();
+			 $data3[]= $query->result_array();
+			 $this->page_data['data'] = $data3; 		
+		 }
+		 
+		 foreach($repairs as $repair)
+		 {
+			 $installed_location = $this->db->get_where('installed_subitems',array('id' => $repair))->result_array();
+			 $locationNames = $this->db->get_where('locations',array('id' => $installed_location[0]['location']))->result_array();
+			 $siteNames = $this->db->get_where('sites',array('id' => $locationNames[0]['site']))->result_array();			 
+			 $this->page_data['sites'] = $siteNames;
+			 $this->page_data['locations'] = $locationNames;	 		
+		 }
+			$this->page_data['data1'] = $data;
+			$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
+			$this->load->view('back/inventory/reinstall_component',$this->page_data);	
+ }
+
+elseif ($para1 == 'component_reinstall_do')
+ {
+ $this->load->library('form_validation');
+ $this->form_validation->set_rules('repair_price','Repair Price','required|trim');
+ $this->form_validation->set_rules('repair_completion','Repair Completion Date','required|trim');
+ $this->form_validation->set_rules('end_repair_comments','Reason For Repairing','required|trim');
+ 	
+ if($this->form_validation->run() == TRUE)
+ {
+	 if($this->session->userdata('adminid'))
+	 {  
+		// if($this->input->post('repair_completion'))
+		// {	
+			$this->page_data['assets_ids'] = explode(',', $_POST['asset_id']);
+			$install_ids = $this->page_data['assets_ids'];
+			foreach ($install_ids as $id){
+			$date = date("Y-m-d H:i:s");
+
+			$install = $this->db->get_where('installed_subitems',array('id' => $id))->result_array();
+			$ast_mfg = $this->db->get_where('assets',array('id' => $install[0]['asset_id']))->result_array();
+            // echo "<pre>"; print_r($install); exit;
+			$assets_data = array('action_status'=>'14','user_type' => "1",'checkin_by' => $this->session->userdata('adminid'),'site'=> $install[0]['site']);
+			$this->db->where('id',$install[0]['asset_id']);
+			$this->db->update('assets',$assets_data);
+			
+			$installing_data = array(
+				'transaction_type' => "14",
+				'user_type' => "1",
+				'user_name' => $this->session->userdata('adminid'),
+				'action_date' => $date,
+				);
+				$this->db->where('id',$install[0]['installed_id']);
+			$this->db->update('installed_inventory',$installing_data);
+			
+			$subitems = $this->db->get_where('installed_subitems',array('id' => $install[0]['id']))->result_array();
+			foreach($subitems as $subasset){
+				$installing_subitem_data = array(
+					'transaction_type' => 14,
+					'company_type'=>'',
+					'company_name'=>'',
+					'company_address'=>'',
+					'person_name'=>'',
+					'person_contact'=>'',
+					'faulty_time_omc' => '',
+					'faulty_date' => '',
+					'est_cost' => '',
+					'comments' => $this->input->post('end_repair_comments'),
 					'action_by_user_type' => "1",
 					'action_by_user' => $this->session->userdata('adminid'),
 					'action_date' => $date,
@@ -6119,73 +6047,26 @@ elseif ($para1 == 'end_repair')
 						'subitem_id' => $subasset['subitem_id'],
 						'serial_no'=>$subasset['serial_no'],
 						'identification_no'=>$subasset['identification_no'],
+						'unit_repairing_cost'=>$this->input->post('repair_price'),
 						'is_sub_item'=>1,
-						'transaction_type' => "4",
-						'site' => $this->input->post('item_site'),
-						'location' => $this->input->post('item_location'),
-						'repair_type' => $this->input->post('repair_type'),
-						'available' => $this->input->post('item_availability'),
+						'transaction_type' => "14",
+						'route' => $subasset['route'],
+						'site' => $subasset['site'],
+						'location' => $subasset['location'],
 						'user_type' => "1",
 						'added_by' => $this->session->userdata('adminid'),
 						'action_date' => $date,
-						'organisation_type' => 2,
-						'organisation' => $this->input->post('outer_company_name'),
-						'organisation_address' => $this->input->post('outer_company_address'),
-						'person' => $this->input->post('outsider_name'),
-						'person_contact' => $this->input->post('outsider_contact'),
-						'return_date' => $this->input->post('expected_completion'),
-						'action_comments' => $this->input->post('start_repair_reason'),
+						'return_date' => $this->input->post('repair_completion'),
+						'action_comments' => $this->input->post('end_repair_comments'),
 						);
 					$this->db->insert('asset_transaction',$data);
 			}	
 		 }
-		 if($repairing_start[0]['have_sub_items']==0){
-
-			$this->db->where('identification_no',$repairing_start[0]['identification_no']);
-			$this->db->delete('faulty_equipment_list');
-
-			$data = array(
-				'installed_id' => $id,
-				'asset_id'=> $repairing_start[0]['asset_id'],
-				'item_id' => $repairing_start[0]['item_id'],
-				'installed_id' => $repairing_start[0]['installed_id'],
-				'serial_no'=>$repairing_start[0]['serial_no'],
-				'identification_no'=>$repairing_start[0]['identification_no'],
-				'transaction_type' => "9",
-				'site' => $repairing_start[0]['site'],
-				'location' => $repairing_start[0]['location'],
-				'unit_repairing_cost' => $unit_repair_cost,
-				'organisation_type' => $repairing_start[0]['organisation_type'],
-				'organisation' => $repairing_start[0]['organisation'],
-				'organisation_address' => $repairing_start[0]['organisation_address'],
-				'repairing_person_type' => $repairing_start[0]['repairing_person_type'],
-				'person' => $repairing_start[0]['person'],
-				'person_contact' => $repairing_start[0]['person_contact'],
-				'user_type' => "1",
-				'added_by' => $this->session->userdata('adminid'),
-				'action_date' => $date,
-				'return_date' => $this->input->post('repair_completion'),
-				'action_comments' => $this->input->post('end_repair_comments'),
-				);
-		}
-
-			
-			$counter++;
-			// echo "<pre>"; print_r($data); exit;  
-				  
-			$assets_data = array('action_status'=>'9','site'=> $this->input->post('item_site'));
-			$this->db->where('id',$repairing_start[0]['asset_id']);
-			$this->db->update('assets',$assets_data);
-			$this->db->insert('asset_transaction',$data);
-			}
-			
-		 echo json_encode(array('response' => true, 'message' =>'Repairing Completed.','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
-			
-	 }
+		// }
+	    echo json_encode(array('response' => true, 'message' =>'comp Reinstalled .','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
+		}	
 	}
 }
-
-
 
 elseif ($para1 == 'retire')
 {
@@ -6301,6 +6182,7 @@ elseif ($para1 == 'retire')
 											'transaction_type' => "6",
 											'action_date' => $date,
 											'retire_type' => $this->input->post('retire_type'),
+											'route' => $subasset['route'],
 											'site' => $this->input->post('site_id'),
 											'retire_date' => $this->input->post('retire_date'),
 											'action_comments' => $this->input->post('retire_reason')
@@ -6321,6 +6203,7 @@ elseif ($para1 == 'retire')
 									'identification_no'=>$installed_inventory[0]['identification_no'],
 									'transaction_type' => "6",
 									'retire_type' => $this->input->post('retire_type'),
+									'route' => $installed_inventory[0]['route'],
 									'site' => $this->input->post('site_id'),
 									'retire_date' => $this->input->post('retire_date'),
 									'user_type' => "1",
@@ -6566,17 +6449,7 @@ elseif ($para1 == 'retire')
 	/** Site related Locations START */
 	public function site_related_locations($para1='')
 	{
-        $locations = $this->db->get_where('locations',array('site' => $para1))->result_array();
-		//echo "<pre>"; print_r($locations); exit;
-		// $div = '';
-		// $div .= '<select name="location[]" onchange="(this.value,this)" class="demo-cs-multiselect form-control" multiple="multiple" data-placeholder="Choose Location" tabindex="-1" data-hide-disabled="true" id="service_category">';
-		// $div .='<option value="">Choose location</option>';
-		// if($locations){
-		// 	foreach($locations as $row){
-		// 		$div .= '<option value="'.$row["id"].'">'.$row["location"].'</option>';
-		// 	}
-		// }
-		// $div .= '</select>'; 		
+        $locations = $this->db->get_where('locations',array('site' => $para1))->result_array();		
 		echo json_encode($locations); 
 	}/** Site related Locations END */
 

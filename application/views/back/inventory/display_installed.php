@@ -55,14 +55,14 @@
                     <tr role="row">
                       <th class="sorting_asc" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending" style="width: auto;">SR #</th>
                       <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Name</th>
-                      <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Category</th>
+                      <!-- <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Category</th> -->
                       <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Serial No</th>
                       <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Status</th>
                       <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Office: activate to sort column ascending" style="width: auto;">Site</th>
                       <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Location</th>
                     </tr>
                   </thead>
-                  <tfoot>
+                  <!-- <tfoot>
                     <tr>
                        <th rowspan="1" colspan="1">Sr #</th>
                        <th rowspan="1" colspan="1">Name</th>
@@ -72,10 +72,11 @@
                        <th rowspan="1" colspan="1">Site</th>
                        <th rowspan="1" colspan="1">location</th>
                     </tr>
-                  </tfoot>
+                  </tfoot> -->
                   <tbody>
                   <?php
                      $counter = 0;
+                     $index = 0;
                       foreach($installs as $install)
                       {
                       $counter++;
@@ -86,15 +87,14 @@
                         <?php echo $counter;?>
                       </td>
                       <td>
-                      <a href="#" onclick="show_asset('<?php echo base_url().'inventory/selected_install/list/'.$install['id'];?>','display_selected_install');">
+                      <a href="#" onclick="show_asset('<?php echo base_url().'inventory/selected_install/list/'.$install['id'];?>','display_selected_install');" data-toggle="modal" data-target="#inventoryModal">
                       <?php
-                       $item = $this->db->get_where('items',array('id'=>$install['name']))->result_array();
-                       echo $item[0]['name'];
+                       echo $itemNames[$index];
                       ?>
                       </a>
                       </td>
 
-                      <td>  <?php
+                      <!-- <td>  <?php
                                   if($item[0]['item_type']==1)
                                   {
                                     echo "Marketing & Promotional Type";
@@ -147,7 +147,7 @@
                                   {
                                     echo"Tools";
                                   }
-                        ?></td>
+                        ?></td> -->
                         <td><?php echo $install['serial_no'] ?></td>
                       <td>
                          <?php
@@ -211,14 +211,15 @@
                       </td>
                       <td>
                       <?php
-                            $site = $this->db->get_where('sites',array('id'=>$install['site']))->result_array();
-                            echo $site[0]['name'];
+                            // $site = $this->db->get_where('sites',array('id'=>$install['site']))->result_array();
+                            echo $siteNames[$index];
                           ?>
                         </td>
                       <td>
                     <?php
-                        $location = $this->db->get_where('locations',array('id' => $install['location']))->result_array();
-                         echo $location[0]['location'];
+                        // $location = $this->db->get_where('locations',array('id' => $install['location']))->result_array();
+                         echo $locationNames[$index];
+                         $index++;
                         ?>
                       </td>
                       <?php } ?>
@@ -231,8 +232,26 @@
             </div><!-- dataTable wrapper END -->
           </div>
 
-             <div id='display_selected_install' style="display:none;">
-             </div>
+             <!-- <div id='display_selected_install' style="display:none;">
+             </div> -->
+
+             <div class="modal fade" id="inventoryModal">
+                  <div class="modal-dialog modal-lg">
+                      <div class="modal-content ">
+                          <div class="modal-header">
+                              <h5 class="modal-title">Equpment Detail</h5>
+                              <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                          </div>
+                          <div class="modal-body">
+                            <div id="display_selected_install">
+                            </div>  
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
 
              <div id='display_install_history' style="display:none;">
              </div>
@@ -521,7 +540,7 @@ var loading_set = '<div class="col-md-2"><div class="stat"><div class="stat-icon
       list.html(loading_set);
     },
     success: function(data){
-      $('.hide_div').toggle();
+      // $('.hide_div').toggle();
       $('#display_selected_install').html(data).show('slow');
     },
     error: function(e) {

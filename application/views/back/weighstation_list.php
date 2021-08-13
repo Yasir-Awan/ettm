@@ -27,6 +27,7 @@
                 <th>Software Type</th>
                 <th>Status</th>
                 <th>Google Map Status</th>
+                <th>Camera Status</th>
                 <th>Action</th>
                 
             </tr>
@@ -35,9 +36,7 @@
             <?php if($weigh){
                 $counter = 0;
                 foreach($weigh as $row){
-
                       $counter++;
-
             ?>
              <tr>
                 <td><?php echo $counter;?></td>
@@ -54,13 +53,11 @@
                     echo '<span class="badge badge-warning">JOD</span>';
                 };?></td>
                 <td><?php if($row['status'] != '1') {
-
                  ?>
                  <input type="checkbox" name="toggle" id="toggle_<?php echo $row['id']; ?>" value="<?php echo $row['id']; ?>" data-toggle="toggle" data-off="Off" data-on="On" data-style="ios">
                 <?php
             }elseif($row['status'] == '1')
             {
-            //echo 'else'.$row['status'];
                 ?>
                   <input type="checkbox" name="toggle" id="toggle_<?php echo $row['id']; ?>" value="<?php echo $row['id']; ?>" data-toggle="toggle" data-off="Off" data-on="On" data-style="ios" checked="checked">
                 <?php
@@ -78,20 +75,33 @@
                   <input type="checkbox" name="toggle1" id="toggle_<?php echo $row['id']; ?>" value="<?php echo $row['id']; ?>" data-toggle="toggle" data-off="Off" data-on="On" data-style="ios" checked="checked">
                 <?php
             }?>
-                 </td>
+                </td>
+                <td><?php if($row['cam_status'] != '1') {
+                    ?>
+                    <input type="checkbox" name="toggle2" id="toggle_<?php echo $row['id']; ?>" value="<?php echo $row['id']; ?>" data-toggle="toggle" data-off="Off" data-on="On" data-style="ios">
+                    <?php
+                    }elseif($row['cam_status'] == '1')
+                    {
+                    //echo 'else'.$row['status'];
+                    ?>
+                    <input type="checkbox" name="toggle2" id="toggle_<?php echo $row['id']; ?>" value="<?php echo $row['id']; ?>" data-toggle="toggle" data-off="Off" data-on="On" data-style="ios" checked="checked">
+                    <?php
+                    }?>
+                    </td>
                 <td>
                     <span class="btn btn-success btn-sm btn-labeled fa fa-edit" id="cancel_reason" name="tp_edit" onclick="ajax_html('<?php echo base_url().'admin/weighstation/edit/'.$row['id'];?>','edit_weigh_contents');" data-toggle="modal" data-target="#weigh_edit">&nbsp;Edit</span>
 
                     <span class="btn btn-danger btn-xs  fa fa-trash" onclick="delete_confirm('Really want to delete This','<?php echo $row['id']; ?>')">Delete</span>
-
                 </td>
                 
             </tr> 
-            <?php    }
+            <?php 
+             }
             }?>
            
         </tbody>
     </table>
+ </div>
     <script>
     $(document).ready(function(){
         $('#dataTable3').DataTable();

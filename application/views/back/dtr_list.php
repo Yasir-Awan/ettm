@@ -25,6 +25,8 @@
                 <th>Uploaded By </th>
                 <th>Toll Plaza</th>
                 <th>Upload Date</th>
+                <th>Reason for Delay</th>
+                <th>Supervise Date</th>
                 <th>DTR Date</th>
                 <th width="15%">Status</th>
                 <th width="30%">Action</th>
@@ -69,6 +71,8 @@
                        ?></td>
                 <td><?php echo $toolplaza_name;?></td>
                 <td><?php echo date('F j, Y, g:i a',$row['adddate']); ?></td>
+                <td><?php echo $row['toll_delay']; ?></td>
+                <td><?php if(isset($row['actiondate'])){ if($row['actiondate'] != '') echo date('F j, Y, g:i a',$row['actiondate']); } ?></td>
                 <td> <?php echo date('F j, Y',strtotime($row['for_date']));?></td>
                 <td> <?php if($row['status'] == 0){?>
                          <span class="badge badge-primary">Pending</span>

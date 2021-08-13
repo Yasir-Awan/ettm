@@ -1,7 +1,7 @@
 <div class="table-responsive hide_selected_asset">
 
 
-  <span align='center'><h4 style="color: #030a10;" class='mb-3 mt-3'>Asset Comprihensive Detail</h4></span>
+  <span align='center'><h4 style="color: #030a10;" class='mb-3 mt-3'>Asset Comprehensive Detail</h4></span>
   <br><br>
 <div class"row">
 <?php foreach($selected_assets as $asset) {?>
@@ -13,7 +13,7 @@
         <div class="col-md-6">
         </div>
         <div class="col-md-2">
-        <span class="btn btn-success pull-right btn-xs btn-labeled " id="cancel_reason" name="asset_edit" onclick="ajax_html('<?php echo base_url().'inventory/asset_edit/'.$asset['id'];?>','edit_asset_contents');" data-toggle="modal" data-target="#assets-edit" style='margin-right:-260px;'> <i class="fa fa-edit"> </i> &nbsp; Edit</span>
+        <!-- <span class="btn btn-success pull-right btn-xs btn-labeled " id="cancel_reason" name="asset_edit" onclick="ajax_html('<?php echo base_url().'inventory/asset_edit/'.$asset['id'];?>','edit_asset_contents');" data-toggle="modal" data-target="#assets-edit" style='margin-right:-260px;'> <i class="fa fa-edit"> </i> &nbsp; Edit</span> -->
         </div>             
         <div class="col-md-2">
                     <span class="btn btn-danger btn-xs  fas fa-trash-alt" style='margin-left:235px;' onclick="delete_confirm_tab('Really want to delete This','<?php echo base_url().'inventory/assets/delete/'.$asset['id'];?>')"> 
@@ -50,7 +50,7 @@
       <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Supplier:</span></th>
       <?php $supplierName = $this->db->get_where('suppliers',array('id' => $asset['supplier']))->result_array();?>
       <td><span style="font-size: 0.80rem;color: #030a10;margin-left:;"><?php echo $supplierName[0]['name'];?></span></td>
-      <th><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Manufecturer:</span></th>
+      <th><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Manufacturer:</span></th>
       <?php $manufacturer = $this->db->get_where('manufacturers',array('id' => $asset['manufacturer']))->result_array();?>
       <td><span style="font-size: 0.80rem;color: #030a10;margin-left: ;"><?php echo $manufacturer[0]['name'];?></span></td>
 
@@ -90,7 +90,7 @@
       } 
       ?>
       <td><span style="font-size: 0.80rem;color: #030a10;margin-left:;"> <?php   echo $userName[0]['fname']." ".$userName[0]['lname'];  ?></span> </td>
-      <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">This asset Added on:</span></th>
+      <th scope="row"><span class="text-left" style="font-size: 0.80rem;color: #030a10;float: left;margin-left: ;">Added on:</span></th>
       <td><span style="font-size: 0.80rem;color: #030a10;margin-left:;"><?php echo date('F j, Y, g:i a',$asset['add_date']);?></span></td>
     </tr> 
   </tbody>

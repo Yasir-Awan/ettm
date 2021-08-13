@@ -2,24 +2,26 @@
 	 <div class="card">
 		 <div class="card-body">
 			 <div id="lanelower" class="media">
-				 <div class="media-middle media-body">
+				 <div class="media-middle media-body data-tables">
 					 <h3 class="media-heading"><span class="fw-l">Data-Sheet</span></h3>
-					 <table>
+					 <table id="dsr-table">
 						 <thead>
 							 <tr>
 								 <th width="30%">Tollplaza</th>
 								 <th width="20%">Uploaded</th>
-								 <th width="25%">Not Uploaded</th>
-								 <th width="30%">Status</th>
+								 <th width="20%">Not Uploaded</th>
+								 <th width="20%">Approved</th>
+								 <th width="20%">Rejected</th>
 							 </tr>
 						 </thead>
 						 <tbody>
-							 <?php if(isset($tool)){ $u = 0; foreach($tool as $toll){ ?>
+							 <?php if(isset($tool['tool'])){ $u = 0; foreach($tool['tool'] as $toll){ ?>
 							 <tr>
-								 <td><a href="" target="_blank"><?php echo $toll['name']; ?></a></td>
-								 <td><?php if(isset($days_count)){ if($dsr_tool[$u]['count'] <= $days_count) echo $dsr_tool[$u]['count'];} ?></td>
-								 <td><?php if($dsr_tool[$u]['not_uploaded'] >= 0) echo $dsr_tool[$u]['not_uploaded']; ?></td>
-								 <td><?php if(isset($dsr_tool[$u]['error'])){ echo $dsr_tool[$u]['error']; }elseif(isset($dsr_tool[$u]['success'])){ echo $dsr_tool[$u]['success']; } ?></td>
+								 <td><span id="<?php if($id == "current-month"){ ?>current-month-dsr-toll-<?php echo $toll['id']; }if($id == "current-quarter"){ ?>current-quarter-dsr-toll-<?php echo $toll['id']; }if($id == "current-semiannual"){ ?>current-semiannual-dsr-toll-<?php echo $toll['id']; } ?>" class="extend" target=""><?php if(isset($toll['name'])) echo $toll['name']; ?></span></td>
+								 <td><?php if(isset($toll['count'][0]['uploaded'])) echo $toll['count'][0]['uploaded'] ?></td>
+								 <td><?php if(isset($toll['count'][0]['not_uploaded'])) echo $toll['count'][0]['not_uploaded'] ?></td>
+								 <td><?php if(isset($toll['count'][0]['approved'])) echo $toll['count'][0]['approved'] ?></td>
+								 <td><?php if(isset($toll['count'][0]['rejected'])) echo $toll['count'][0]['rejected'] ?></td>
 							 </tr>
 							 <?php $u++;  } } ?>
 						 </tbody>
@@ -29,4 +31,11 @@
 		 </div>
 	 </div>
 </div>
-			
+<script>
+$(document).ready(function() {
+    $('#dsr-table').DataTable();
+	$("[data-toggle='toggle']").bootstrapToggle('destroy')                 
+                    $("[data-toggle='toggle']").bootstrapToggle();
+} );
+	
+</script>

@@ -25,18 +25,20 @@
                 <th>Uploaded By </th>
                 <th>Toll Plaza</th>
                 <th>Upload Date</th>
+                <th>Reason for Delay</th>
                 <th>DSR Date</th>
-                <th width="15%">Status</th>
+				<th>Supervised Date</th>
+                <th width="10%">Status</th>
                 <th width="30%">Action</th>
                 
             </tr>
         </thead>
         <tbody>
-            <?php if($dsr){
+            <?php if($dsr['dsr']){
               //echo "<pre>";
              /// print_r($dsr); exit;
                 $counter = 0;
-                foreach($dsr as $row){
+                foreach($dsr['dsr'] as $row){
 
                       $counter++;
 
@@ -49,44 +51,25 @@
              <tr>
                 <td><?php echo $counter;?></td>
                 <td>
-
-
-                  <?php
-                       
-                          $this->db->select('fname, lname');
-                          $this->db->from('tpsupervisor');
-                          $this->db->where('id', $row['supervisor_id']);
-                          $upload_name = $this->db->get()->result_array();
-						  
-						  $this->db->select('role');
-                          $this->db->from('tpsupervisor');
-                          $this->db->where('id', $row['supervisor_id']);
+					<?php
+					$this->db->select('fname, lname');
+					$this->db->from('tpsupervisor');
+					$this->db->where('id', $row['supervisor_id']);
+					$upload_name = $this->db->get()->result_array();
+					$this->db->select('role');
+					$this->db->from('tpsupervisor');
+					$this->db->where('id', $row['supervisor_id']);
                           $role = $this->db->get()->result_array();
 					
                           echo $upload_name[0]['fname'].' '.$upload_name[0]['lname'].' '; if($role[0]['role'] == 2){ echo "(Technical Manager)"; } elseif($role[0]['role'] == -1){ echo "(Technician)"; } elseif($role[0]['role'] == 1) { echo '(Site Incharge)';} elseif($role[0]['role'] == 0) { echo "(Supervisor)";};
-                       ?></td>
+                       ?>
+				 </td>
                 <td> <?php echo $toolplaza_name;?></td>
-                <!--td>
-                         <?php //echo date("F, Y",strtotime($row['for_month'])); ?>
-                </td-->
-                <!--td>
-                          <?php 
-
-                            if($row['type'] == 1){
-                                echo '<span class="badge badge-info">Standard (Complete Month)</span>';
-                            }else{
-                                $c_d = explode('-',$row['for_month']);
-                                $start_date = $c_d[0].'-'.$c_d[1].'-'.$row['start_date'];
-                                $end_date = $c_d[0].'-'.$c_d[1].'-'.$row['end_date'];
-                            
-                                echo '<span class="badge badge-info">Custom (Specific Dates)</span><br>';
-                                echo '<span class="badge badge-success" style="margin-top: 1.5%;">From: &nbsp;'.date("F j, Y", strtotime($start_date)).'</span><br>';
-                                echo '<span class="badge badge-warning" style="margin-top: 1.5%;">To:'.date("F j, Y", strtotime($end_date)).'</span>';
-                            }
-                          ?>
-                        </td-->
-                <td> <?php echo date('F j, Y',$row['created_at']);?></td>
+                <td> <?php echo date('F j, Y g:i a',$row['created_at']);?></td>
+                <td> <?php echo $row['toll_delay'];?></td>
                 <td> <?php echo  date('F j, Y',strtotime($row['datecreated']));?></td>
+				<td> <?php if($row['supervised_at'] != ''){ echo date('F j, Y g:i a',$row['supervised_at']); }
+					elseif($row['updated_at'] != '' && $row['status'] == 1){ echo date('F j, Y',$row['updated_at']); }?></td>
                 <td> <?php if($row['status'] == 0){?>
                          <span class="badge badge-primary">Pending</span>
 
@@ -135,8 +118,8 @@
     </script>
 	
 	
-	<span id = 'show' href="<?php if(isset($show)) echo $show; ?>" class="btn-info float-right btn-sm">Show More</span>
-	<?php if(isset($less)){ ?><span id = 'show-less' href="<?php if(isset($less)) echo $less; ?>" class="btn-info float-left btn-sm">Show Less</span> <?php } ?>
+	<span id = 'show' href="<?php if(isset($dsr['feat']['show'])) echo $dsr['feat']['show']; ?>" class="btn-info float-right btn-sm">Show More</span>
+	<?php if(isset($dsr['feat']['less'])){ ?><span id = 'show-less' href="<?php if(isset($dsr['feat']['less'])) echo $dsr['feat']['less']; ?>" class="btn-info float-left btn-sm">Show Less</span> <?php } ?>
 	<script>
 		$('#show').click(function(){
 			var count =$(this).attr('href');

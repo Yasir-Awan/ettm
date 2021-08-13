@@ -21,7 +21,7 @@
                       <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Office: activate to sort column ascending" style="width: auto;">Action</th>
                     </tr>
                   </thead>
-                  <tfoot align='center'>
+                  <!-- <tfoot align='center'>
                     <tr>
                        <th rowspan="1" colspan="1">Sr#</th>
                        <th rowspan="1" colspan="1">Subitem Name</th>
@@ -30,7 +30,7 @@
                        <th rowspan="1" colspan="1">Description</th>
                        <th rowspan="1" colspan="1">Action</th>
                     </tr>
-                  </tfoot>
+                  </tfoot> -->
                   <tbody align='center'>    
                   <?php
                   // echo "<pre>"; print_r($items);

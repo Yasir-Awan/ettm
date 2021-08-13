@@ -31,7 +31,7 @@ class Other_crons extends CI_Controller{
 
             
             foreach ($weigh as $row) {
-
+                echo "HAI<br>";
                 $ins_data = array();
                 $dir = 'ftp://'.$row['address'].'/';
                 $conn_id = ftp_connect($row['address']);
@@ -39,6 +39,7 @@ class Other_crons extends CI_Controller{
                    if($row['file_index']){
 
                         $file = 'V'.$row['file_index'].'.dat';
+                        
                    }else{
                         $files = scandir($dir);
 
@@ -79,8 +80,8 @@ class Other_crons extends CI_Controller{
                                     WHERE weigh_id = '$id' AND date = '$date'");
                                     $c = $query->row()->count_id;
                                 }
-                                 // echo "<pre>";
-                                //     print_r($result); exit;
+                                 echo "<pre>";
+                                 print_r($result); exit;
                                 foreach ($result as $key => $value) {
 
                                     

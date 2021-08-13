@@ -143,8 +143,14 @@ $exempt = $this->db->get_where('exempt',array('mtr_id' => $mtrid))->result_array
 </div>
 
 </div><!-- Content row End -->
+<?php if($page == "Dashboard"){?>
+   <?php $hidden = array('plaza_id' => $chart['toolplaza_id'], 'month' => $chart['month']); ?> 
+      <?php echo form_open_multipart(base_url().'admin/dashboard_timer', array('id' => 'timer', 'method' => 'post'),$hidden);?> 
+         
+      </form>
+  <?php } ?>
 
-
+<?php if($this->session->userdata('adminid')!=22){ ?>
       <div class="main-content-inner">
         <div class="row" >
 
@@ -269,12 +275,7 @@ $exempt = $this->db->get_where('exempt',array('mtr_id' => $mtrid))->result_array
               
             </div>
           </div>
-          <?php if($page == "Dashboard"){?>
-   <?php $hidden = array('plaza_id' => $chart['toolplaza_id'], 'month' => $chart['month']); ?> 
-      <?php echo form_open_multipart(base_url().'admin/dashboard_timer', array('id' => 'timer', 'method' => 'post'),$hidden);?> 
-         
-      </form>
-  <?php } ?>
+          
 <!-- Traffic summary Table END -->
 
           <!-- Bar Chart START -->
@@ -422,6 +423,7 @@ $exempt = $this->db->get_where('exempt',array('mtr_id' => $mtrid))->result_array
 
         </div>
       </div>
+          <?php } ?>
 
   <?php if($page == "Dashboard"){?>  
 

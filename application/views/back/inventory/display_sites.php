@@ -23,16 +23,18 @@
                     <tr role="row">
                       <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending" style="width: auto;">SR #</th>
                       <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">SITE NAME</th>
+                      <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">SITE TYPE</th>
                       <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">ACTION</th>
                     </tr>
                   </thead>
-                  <tfoot align="center">
+                  <!-- <tfoot align="center">
                     <tr>
                        <th rowspan="1" colspan="1">SR #</th>
                        <th rowspan="1" colspan="1">SITE NAME</th>
+                       <th rowspan="1" colspan="1">SITE TYPE</th>
                        <th rowspan="1" colspan="1">ACTION</th>
                     </tr>
-                  </tfoot>
+                  </tfoot> -->
                   <tbody align="center" >
                   <?php
                         $counter = 0;
@@ -44,7 +46,18 @@
                   <tr role="row" class="odd">
                       <td class="sorting_1"><?php echo $counter;?></td>
                       <td><?php echo $site['name'];?></td>
-                      <td> <span class="btn btn-success btn-xs btn-labeled fas fa-edit" id="cancel_reason" name="site_edit" onclick="ajax_html('<?php echo base_url().'inventory/site_edit/'.$site['id'];?>','edit_site_contents');" data-toggle="modal" data-target="#site-edit">&nbsp;Edit</span>
+                      <td>
+                        <?php 
+                        if($site['site_type']==1)
+                        echo "Toll Plaza";
+                        if($site['site_type']==3)
+                        echo "Head Quarter"; 
+                        if($site['site_type']==2)
+                        echo "Weigh Station";
+                        ?>
+                       </td>
+                      <td> 
+                      <!-- <span class="btn btn-success btn-xs btn-labeled fas fa-edit" id="cancel_reason" name="site_edit" onclick="ajax_html('<?php echo base_url().'inventory/site_edit/'.$site['id'];?>','edit_site_contents');" data-toggle="modal" data-target="#site-edit">&nbsp;Edit</span> -->
                      &nbsp
                     <span class="btn btn-danger btn-xs  fas fa-trash-alt" onclick="delete_confirm_tab('Really want to delete This','<?php echo base_url().'inventory/sites/delete/'.$site['id'];?>')" > 
                     Delete</span></td>

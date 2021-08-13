@@ -8,7 +8,7 @@ class nha extends CI_Model
 		parent::__construct();
 		//$this->load->library('form_validation');
 		//$this->load->helper('form');
-		date_default_timezone_set('Asia/Karachi');
+		//date_default_timezone_set('Asia/Karachi');
 	}
 	public function mtr_per_year($year){
 		$querymtr = 'SELECT * FROM mtr WHERE YEAR(for_month) = YEAR(NOW() -  INTERVAL '.$year.' YEAR) AND status = 1 ORDER BY ID DESC';

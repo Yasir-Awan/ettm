@@ -1,6 +1,6 @@
 
           <?php 
-            $weighstation_name = $this->db->get_where('weighstation',array('id' => $weighstation[0]['weigh_id']))->row()->name;
+            $weighstation_name = @$this->db->get_where('weighstation',array('id' => @$weighstation[0]['weigh_id']))->row()->name;
           ?>
             <!-- page title area end -->
             
@@ -27,7 +27,7 @@
                                                                         <span style="font-size:14px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date &nbsp;:</span>
                                                                     </td>
                                                                     <td width="60%" text-align="left">
-                                                                        <span style="font-size:14px;text-align:left"><?php echo date("F j, Y", strtotime($weighstation[0]['date']));?></span>
+                                                                        <span style="font-size:14px;text-align:left"><?php echo @date("F j, Y", strtotime(@$weighstation[0]['date']));?></span>
                                                                     </td>
                                                                 </tr>
                     
@@ -74,6 +74,15 @@
                                                 </tr>
                                                  <?php 
                                              }
+                                             ?>
+                                             <tr><td colspan="2"><div style="line-height:20px; font-size:11px;">   Total Vehicles</div></td><td colspan="8"><div style="line-height:20px; font-size:11px;"><?php echo " ".$totalVehicles;?></div></td></tr>
+                                             <tr><td colspan="2"><div style="line-height:20px; font-size:11px;">   Total Overloaded</div></td><td colspan="8"><div style="line-height:20px; font-size:11px;"><?php echo " ".$totalOverloaded;?></div></td></tr>
+                                             <tr><td colspan="2"><div style="line-height:20px; font-size:11px;">  Up To 10 Ton</div></td><td colspan="8"><div style="line-height:20px; font-size:11px;"><?php echo " ".$lessThanTen;?></div></td></tr>
+                                             <tr><td colspan="2"><div style="line-height:20px; font-size:11px;">  Up To 20 Ton</div></td><td colspan="8"><div style="line-height:20px; font-size:11px;"><?php echo " ".$lessThanTwenty;?></div></td></tr>
+                                             <tr><td colspan="2"><div style="line-height:20px; font-size:11px;">  Up To 30 Ton</div></td><td colspan="8"> <div style="line-height:20px; font-size:11px;"><?php echo " ".$lessThanThirty;?></div></td></tr>
+                                             <tr><td colspan="2"><div style="line-height:20px; font-size:11px;">  Up To 40 Ton</div></td><td colspan="8"> <div style="line-height:20px; font-size:11px;"><?php echo " ".$lessThanFourty;?></div></td></tr>
+                                             <tr><td colspan="2"><div style="line-height:20px; font-size:11px;">  Greater Than 40 Ton</div></td><td colspan="8"> <div style="line-height:20px; padding:unset; font-size:11px;"><?php echo " ".$greaterThanFourty;?></div></td></tr>
+                                             <?php
                                                }     
                                                 ?>
                                                 

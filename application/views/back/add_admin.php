@@ -27,9 +27,18 @@
       
     </div>
     <div class="form-group">
-      <label for="exampleInputEmail1" style="font-weight: 900;">role</label>
-      <input type="text" name="role" class="form-control required" id="exampleInputEmail1"  placeholder="Enter contact">
-      
+    <div class="row">
+    <div class="col-md-4"><label for="exampleInputEmail1" style="font-weight: 900;">role</label></div>
+    <div class="col-md-4">      
+                <select class="form-control required" name="role" id="tsp_id" placeholder="Select Asset Name" style="margin-left:-140px;">
+                        <option value="1">Super Admin</option>
+                        <option value="2">Sub Admin</option>
+                        <option value="3">M3 Admin</option>
+                        <option value="4">Middle Admin</option>
+                        <option value="4">M5 Admin</option>
+                  </select>     
+          </div> 
+          </div>
     </div>
 
     <div class="form-group " style=''>

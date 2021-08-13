@@ -667,6 +667,7 @@ $conn = null;
 
             $conn = oci_connect($row['username'], $row['password'], $row['server_ip'].'/'.$row['services']);
             if($conn){
+             
                 if($check_record[0]->record > 0){
                     $sqlgroup = "SELECT vicinity_id,MAX(date) as max_date FROM transactions WHERE tollplaza_id = ".$row['tollplaza_id']." GROUP BY vicinity_id";
                     $datagroup = $this->db->query($sqlgroup)->result_array();  

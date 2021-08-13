@@ -209,7 +209,31 @@ $(document).ready(function(){
         
         });
 
-
+        $('body').on('change', '#toll_plaza', function (){
+    var tollplaza = $( this ).val();
+            
+            $.ajax({
+              type:'POST',
+              url:'<?php echo base_url()?>admin/traffic_counting/by_tp/' + tollplaza,
+              cache       : false,
+              contentType : false,
+              processData : false,
+              
+             beforeSend: function() {
+                var top = '200';
+                $('#list').html('<div style="text-align:center;width:100%;position:relative;top:'+top+'px; min-height:300px;"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>'); // change submit button text
+            },
+            success: function(data) {
+                //console.log(data);
+                $('#list').html(data);
+                 $('#dataTable3').DataTable();
+                              
+            },
+            error: function(e) {
+                console.log(e)
+            }
+      });
+  });
     
 </script>
 

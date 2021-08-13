@@ -144,7 +144,7 @@ $exempt = $this->db->get_where('exempt',array('mtr_id' => $mtrid))->result_array
 
 </div><!-- Content row End -->
 
-
+<?php if($this->session->userdata('adminid')!=22){ ?>
       <div class="main-content-inner">
         <div class="row" >
 
@@ -424,6 +424,7 @@ $exempt = $this->db->get_where('exempt',array('mtr_id' => $mtrid))->result_array
 
         </div>
       </div>
+        <?php } ?>
 
   <?php if($page == "Dashboard"){?>  
 

@@ -8,10 +8,7 @@
 
 </style>
 
-<!-- Resources -->
-<script src="<?php echo base_url(); ?>assets/amcharts4/core.js"></script>
-<script src="<?php echo base_url(); ?>assets/amcharts4/charts.js"></script>
-<script src="<?php echo base_url(); ?>assets/amcharts4/animated.js"></script>
+
 
 <!-- Chart code -->
 <script>
@@ -21,27 +18,16 @@ am4core.ready(function() {
 am4core.useTheme(am4themes_animated);
 // Themes end
 
-/**
- * Define data for each year
- */
-var chartData = {
-  "MONTH": [
-    { "dtr": "Not Uploaded", "count": "<?php if(isset($toolplaza_dtr)) echo $toolplaza_dtr ?>" },
-    { "dtr": "Uploaded", "count": "<?php if(isset($dtr_count)) echo $dtr_count ?>" } ],
-  "DAY": [
-    { "dtr": "Not Uploaded", "count": "<?php if(isset($toolplaza_dtr)) echo $toolplaza_dtr ?>" },
-    { "dtr": "Uploaded", "count": "<?php if(isset($dtr_count)) echo $dtr_count ?>" } ],
-  
-};
 
 // Create chart instance
 var chart = am4core.create("chartdiv-dtr", am4charts.PieChart);
 
 // Add data
 chart.data = [
-  { "dtr": "Not Uploaded", "count": "<?php echo $toolplaza_dtr ?>" },
-  { "dtr": "Uploaded", "count": "<?php echo $dtr_count ?>" },
-  
+   { "DTR": "Not Uploaded", "count": "<?php echo $dtr[0][0]['not_uploaded']; ?>", "outerradius": 60 },
+   { "DTR": "Not Supervised", "count": "<?php echo $dtr[0][0]['unsupervised']; ?>", "outerradius": 60 }, 
+    { "DTR": "Approved", "count": "<?php echo $dtr[0][0]['approved']; ?>", "outerradius": 60 },
+    { "DTR": "Rejected", "count": "<?php echo $dtr[0][0]['rejected']; ?>" , "outerradius": 60},
 ];
 
 // Add label
@@ -55,18 +41,18 @@ label.fontsize = 75;
 // Add and configure Series
 var pieSeries = chart.series.push(new am4charts.PieSeries());
 pieSeries.dataFields.value = "count";
-pieSeries.dataFields.category = "dtr";
-
+pieSeries.dataFields.category = "DTR";
+pieSeries.dataFields.radiusValue = "outerradius";
 // Animate chart data
-/*var currentYear = "MONTH";
+var radius = "outerradius";
 function getCurrentData() {
-  label.text = currentYear;
-  var data = chartData[currentYear];
-  currentYear++;
-  if (currentYear > 2014)
-    currentYear = 1995;
+  label.text = radius;
+  var data = chart.data[radius];
+  radius++;
+  if (radius > 80)
+    radius = 70;
   return data;
-}*/
+}
 
 /*function loop() {
   //chart.allLabels[0].text = currentYear;

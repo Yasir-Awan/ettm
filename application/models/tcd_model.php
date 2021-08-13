@@ -8,7 +8,7 @@ class tcd_model extends MY_Model
 		parent::__construct();
 		//$this->load->library('form_validation');
 		//$this->load->helper('form');
-		date_default_timezone_set('Asia/Karachi');
+		//date_default_timezone_set('Asia/Karachi');
 	}
 	public $table = 'tcd';
 	
@@ -43,7 +43,7 @@ class tcd_model extends MY_Model
 		$toll = 'toolplaza'; $where = array('id' => $tool);
 		$postload[0]['plaza_name'] = $this->database_model->get_where($toll, $where)->row()->name;
 		$terrif = $this->calculation_model->terrif_value($tool, $date)->result_array();
-		if(isset($terrif[0][0])){
+		if(isset($terrif[0])){
 			$tarrif[0][0]['class_1_value'] = $terrif[0]['class_1_value'];
 			$tarrif[0][0]['class_2_value'] = $terrif[0]['class_2_value'];
 			$tarrif[0][0]['class_3_value'] = $terrif[0]['class_4_value'];

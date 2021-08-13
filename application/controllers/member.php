@@ -908,7 +908,16 @@ class Member extends CI_Controller{
 				$sql = "SELECT * FROM `traffic_counter` WHERE tollplaza = ".$this->input->post('tollplaza')." AND direction = '".$this->input->post('direction')."' AND ".$datetime." between video_start_date and video_end_date";
 				
 				$result = $this->db->query($sql)->result_array();
-				
+				// //echo $this->db->last_query();
+				// $test_date = strtotime('2020-11-22 07:00:00');
+				// echo $test_date."<br>";
+				// echo date('Y-m-d H:i:s','1606010400')."<br>";
+				// echo date('Y-m-d H:i:s',$result[0]['video_start_date'])."<br>";
+				// echo date('Y-m-d H:i:s',$result[0]['video_end_date'])."<br>";
+				// echo date('Y-m-d H:i:s',$result[0]['session_start_date'])."<br>";
+				// echo date('Y-m-d H:i:s',$result[0]['session_end_date'])."<br>";
+				// echo "<pre>";
+				// print_r($result); exit;
 				if($result){
 					echo json_encode(array('response' => FALSE,'message' => 'Session of this date time already exists')); exit;
 				}

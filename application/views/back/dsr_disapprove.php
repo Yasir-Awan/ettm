@@ -11,7 +11,7 @@ ol li {
     <div class="form-group">
       <label for="exampleInputEmail1" style="font-weight: 900;">Reason For Dissapprove</label>
       <div class="abstract">
-      	<textarea class="form-control summernotes" data-name="dissapprove_reason" rows="5" id="dissapprove"></textarea>
+      	<textarea class="form-control summernotes" data-name="dissapprove_reason" rows="5" id="dissapprove_reason"></textarea>
       </div>
     </div>
     <span class="btn btn-primary pull-right btn-xs" onclick="form_submit('dissapprove');">Update DSR</span>

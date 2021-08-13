@@ -78,6 +78,7 @@
           <td>
             <?php 
               echo date("F j, Y, h:i:s A", $row['video_start_date']);
+              // echo date( "F j, Y, h:i:s A", strtotime( '+3 hour' , strtotime($row['video_start_date']) ) );
             ?>
           </td>
           <td>

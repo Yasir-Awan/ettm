@@ -21,7 +21,8 @@ class Omc extends CI_Controller
 			return redirect('omc/login');
 		}
 		$data = $this->Admin_model->omcchartdata();
-
+		// echo "<pre>";
+		// print_r($data); exit;
 		// $this->load->model('General');
 	 	// $this->General->notifications();
 		$previous_year = date("Y-m-d",strtotime(@$data['chart']['month'].' -1 year'));
@@ -31,8 +32,7 @@ class Omc extends CI_Controller
 		
 		$this->page_data['mtr'] = $this->db->get_where('mtr',array('id' => $data['mtr_id'] ))->result_array();
 	    $month_year = explode('-',$this->page_data['mtr'][0]['for_month']);
-		//echo "<pre>";
-		//print_r($month_year); exit;
+		
 		$start_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['start_date'];
 		$end_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['end_date'];
         $sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['mtr'][0]['toolplaza']." ,toolplaza) AND (start_date <= '".$start_date."' AND end_date >= '".$end_date."')";
@@ -41,7 +41,6 @@ class Omc extends CI_Controller
 		$this->page_data['mtrid'] = $data['mtr_id'];
 		$this->page_data['plaza_id'] = $data['chart']['toolplaza_id'];
 		$this->page_data['month'] = $data['chart']['month'];
-
 
 		$this->page_data['tollplaza'] = $this->db->get_where('toolplaza',array('status' => 1, 'omc'=>$this->session->userdata('omcid')))->result_array();
 		$this->page_data['chart'] = $data['chart'];
@@ -55,140 +54,180 @@ class Omc extends CI_Controller
 		
 		$this->load->view('back/omcdashboard', $this->page_data);
 	}
+/*Author: Yasir 
+	Function name: dasboard Parameter Name $id, $tool
+	Function: Its the main function that displays dashboardST
+	Date Creation: Late
+	Optimized Date: 30/07/2020*/
 	public function dashboard(){
+		date_default_timezone_set("Asia/Karachi");
+		$this->load->model('dashboardst');
 		if(!$this->session->userdata('omcid')){	
 			return redirect('omc/login');
 		}
 		$id = 'today';
-		//Queries Section 
-		$querydsr = 'SELECT * FROM dsr_updated WHERE DATE(datecreated) = DATE(NOW()) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-		$monthlydsr = 'SELECT * FROM dsr_updated WHERE DATE(datecreated) = DATE(NOW()) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-		$querydtr = 'SELECT * FROM dtr WHERE DATE(for_date) = DATE(NOW()-INTERVAL 1 DAY) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
+		//Loading Tollplazas from Database
+		$table = 'toolplaza'; $where = array('status' => 1);
+		$tool = $this->database_model->get_where($table, $where)->result_array();
+		///DSR Area Start
+		$this->dash_dsr($id, $tool);
 		
-		//Query on database section 
-		$dsrmonth = $this->database_model->query($querydsr);
-		$dtrmonth = $this->database_model->query($querydtr);
-		
-		//loading table from database
-		$table = 'dsr_updated'; $where = array('');
-		$dsrtool = $this->database_model->get_where($table, $where);
-		$table = 'toolplaza'; $where = array('status' => '1','omc' => $this->session->userdata('omcid'));
-		$tolplaza = $this->database_model->get_where($table, $where);
-		
-		//displaying database arrays
-		$dsr = $dsrmonth->result_array();
-		$dtr = $dtrmonth->result_array();
-		
-		//Counting database arrays
-		$dsr_count = $dsrmonth->num_rows();
-		$dtr_count = $dtrmonth->num_rows();
-		$toolplaza = $tolplaza->num_rows();
-		
-		
-		$today = date("d");
-		$toolplaza_all = $toolplaza;
-		$toolplaza_dsr = $toolplaza_all - $dsr_count;
-		$toolplaza_dtr = $toolplaza_all - $dtr_count;
-		
-		$k = 0; $closed_lanes = 0; $open_lanes = 0; $faulty_cameras = 0;
-		if($dsr){
-			$cameras = 0; $faulty_cameras = $dsr[$k]['faulty_cameras'] = 0; $total_lanes = 0;
-			foreach($dsr as $d){
-				$table = 'toolplaza'; $where = array('id' => $d['toolplaza_id']);
-				$dsr[$k]['tool'] = $toll[$k] = $this->database_model->get_where($table, $where)->result_array();
-                /*?> <pre><?php echo print_r($dsr[$k]['tool']); */
-                $table = 'omc'; $where = array('id' => $d['omc']); 
-				$omc[$k]['name'] = $this->database_model->get_where($table, $where)->row()->name;
-				$r = 0;
-				foreach($toll[$k] as $tool){
-					$table = 'dsr_lane'; $where = array('dsr_id' => $d['id'], 'toolplaza_id' => $tool['id']);
-					$dsr[$k]['lanes'] = $d_lane = $this->database_model->get_where($table, $where)->result_array();
-					$l = 0;
-					$dsr[$k]['closed_lanes'] = 0; $dsr[$k]['faulty_cameras'] = 0; $dsr[$k]['open_lanes'] = $open_lanes =  0;  
-					foreach($dsr[$k]['lanes'] as $lane){
-						if($lane){
-							$lanes = $dsr[$k]['total_lanes'] = $dsr[$k]['total_lane_cameras'] = count($dsr[$k]['lanes']);
-							if(isset($lane['lane_status'])){
-									if($lane['lane_status'] == 1){ $dsr[$k]['closed_lanes']++; $closed_lanes++; }
-									if($lane['lane_status'] == 0){ $dsr[$k]['open_lanes']++; } }
-
-							if(isset($lane['lane_camera_status'])){
-									if($lane['lane_camera_status'] == 1){ $dsr[$k]['faulty_cameras']++; $faulty_cameras++; }
-								}
-						}
-						if(!$lane){}
-						$l++;
-					}				
-					$c_lanes = $dsr[$k]['closed_lanes'];
-					$r++;
-				}
-				$total_lanes = $total_lanes + $lanes;
-				$tollplaza[$k] = $d['toolplaza_id'];
-				
-				$toolplaza_st[$k]['id'] = $d['toolplaza_id'];
-				$toolplaza_st[$k]['omc_name'] = $omc[$k]['name'];
-				$toolplaza_st[$k]['name'] = $toll[$k][0]['name'];
-				$toolplaza_st[$k]['closed_lanes'] = $dsr[$k]['closed_lanes'];
-				$toolplaza_st[$k]['total_lanes'] = $dsr[$k]['total_lanes'];
-				$toolplaza_st['total_lanes'] = $total_lanes;
-				$toolplaza_st['closed_lanes'] = $closed_lanes;
-				$toolplaza_st[$k]['faulty_cameras'] = $dsr[$k]['faulty_cameras']++;
-				$toolplaza_st['faulty_cameras'] = $faulty_cameras;
-				$toolplaza_st[$k]['total_cameras'] = $dsr[$k]['total_lane_cameras'];
-				$k++;
-				$this->page_data['toolplaza_st'] = $toolplaza_st;
-            }
-            // exit;
-		}
-		elseif(!$dsr){
-			$this->page_data['message_dsr'] = "Today, DSR is not uploaded yet.";
-			$closed_lanes = ''; $open_lanes = ''; $faulty_cameras = ''; $total_lanes = ''; $cameras = '';
-		}
-		$k = 0; $total_traffic = 0; $total_revenue = 0;
-		if($dtr){
-			foreach($dtr as $d){
-        		$sql = "Select * From terrif Where FIND_IN_SET (".$d['toolplaza']." ,toolplaza) AND (start_date <= '".$d['for_date']."' AND end_date >= '".$d['for_date']."')";
-				$tarrif =  $this->database_model->query($sql)->result_array();	
-				$select = 'name'; $table = 'toolplaza'; $where = array('id' => $d['toolplaza']);
-				$toll = $this->database_model->get_select($select, $table, $where)->result_array();
-				
-				$toolplaza_ts[$k]['id'] = $d['toolplaza'];
-				$toolplaza_ts[$k]['name'] = $toll[0]['name'];
-				$toolplaza_ts[$k]['traffic'] = $traffic = $d['class1'] + $d['class2'] + $d['class3'] + $d['class4'] + $d['class5'] + $d['class6'] + $d['class7'] + $d['class8'] + $d['class9'] + $d['class10'];
-				$toolplaza_ts[$k]['revenue'] = $revenue = ($d['class1'] * $tarrif[0]['class_1_value']) + ($d['class2'] * $tarrif[0]['class_2_value']) + ($d['class3'] * $tarrif[0]['class_3_value']) + ($d['class4'] * $tarrif[0]['class_4_value']) + ($d['class5'] * $tarrif[0]['class_5_value']) + ($d['class6'] * $tarrif[0]['class_6_value']) + ($d['class7'] * $tarrif[0]['class_7_value']) + ($d['class8'] * $tarrif[0]['class_8_value']) + ($d['class9'] * $tarrif[0]['class_9_value']) + ($d['class10'] * $tarrif[0]['class_10_value']);
-				$toolplaza_ts['total_traffic'] = $total_traffic = $total_traffic + $traffic;
-				$toolplaza_ts['total_revenue'] = $total_revenue = $total_revenue + $revenue;
-				$k++;
-			}
-			$this->page_data['toolplaza_ts'] = $toolplaza_ts;
-		}
-		else{
-			$this->page_data['message_dtr'] = "Today, DTR is not uploaded yet.";
-		} 
+		///DSR Area Closed
+		///DTR Area Start 
+		$dtrid = 'today-dtr';
+		$this->dash_dtr($dtrid, $tool);
+		///DTR Area End
 		$this->page_data['id'] = $id;
-		$this->page_data['dsr_count'] = $dsr_count;
-		$this->page_data['toolplaza_dsr'] = $toolplaza_dsr;
-		$this->page_data['dtr_count'] = $dtr_count;
-		$this->page_data['toolplaza_dtr'] = $toolplaza_dtr;
-		$this->page_data['dsr'] = $dsr;
-		$this->page_data['dtr'] = $dtr;
-		$this->page_data['total_lanes'] = isset($total_lanes);
-		$this->page_data['closed_lanes'] = $closed_lanes;
-		$this->page_data['faulty_cameras'] = $faulty_cameras;
-		$this->page_data['cameras'] = $cameras;
 		
+		/*?><pre> <?php echo print_r($this->page_data);exit;*/
 		$this->page_data['page'] = 'Dashboard ST';
 		$this->load->view('back/omcDdashboard',$this->page_data);
 	}
+	/*Author: Yasir 
+	Function name: dash_dsr Parameter Name $id, $tool
+	Function: To get and display data for DSR portion in Dashboard ST
+	Date Creation: 5/7/2020
+	Optimized date : 5/10/2020*/
+	public function dash_dsr($id, $tool){
+		date_default_timezone_set("Asia/Karachi");
+		$dsr = $this->dashboardst->main($id);
+		/*?><pre> <?php echo print_r($dsr);exit;*/
+			/*?> <?php echo print_r($tool);exit;*/
+		if($id ==  'today' || $id == 'yesterday'){
+			//calculation total lanes and closed lanes in all tollplazas
+			$dsr[2]['all_tool'] = $this->dashboardst->data($id, NULL);
+			//calculation total lanes and closed lanes in all tollplazas
+			$dsr[2]['all_tool_lane_cameras'] = $this->dashboardst->lane_cameras($id, NULL);
+			$toolplaza_st['total_lanes'] = $dsr[2]['all_tool'][0]['total_lanes'];
+			$toolplaza_st['closed_lanes'] = $dsr[2]['all_tool'][0]['closed_lanes'];
+			$toolplaza_st['faulty_cameras'] =  $dsr[2]['all_tool_lane_cameras'][0]['faulty_cameras'];
+		}
+		$t = 0;
+		foreach($tool as $toll){
+
+			$toolplaza_st['tool'][$t]['id'] = $toll['id']; 
+			$toolplaza_st['tool'][$t]['name'] = $toll['name'];
+			$this->page_data['tool']['tool'][$t]['id'] = $toolplaza_st['tool'][$t]['id'];
+			$this->page_data['tool']['tool'][$t]['name'] = $toolplaza_st['tool'][$t]['name']; 
+			if($id == 'today' || $id == 'yesterday'){
+				if(isset($dsr[1])){
+					$k = 0;
+					foreach($dsr[1] as $d){
+						if($d['toolplaza_id'] == $toll['id']){
+
+								$table = 'view_dsr_lanes'; $where = array('dsr_id' => $d['id'], 'toolplaza_id' => $d['toolplaza_id']);
+								$dsr[1][$k]['lanes'] = $d_lane = $this->database_model->get_where($table, $where)->result_array();
+								//calculating total lanes and closed lanes in respective tollplazas
+								$dsr[2]['toolplaza'] = $this->dashboardst->data($id, $d['toolplaza_id']);
+
+								//calculating total lanes and closed lanes in respective tollplazas
+								$dsr[2]['tool_lane_cameras'] = $this->dashboardst->lane_cameras($id, $d['toolplaza_id']);
+
+								$tollplaza[$k] = $d['toolplaza_id'];
+								/*?><pre> <?php echo print_r($dsr[2]);exit;*/
+								$toolplaza_st['tool'][$t]['dsr'][$k]['id'] = $d['id'];
+								$toolplaza_st['tool'][$t]['dsr'][$k]['status'] = $d['status'];
+								if(isset($toolplaza_st['tool'][$t]['dsr'][$k]['status'])){
+									if($toolplaza_st['tool'][$t]['dsr'][$k]['status'] != 0){
+										$toolplaza_st['tool'][$t]['dsr'][$k]['omc_name'] = $d['omc_name'];
+										$toolplaza_st['tool'][$t]['dsr'][$k]['closed_lanes'] = $dsr[2]['toolplaza'][0]['closed_lanes'];
+										$toolplaza_st['tool'][$t]['dsr'][$k]['total_lanes'] = $dsr[2]['toolplaza'][0]['total_lanes'];
+
+										$toolplaza_st['tool'][$t]['dsr'][$k]['faulty_cameras'] = $dsr[2]['tool_lane_cameras'][0]['faulty_cameras'];
+
+										$toolplaza_st['tool'][$t]['dsr'][$k]['total_cameras'] = $dsr[2]['tool_lane_cameras'][0]['total_cameras'];
+									}
+									if($toolplaza_st['tool'][$t]['dsr'][$k]['status'] == 0){
+										$toolplaza_st['tool'][$t]['dsr'][$k]['message'] = 'Pending';
+									}elseif($toolplaza_st['tool'][$t]['dsr'][$k]['status'] == 1){
+										$toolplaza_st['tool'][$t]['dsr'][$k]['message'] = 'Approved';
+									}elseif($toolplaza_st['tool'][$t]['dsr'][$k]['status'] == 2){
+										$toolplaza_st['tool'][$t]['dsr'][$k]['message'] = 'Rejected';
+									}
+								}
+								$k++;
+								$this->page_data['toolplaza_st']['tool'][$t]['dsr'] = $toolplaza_st['tool'][$t]['dsr'];
+								$this->page_data['tool']['tool'] = $toolplaza_st['tool'];
+								$this->page_data['tool']['tool'][$t]['dsr'] = $toolplaza_st['tool'][$t]['dsr'];
+						}
+					}
+				}
+			}
+			else{
+				$this->page_data['tool']['tool'][$t]['count'] = $this->dashboardst->data($id, $toll['id']); 
+			}
+	
+			$t++;
+		}
+		$this->page_data['dsr'] = $dsr;
+	}
+
+	/*Author: Numaan 
+	Function name: dash_dtr Parameter Name $id, $tool
+	Function: To get and display data for DSR portion in Dashboard ST
+	Date Creation: 5/7/2020
+	Optimized date : 5/10/2020*/
+	public function dash_dtr($id, $tool){
+		date_default_timezone_set("Asia/Karachi");
+		$dtr = $this->dashboardst->main($id);
+
+		$t = 0;
+		foreach($tool as $toll){
+			$toolplaza_st['tool'][$t]['id'] = $toll['id'];
+			$toolplaza_st['tool'][$t]['name'] = $toll['name'];
+			$this->page_data['tool']['tool'][$t]['id'] = $toolplaza_st['tool'][$t]['id'];
+			$this->page_data['tool']['tool'][$t]['name'] = $toolplaza_st['tool'][$t]['name'];
+			if($id == 'today-dtr' || $id == 'yesterday-dtr'){
+				$dtr[2] = $this->dashboardst->total_traffic();
+				$this->page_data['tool']['total_traffic'] = $dtr[2][0]['traffic'];
+				$this->page_data['tool']['total_revenue'] = $dtr[2][0]['revenue'];
+				$k = 0;
+				foreach($dtr[1] as $d){
+					if($d['toolplaza_id'] == $toll['id']){
+						$toolplaza_st['tool'][$t]['dtr'][0]['id'] = $d['id'];
+						$toolplaza_st['tool'][$t]['dtr'][0]['status'] = $d['status'];
+						if($toolplaza_st['tool'][$t]['dtr'][0]['status'] != 0){
+							$toolplaza_st['tool'][$t]['dtr'][0]['omc_name'] = $d['omc_name'];
+							$toolplaza_st['tool'][$t]['dtr'][0]['total'] = $d['total'];
+							$toolplaza_st['tool'][$t]['dtr'][0]['revenue'] = $d['revenue'];
+							if($toolplaza_st['tool'][$t]['dtr'][0]['status'] == 1){
+								$toolplaza_st['tool'][$t]['dtr'][0]['message'] = 'Approved';
+							}elseif($toolplaza_st['tool'][$t]['dtr'][0]['status'] == 2){
+								$toolplaza_st['tool'][$t]['dtr'][0]['message'] = 'Rejected';
+							}
+						}
+						if($toolplaza_st['tool'][$t]['dtr'][0]['status'] == 0)
+								$toolplaza_st['tool'][$t]['dtr'][0]['message'] = 'Pending';
+						
+						$this->page_data['toolplaza_st']['tool'][$t]['dtr'] = $toolplaza_st['tool'][$t]['dtr'];
+						$this->page_data['tool']['tool'][$t]['dtr'] = $toolplaza_st['tool'][$t]['dtr'];
+					}
+					$k++;
+				}
+			}
+			else{
+				$this->page_data['tool']['tool'][$t]['count'] = $this->dashboardst->data($id, $toll['id']); 
+			}
+			/*$this->page_data['tool'] = $toolplaza_st;*/
+			$t++;
+		}
+		
+		/*?><pre> <?php echo print_r($this->page_data['tool']);exit;*/
+		$this->page_data['dtr'] = $dtr;
+	}
+
 	public function daily_comprehensive_site_report(){
+		date_default_timezone_set("Asia/Karachi");
 		if(!$this->session->userdata('omcid')){	
 			return redirect('omc/login');
 		}
-		$data = $this->Admin_model->comprehensive_report($para1 = 'omc');	
+		$date = date('Y-m-d');
+		$data = $this->dsr_model->comprehensive($date);	
 		$this->page_data['toolplaza'] = $data['toolplaza'];
+		$this->page_data['inventory'] = $data['inventory'];
 		$this->page_data['today'] = date('d-m-Y');
 		$this->page_data['page'] = "Daily Comprehensive Site Report";
-		$this->load->view('back/includes/dashboarddtrdsr/sitereport', $this->page_data);
+		$this->load->view('back/includes/omcdashboarddtrdsr/sitereport', $this->page_data);
 	}
 	public function dashboard_dsr(){
 		$id = $this->input->post('id');

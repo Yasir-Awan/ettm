@@ -35,7 +35,7 @@
                                                 </div> -->
                                                 <input type="hidden" name="weighstation" id="weighstation" value="<?php echo $weigh;?>">
                                                 <div class="weighdate col-md-6">
-                                                    <input type="text" id="day" name="day" class="form-control" placeholder="Select Date" >
+                                                    <input type="text" id="day" name="day" class="form-control" autocomplete="off" placeholder="Select Date" <?php if(empty($dates['start_date']) || empty($dates['end_date'])){echo "disabled";}?>>
                                                 </div>
 
                                                 
@@ -52,7 +52,7 @@
                                                   <?php } ?>
                                               </div>
                                           </div>
-                                        <table id="dataTable3" class="text-center table table-bordered"> <span class="pull-right">Dated:<?php echo date('d-m-Y');?></span>
+                                        <table class="text-center table table-bordered table-responsive"> <span class="pull-right">Dated:<?php echo date('d-m-Y');?></span>
                                             <thead class="text-capitalize">
                                                 <tr>
                                                     <th rowspan="2" style="width: 15% !important;">Date</th>
@@ -66,7 +66,7 @@
                                                           <th>3 Axle</th>
                                                           <th>4,5,6 Axle</th>
                                                           <th>Total</th>
-                                                           <th>2 Axle</th>
+                                                          <th>2 Axle</th>
                                                           <th>3 Axle</th>
                                                           <th>4,5,6 Axle</th>
                                                           <th>Total</th>
@@ -75,8 +75,30 @@
                                             </thead>
                                             <tbody>
                                                 <?php if($weighstation){
+                                                        $entries = 0;
+                                                        $total = 0;
+                                                        $two_ax_inload_total = 0;
+                                                        $three_ax_inload_total = 0;
+                                                        $ffs_ax_inload_total = 0;
+                                                        $inload_total = 0;
+                                                        $two_ax_overload_total = 0;
+                                                        $three_ax_overload_total = 0;
+                                                        $ffs_ax_overload_total = 0;
+                                                        $overload_total = 0;
+                                                        $total_fine = 0;
                                                         foreach($weighstation as $row){
-
+                                                          
+                                                          $entries++;
+                                                          $total = $total + $row['total_vehicles'];
+                                                          $two_ax_inload_total = $two_ax_inload_total + $row['2ax_inload'];
+                                                          $three_ax_inload_total = $three_ax_inload_total + $row['3ax_inload'];
+                                                          $ffs_ax_inload_total = $ffs_ax_inload_total + $row['456ax_inload'];
+                                                          $inload_total = $inload_total + $row['total_vehicles_inload'];
+                                                          $two_ax_overload_total = $two_ax_overload_total + $row['2ax_overloaded'];
+                                                          $three_ax_overload_total = $three_ax_overload_total + $row['3ax_overloaded'];
+                                                          $ffs_ax_overload_total = $ffs_ax_overload_total + $row['456ax_overloaded'];
+                                                          $overload_total = $overload_total + $row['total_vehicles_overloaded'];
+                                                          $total_fine = $total_fine + $row['total_fine'];
                                                   ?>
                                                 <tr>
                                                     <td style="width:90px !important;"><?php echo date('d-m-Y',strtotime($row['date']));?></td>
@@ -89,11 +111,76 @@
                                                     <td> <?php echo $row['3ax_overloaded'];?> </td>
                                                     <td> <?php echo $row['456ax_overloaded'];?> </td>
                                                     <td> <?php echo $row['total_vehicles_overloaded'];?> </td>
-                                                    
                                                     <td> <?php echo $row['total_fine']?> </td>
+                                                    
                                                 </tr>
                                                 <?php } 
-                                                          }
+                                                ?>
+                                                <tr>
+                                                    <td style="font-weight: 900;font-size: 14px;">Total</td>
+                                                    <td style="font-weight: 900;font-size: 14px;"><?php echo array_sum(array_column($weighstation, 'total_vehicles'));//echo $total; ?></td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo array_sum(array_column($weighstation, '2ax_inload'));//$two_ax_inload_total;?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo array_sum(array_column($weighstation, '3ax_inload'));//$three_ax_inload_total;?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo array_sum(array_column($weighstation, '456ax_inload'));//$ffs_ax_inload_total ;?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo array_sum(array_column($weighstation, 'total_vehicles_inload'));//$inload_total;?></td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo array_sum(array_column($weighstation, '2ax_overloaded'));//$two_ax_overload_total;?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo array_sum(array_column($weighstation, '3ax_overloaded'));//$three_ax_overload_total;?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo array_sum(array_column($weighstation, '456ax_overloaded'));//$ffs_ax_overload_total;?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo array_sum(array_column($weighstation, 'total_vehicles_overloaded'));//$overload_total;?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo array_sum(array_column($weighstation, 'total_fine'));//echo $total_fine;?> </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                    <td style="font-weight: 900;font-size: 14px;">Average</td>
+                                                    <td style="font-weight: 900;font-size: 14px;"><?php echo round($total / $entries,2); ?></td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo round($two_ax_inload_total / $entries,2);?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo round($three_ax_inload_total / $entries,2);?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo round($ffs_ax_inload_total / $entries,2) ;?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo round($inload_total / $entries,2);?></td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo round($two_ax_overload_total / $entries,2);?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo round($three_ax_overload_total/ $entries,2);?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo round($ffs_ax_overload_total/ $entries,2);?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo round($overload_total/ $entries,2);?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo round($total_fine/ $entries,2);?> </td>
+                                                    
+                                                </tr>
+                                               <tr>
+                                                    <td style="font-weight: 900;font-size: 14px;">Maximum</td>
+                                                    <td style="font-weight: 900;font-size: 14px;"><?php  echo max(array_map(function($a) { return $a['total_vehicles']; }, $weighstation));?></td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo max(array_map(function($a) { return $a['2ax_inload']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo max(array_map(function($a) { return $a['3ax_inload']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo max(array_map(function($a) { return $a['456ax_inload']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo max(array_map(function($a) { return $a['total_vehicles_inload']; }, $weighstation));?></td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo max(array_map(function($a) { return $a['2ax_overloaded']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo max(array_map(function($a) { return $a['3ax_overloaded']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo max(array_map(function($a) { return $a['456ax_overloaded']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo max(array_map(function($a) { return $a['total_vehicles_overloaded']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo max(array_map(function($a) { return $a['total_fine']; }, $weighstation));?> </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                    <td style="font-weight: 900;font-size: 14px;">Minimum</td>
+                                                    <td style="font-weight: 900;font-size: 14px;"><?php  echo min(array_map(function($a) { return $a['total_vehicles']; }, $weighstation));?></td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo min(array_map(function($a) { return $a['2ax_inload']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo min(array_map(function($a) { return $a['3ax_inload']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo min(array_map(function($a) { return $a['456ax_inload']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo min(array_map(function($a) { return $a['total_vehicles_inload']; }, $weighstation));?></td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo min(array_map(function($a) { return $a['2ax_overloaded']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo min(array_map(function($a) { return $a['3ax_overloaded']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo min(array_map(function($a) { return $a['456ax_overloaded']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo min(array_map(function($a) { return $a['total_vehicles_overloaded']; }, $weighstation));?> </td>
+                                                    <td style="font-weight: 900;font-size: 14px;"> <?php echo min(array_map(function($a) { return $a['total_fine']; }, $weighstation));?> </td>
+                                                    
+                                                </tr>
+                                                <?php          }else{
+                                                ?>
+                                                <tr>
+                                                  <td colspan=11>
+                                                    No record Found
+                                                  </td>
+                                                </tr>
+                                                <?php } 
+
                                                 ?>
                                             </tbody>
                                         </table>
@@ -183,37 +270,18 @@
       $(document).ready(function(){
       
         $("#day").datepicker({
-             format: "mm/yyyy",
-             viewMode: "months", 
-              minViewMode: "months"  ,
-                  startDate: "<?php echo $dates['start_date']?>",
+            format: "mm/yyyy",
+            viewMode: "months", 
+            minViewMode: "months"  ,
+            startDate: "<?php echo $dates['start_date']?>",
             autoclose: true,
             endDate: "<?php echo $dates['end_date']?>"
          });
-
+        
   });
 
 
-      var timer =  setInterval(function(){
-    
-        $.ajax({   
-           url: "<?php echo base_url().'admin/get_weighstation_data';?>", // form action url
-           type: 'POST', // form submit method get/post
-           dataType: 'html',
-           success: function(data) {
-                var obj = JSON.parse(data);
-                obj.forEach(function(element) {
-                     $('#total_' + element.id).text(element.total_vehicles) ;
-                     $('#overloaded_' + element.id).text(element.overloaded);
-                     $('#fined_' + element.id).text(element.fined) ;
-                });           
-           },
-           error: function(e) {
-               console.log(e)
-           }
-       }); 
-        
-    },15000); 
+      
 
     </script>
 
