@@ -1,0 +1,1 @@
+<td><?php if(isset($attendee['leave_to'])) { echo $attendee['leave_to']; } ?></td>

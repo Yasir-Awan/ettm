@@ -1,0 +1,1 @@
+<td class=""><strong><?php echo $inv['name']; ?></strong></td>

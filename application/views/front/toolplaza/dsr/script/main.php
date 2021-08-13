@@ -1,0 +1,20 @@
+<?php 
+if(isset($north)){
+	include('north.php');
+}
+if(isset($south)){
+	include('south.php');
+}
+if(isset($dsr_bound)){
+	include('inventory/bound.php');
+}
+if(isset($t_inventory)){
+	include('inventory/tollplaza.php');
+}
+if(isset($s_feature)){
+	include('features/status.php');
+}
+if(isset($staff)){
+	include('attendance/main.php');
+}
+?>

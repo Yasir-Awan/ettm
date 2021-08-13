@@ -1,0 +1,1 @@
+<th><?php echo $feat['name']; ?></th>

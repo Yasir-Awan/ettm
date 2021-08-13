@@ -1,0 +1,5 @@
+<input type="hidden" name="id_<?php echo $n['abr']; ?>" value="<?php echo $n['id']; ?>">
+<input type="radio" id="toggle-<?php echo $n['abr']; ?>-open" name="status_<?php echo $n['abr']; ?>" <?php if(isset($dsr['dsr'][0]['bound'][0]['lane'][$counter]['status'])){ if($dsr['dsr'][0]['bound'][0]['lane'][$counter]['status'] == 0){ echo 'checked'; } }else{ echo 'checked';} ?>  value="0">
+<label for="toggle-<?php echo $n['abr']; ?>-open" class="radio">Open</label>
+<input type="radio" id="toggle-<?php echo $n['abr']; ?>-closed" name="status_<?php echo $n['abr']; ?>" <?php if(isset($dsr['dsr'][0]['bound'][0]['lane'][$counter]['status'])){ if($dsr['dsr'][0]['bound'][0]['lane'][$counter]['status'] == 1){ echo 'checked'; } } ?> value="1">
+<label for="toggle-<?php echo $n['abr']; ?>-closed" class="radio">Close</label>

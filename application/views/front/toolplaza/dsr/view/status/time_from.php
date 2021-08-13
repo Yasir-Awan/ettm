@@ -1,0 +1,1 @@
+<td><?php if(isset($feat['time_from'])) { echo $feat['time_from']; } ?></td>

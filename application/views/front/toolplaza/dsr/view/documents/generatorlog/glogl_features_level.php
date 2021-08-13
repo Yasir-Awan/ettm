@@ -1,0 +1,1 @@
+<td class="<?php if(isset($feature['val'])){ if($feature['val'] == 1){ echo 'bg-success';} } ?>"><?php echo $feature['level']; ?></td>

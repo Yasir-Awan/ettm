@@ -1,0 +1,4 @@
+<input type="radio" id="toggle-<?php echo $s['abr']; ?>-omc" name="closed_<?php echo $s['abr']; ?>" <?php if(isset($dsr['dsr'][0]['bound'][1]['lane'][$counter]['closed_by'])){ if($dsr['dsr'][0]['bound'][1]['lane'][$counter]['closed_by'] == 1){ echo 'checked'; } ;} ?> value="1">
+<label for="toggle-<?php echo $s['abr']; ?>-omc" class="radio">By OMC</label>
+<input type="radio" id="toggle-<?php echo $s['abr']; ?>-tech" name="closed_<?php echo $s['abr']; ?>"  <?php if(isset($dsr['dsr'][0]['bound'][1]['lane'][$counter]['closed_by'])){ if($dsr['dsr'][0]['bound'][1]['lane'][$counter]['closed_by'] == 2){ echo 'checked'; } ;} ?>  value="2">
+<label for="toggle-<?php echo $s['abr']; ?>-tech" class="radio">Due to Technical Issue</label>

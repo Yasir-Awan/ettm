@@ -1,0 +1,1 @@
+<th><?php echo $feature['name']; ?></th>

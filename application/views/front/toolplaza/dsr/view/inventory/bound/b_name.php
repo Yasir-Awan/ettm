@@ -1,0 +1,1 @@
+<td class=""><strong><?php echo $bound['name']; ?></strong></td>

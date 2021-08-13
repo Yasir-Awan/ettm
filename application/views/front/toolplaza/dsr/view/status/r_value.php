@@ -1,0 +1,1 @@
+<td class="<?php if(isset($feat['val'])){ if($feat['val'] == 1){ echo 'bg-danger'; } if($feat['val'] == 2){ echo 'bg-secondary'; } if($feat['val'] == 3){ echo 'bg-primary'; } if($feat['val'] == 4){ echo 'bg-info'; } if($feat['val'] == 5){ echo 'bg-success'; }  } ?>"><?php echo $feat['rating']; ?></td>

@@ -1,0 +1,1 @@
+<td><?php echo $feat['value']; ?></td>
