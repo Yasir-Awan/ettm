@@ -140,7 +140,7 @@
 	<div class="row mb-2" style="margin-left:0px; margin-top:30px; margin-right:0px;" id="dtr_month">
 
 		<!-- plaza and month filter START -->
-		<div class="search-box pull-left col-xl-3 col-md-6 mb-1 " style="">
+		<div class="search-box pull-left col-xl-3 col-md-6 mb-1 ">
 
 			<!-- Hidden Form START -->
 			<!-- Hidden Form END -->
@@ -158,7 +158,7 @@
 				<?php } ?>
 			</select>
 
-			<div class="date" style="display:none; width:50.25px; margin-right:30px !mportant; ">
+			<div class="date" style="display:none; width:50.25px; margin-right:30px;">
 				<input type="text" id="formonth" name="formonth" class="form-control" placeholder="Select month" class="card border-left-primary shadow h-100 py-2" style="height: 30px !important; ">
 			</div>
 			<?php echo form_close(); ?>
@@ -171,7 +171,7 @@
 				<div class="card-body" style="padding: 1% !important;">
 					<div class="row no-gutters align-items-center">
 						<div class="col mr-2" style="padding-left: 8%;">
-							<div class="text-xs font-weight-bold text-primary text-uppercase mb-1" style="">
+							<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
 								<h5 class="card-category text-warning" style="font-size: 16px;"><?php if (!empty($chart)) {
 																									echo $chart['tollplaza'];
 																								} ?>
