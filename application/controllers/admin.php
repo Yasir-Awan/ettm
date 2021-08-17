@@ -26,10 +26,9 @@ class Admin extends CI_Controller
 			return redirect('NHMP_dashboard/index');
 		}
 		$data = $this->Admin_model->chartdata();
-		echo "<pre>";
-		print_r($data);
-		exit;
-
+		// echo "<pre>";
+		// print_r($data);
+		// exit;
 		// $this->load->model('General');
 		// $this->General->notifications();
 		$previous_year = date("Y-m-d", strtotime(@$data['chart']['month'] . ' -1 year'));
@@ -1010,13 +1009,13 @@ class Admin extends CI_Controller
 			$i++;
 		}*/
 														/*$data['file'] = file_get_contents('C:\Mandra\0000000294_TSaveBatchDBMessage.txt');
-    	if(sizeof($data['file']) > 1){
-    	foreach($data['file'] as $file){
-    	$data['exp'] = explode('C:\Mandra\0000000294_TSaveBatchDBMessage.txt',$file);
-    	}
-    	}else{
-     $data['exp'] = explode('C:\Mandra\0000000294_TSaveBatchDBMessage.txt',$data['file']);
-    	}	*/
+		if(sizeof($data['file']) > 1){
+		foreach($data['file'] as $file){
+		$data['exp'] = explode('C:\Mandra\0000000294_TSaveBatchDBMessage.txt',$file);
+		}
+		}else{
+	$data['exp'] = explode('C:\Mandra\0000000294_TSaveBatchDBMessage.txt',$data['file']);
+	}	*/
 
 														?>
 		<pre><?php echo print_r($data[$k]['file']); ?></pre><?php exit;
@@ -5353,8 +5352,10 @@ class Admin extends CI_Controller
 
 														public function dashboard_timer($para1 = '')
 														{
+
 															$plaza = $this->input->post('plaza_id');
 															$month = $this->input->post('month');
+
 															$data = $this->Admin_model->timer_chartdata($plaza, $month);
 															$previous_year = date("Y-m-d", strtotime(@$data['chart']['month'] . ' -1 year'));
 															$previous_monthDate = date("Y-m-d", strtotime(date("Y-m-d", strtotime(@$data['chart']['month'])) . "-1 month"));
@@ -5367,10 +5368,10 @@ class Admin extends CI_Controller
 															$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['end_date'];
 															$sql = "Select * From terrif Where FIND_IN_SET (" . $this->page_data['mtr'][0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
 															$this->page_data['terrif'] = $this->db->query($sql)->result_array();
-															$plazaId = $this->input->post('plaza_id');
+
 															$month  = $this->input->post('month');
 															$this->page_data['mtrid'] = $data['mtr_id'];
-															$this->page_data['plaza_id'] = $plazaId;
+															$this->page_data['plaza_id'] = $plaza;
 															$this->page_data['month'] = $month;
 
 															$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();

@@ -34,8 +34,7 @@
           <h4 class="card-title text-success">Revenue</h4>
         </div>
         <div class='col-md-4'>
-          <h5 class="card-category text-warning" style='text-align: center; text-info:solid #f6c23e !important;'> <?php echo "<pre>";
-                                                                                                                  print_r($chart);
+          <h5 class="card-category text-warning" style='text-align: center; text-info:solid #f6c23e !important;'> <?php
                                                                                                                   if (!empty($chart)) {
                                                                                                                     echo $chart['tollplaza'];
                                                                                                                   } ?> </h5>

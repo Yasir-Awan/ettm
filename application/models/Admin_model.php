@@ -520,18 +520,8 @@ class Admin_model extends CI_MODEL
 
 	function chartdata()
 	{
-		if ($this->session->userdata('adminid') == 28) {
-			$data = $this->db->select('*')->where('toolplaza', 10)->order_by('for_month', 'desc')->limit(1)->get('mtr')->result_array();
-			$data_min = $this->db->select('*')->where('toolplaza', 10)->order_by('for_month', 'asc')->limit(1)->get('mtr')->result_array();
-		}
-		if ($this->session->userdata('adminid') == 29) {
-			$data = $this->db->select('*')->where('toolplaza', 11)->order_by('for_month', 'desc')->limit(1)->get('mtr')->result_array();
-			$data_min = $this->db->select('*')->where('toolplaza', 11)->order_by('for_month', 'asc')->limit(1)->get('mtr')->result_array();
-		} else {
-			$data = $this->db->select('*')->order_by('for_month', 'desc')->limit(1)->get('mtr')->result_array();
-			$data_min = $this->db->select('*')->order_by('for_month', 'asc')->limit(1)->get('mtr')->result_array();
-		}
-
+		$data = $this->db->select('*')->order_by('for_month', 'desc')->limit(1)->get('mtr')->result_array();
+		$data_min = $this->db->select('*')->order_by('for_month', 'asc')->limit(1)->get('mtr')->result_array();
 
 		if ($data && $data_min) {
 			$data1 = explode('-', $data[0]['for_month']);
@@ -550,7 +540,9 @@ class Admin_model extends CI_MODEL
 			$month_year = explode('-', $data[0]['for_month']);
 			$start_date = $month_year[0] . '-' . $month_year[1] . '-' . $data[0]['start_date'];
 			$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $data[0]['end_date'];
+
 			$mtr_id =  $data[0]['id'];
+
 			$sql = "Select * From terrif Where FIND_IN_SET (" . $data[0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
 			$tarrif =  $this->db->query($sql)->result_array();
 			$chart['month'] = $data[0]['for_month'];
@@ -977,8 +969,8 @@ class Admin_model extends CI_MODEL
 
 		return array('mtr_id' => $mtr_id, 'start_date' => $start_date1, 'end_date' => $end_date1, 'chart' => $chart, 'revenue' => $revenue);
 	}
-	/*this method is used to get previous month & year data for pie charts*/
-	function get_chart_by($tollplaza = '', $month = '')
+
+	function get_chart_by($tollplaza = '', $month = '') /*this method is used to get previous month & year data for pie charts*/
 	{
 		/* echo"<pre>";
         print_r($tollplaza); exit;*/
@@ -1070,6 +1062,8 @@ class Admin_model extends CI_MODEL
 			$data = $this->db->select('*')->order_by('id', 'desc')->limit(1)->get('mtr')->result_array();
 		}
 		foreach ($data as $key => $value) {
+			//	echo "<pre>";
+			//	print_r($value); 
 			$month_year = explode('-', $data[0]['for_month']);
 			$start_date = $month_year[0] . '-' . $month_year[1] . '-' . $data[0]['start_date'];
 			$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $data[0]['end_date'];
@@ -1082,7 +1076,7 @@ class Admin_model extends CI_MODEL
 			$chart['class3']['data'] = $chart['class3']['data'] + $value['class3'] + $value['class5'] + $value['class6'];
 			$chart['class4']['data'] = $chart['class4']['data'] + $value['class4'];
 			$chart['class5']['data'] = $chart['class5']['data'] + $value['class7'] + $value['class8'] + $value['class9'] + $value['class10'];
-			$chart['total']['traffic'] = $value['class1'] + $value['class2'] + $value['class3'] + $value['class4'] + $value['class5'] + $value['class6'] + $value['class7'] + $value['class8'] + $value['class9'] + $value['class10'];
+			$chart['total']['traffic'] = $chart['total']['traffic'] + $value['class1'] + $value['class2'] + $value['class3'] + $value['class4'] + $value['class5'] + $value['class6'] + $value['class7'] + $value['class8'] + $value['class9'] + $value['class10'];
 			if ($tarrif) {
 				$revenue['special_message'] = " ";
 				$revenue['month']          = $value['for_month'];
@@ -1091,14 +1085,14 @@ class Admin_model extends CI_MODEL
 				$revenue['class3']['data'] = $revenue['class3']['data'] + ($value['class3'] *  $tarrif[0]['class_3_value']) + ($value['class5'] * $tarrif[0]['class_5_value']) + ($value['class6'] * $tarrif[0]['class_6_value']);
 				$revenue['class4']['data'] = $revenue['class4']['data'] + $data[0]['class4'] * $tarrif[0]['class_4_value'];
 				$revenue['class5']['data'] = $revenue['class5']['data'] + ($value['class7']  * $tarrif[0]['class_7_value']) + ($value['class8'] *  $tarrif[0]['class_8_value']) + ($value['class9'] * $tarrif[0]['class_9_value']) + ($value['class10'] * $tarrif[0]['class_10_value']);
-				$revenue['total']['revenue'] = ($value['class1'] * $tarrif[0]['class_1_value']) + ($value['class2'] * $tarrif[0]['class_2_value']) +
+				$revenue['total']['revenue'] = $revenue['total']['revenue'] + ($value['class1'] * $tarrif[0]['class_1_value']) + ($value['class2'] * $tarrif[0]['class_2_value']) +
 					($value['class3'] * $tarrif[0]['class_3_value']) + ($value['class4'] * $tarrif[0]['class_4_value']) +
 					($value['class5'] * $tarrif[0]['class_5_value']) + ($value['class6'] * $tarrif[0]['class_6_value']) +
 					($value['class7'] * $tarrif[0]['class_7_value']) + ($value['class8'] *  $tarrif[0]['class_8_value']) +
 					($value['class9'] * $tarrif[0]['class_9_value']) + ($value['class10'] * $tarrif[0]['class_10_value']);
 			}
 		}
-
+		//	exit;
 		$chart['month']           = $data[0]['for_month'];
 		$chart['class1']['label'] = "Car";
 		$chart['class2']['label'] = "Wagon";

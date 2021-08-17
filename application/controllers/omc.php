@@ -1,5 +1,5 @@
-<?php 
-defined('BASEPATH') OR exit('NO direct script is allowed');
+<?php
+defined('BASEPATH') or exit('NO direct script is allowed');
 class Omc extends CI_Controller
 {
 	public function __construct()
@@ -9,91 +9,147 @@ class Omc extends CI_Controller
 		$this->page_data['page_url'] = current_url();
 		$this->page_data['custom'] = '';
 		$this->load->model('Admin_model');
+
 		$this->load->model('dsr_model');
-		$this->load->model('database_model'); 
-		$this->page_data['key'] = $this->db->get_where('settings',array('type' => 'google_map_api_key'))->row()->value;
-	
+		$this->load->model('database_model');
+		$this->page_data['key'] = $this->db->get_where('settings', array('type' => 'google_map_api_key'))->row()->value;
 	}
 
-	public function index(){
-		if(!$this->session->userdata('omcid'))
-		{	
+	public function nlc_dtr_chart($para1 = '')
+	{
+		if (!$this->session->userdata('omcid')) {
+			return redirect('omc/login');
+		}
+		$data = $this->Admin_model->dtr_chartdata();
+
+		$datadtr = $this->db->select('*')->order_by('id', 'desc')->limit(1)->get('dtr')->result_array();
+		$date_latest = date('n', strtotime($datadtr[0]['for_date']));
+		$dtr_month_min = $this->db->where('MONTH(for_date)', $date_latest)->where('toolplaza', $datadtr[0]['toolplaza'])->order_by('for_date', 'asc')->get('dtr')->result_array();
+		$dtr_month = $this->db->where('MONTH(for_date)', $date_latest)->where('toolplaza', $datadtr[0]['toolplaza'])->order_by('for_date', 'desc')->get('dtr')->result_array();
+		$exempt = $this->db->get_where('dtr_exempt', array('dtr_id' => $datadtr[0]['id']))->result_array();
+
+		$start_date = $dtr_month_min[0]['for_date'];
+		$end_date = $dtr_month[0]['for_date'];
+
+		$sql = "Select * From terrif Where FIND_IN_SET (" . $dtr_month_min[0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
+		$tarrif =  $this->db->query($sql)->result_array();
+		$this->page_data['dtr_month'] = $data['chart']['month'];
+		$this->page_data['plaza_id'] = $data['chart']['toolplaza_id'];
+		$this->page_data['month'] = $data['chart']['month'];
+
+		$this->page_data['dtr'] = $dtr_month_min;
+		$this->page_data['dtrid'] = $data['dtr_id'];
+		$this->page_data['exempt'] = $this->db->get_where('dtr_exempt', array('dtr_id' => $this->page_data['dtrid']))->result_array();
+		$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+		$this->page_data['chart'] = $data['chart'];
+		$this->page_data['revenue'] = $data['revenue'];
+		/*?> <pre> <?php echo print_r($this->page_data); exit; ?> </pre> <?php*/
+
+		$this->page_data['page'] = 'Monthly DTR Chart';
+
+		$this->load->view('back/dtr_chart', $this->page_data);
+	}
+
+	public function nlcsearchfordtrchart($para1 = '')
+	{
+
+		$tollplaza = $this->input->post('tollplaza');
+		$month  = $this->input->post('formonth');
+
+		$data = $this->Admin_model->dtr_chart_tooldata_month($tollplaza, $month);
+		$this->page_data['month'] = $data['month'];
+		$this->page_data['year'] = $data['year'];
+		$this->page_data['dtr1'] = $data['dtr_first'];
+		$this->page_data['dtr2'] = $data['dtr_first'];
+		$this->page_data['page'] = 'Monthly DTR Chart';
+		$this->page_data['custom'] = 'custom_search';
+		$this->page_data['tollplaza'] = $data['tollplaza'];
+
+		$this->load->view('back/customize_dtrchart_search', $this->page_data);
+	}
+
+	public function index()
+	{
+		if (!$this->session->userdata('omcid')) {
 			return redirect('omc/login');
 		}
 		$data = $this->Admin_model->omcchartdata();
 		// echo "<pre>";
 		// print_r($data); exit;
 		// $this->load->model('General');
-	 	// $this->General->notifications();
-		$previous_year = date("Y-m-d",strtotime(@$data['chart']['month'].' -1 year'));
-		$previous_monthDate = date("Y-m-d", strtotime( date( "Y-m-d", strtotime( @$data['chart']['month'] ) ) . "-1 month" ) );
-		$pre_year_data = $this->Admin_model->get_chart_by( @$data['chart']['toolplaza_id'], $previous_year);
-		$pre_month_data = $this->Admin_model->get_chart_by( @$data['chart']['toolplaza_id'], $previous_monthDate);
-		
-		$this->page_data['mtr'] = $this->db->get_where('mtr',array('id' => $data['mtr_id'] ))->result_array();
-	    $month_year = explode('-',$this->page_data['mtr'][0]['for_month']);
-		
-		$start_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['start_date'];
-		$end_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['end_date'];
-        $sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['mtr'][0]['toolplaza']." ,toolplaza) AND (start_date <= '".$start_date."' AND end_date >= '".$end_date."')";
+		// $this->General->notifications();
+		$previous_year = date("Y-m-d", strtotime(@$data['chart']['month'] . ' -1 year'));
+		$previous_monthDate = date("Y-m-d", strtotime(date("Y-m-d", strtotime(@$data['chart']['month'])) . "-1 month"));
+		$pre_year_data = $this->Admin_model->get_chart_by(@$data['chart']['toolplaza_id'], $previous_year);
+		$pre_month_data = $this->Admin_model->get_chart_by(@$data['chart']['toolplaza_id'], $previous_monthDate);
+
+		$this->page_data['mtr'] = $this->db->get_where('mtr', array('id' => $data['mtr_id']))->result_array();
+		$month_year = explode('-', $this->page_data['mtr'][0]['for_month']);
+
+		$start_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['start_date'];
+		$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['end_date'];
+		$sql = "Select * From terrif Where FIND_IN_SET (" . $this->page_data['mtr'][0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
 		$this->page_data['terrif'] = $this->db->query($sql)->result_array();
-		
+
 		$this->page_data['mtrid'] = $data['mtr_id'];
 		$this->page_data['plaza_id'] = $data['chart']['toolplaza_id'];
 		$this->page_data['month'] = $data['chart']['month'];
 
-		$this->page_data['tollplaza'] = $this->db->get_where('toolplaza',array('status' => 1, 'omc'=>$this->session->userdata('omcid')))->result_array();
+		$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1, 'omc' => $this->session->userdata('omcid')))->result_array();
 		$this->page_data['chart'] = $data['chart'];
 
 		$this->page_data['revenue'] = $data['revenue'];
 		$this->page_data['pre_month_chart'] = $pre_month_data['chart'];
-        $this->page_data['pre_month_revenue'] = $pre_month_data['revenue'];
-        $this->page_data['pre_year_chart'] = $pre_year_data['chart'];
-        $this->page_data['pre_year_revenue'] = $pre_year_data['revenue'];
+		$this->page_data['pre_month_revenue'] = $pre_month_data['revenue'];
+		$this->page_data['pre_year_chart'] = $pre_year_data['chart'];
+		$this->page_data['pre_year_revenue'] = $pre_year_data['revenue'];
 		$this->page_data['page'] = 'Dashboard';
-		
+
 		$this->load->view('back/omcdashboard', $this->page_data);
 	}
-/*Author: Yasir 
+	/*Author: Yasir 
 	Function name: dasboard Parameter Name $id, $tool
 	Function: Its the main function that displays dashboardST
 	Date Creation: Late
 	Optimized Date: 30/07/2020*/
-	public function dashboard(){
+	public function dashboard()
+	{
 		date_default_timezone_set("Asia/Karachi");
 		$this->load->model('dashboardst');
-		if(!$this->session->userdata('omcid')){	
+		if (!$this->session->userdata('omcid')) {
 			return redirect('omc/login');
 		}
 		$id = 'today';
 		//Loading Tollplazas from Database
-		$table = 'toolplaza'; $where = array('status' => 1);
+		$table = 'toolplaza';
+		$where = array('status' => 1);
 		$tool = $this->database_model->get_where($table, $where)->result_array();
 		///DSR Area Start
 		$this->dash_dsr($id, $tool);
-		
+
 		///DSR Area Closed
 		///DTR Area Start 
 		$dtrid = 'today-dtr';
 		$this->dash_dtr($dtrid, $tool);
 		///DTR Area End
 		$this->page_data['id'] = $id;
-		
+
 		/*?><pre> <?php echo print_r($this->page_data);exit;*/
 		$this->page_data['page'] = 'Dashboard ST';
-		$this->load->view('back/omcDdashboard',$this->page_data);
+		$this->load->view('back/omcDdashboard', $this->page_data);
 	}
 	/*Author: Yasir 
 	Function name: dash_dsr Parameter Name $id, $tool
 	Function: To get and display data for DSR portion in Dashboard ST
 	Date Creation: 5/7/2020
 	Optimized date : 5/10/2020*/
-	public function dash_dsr($id, $tool){
+	public function dash_dsr($id, $tool)
+	{
 		date_default_timezone_set("Asia/Karachi");
 		$dsr = $this->dashboardst->main($id);
 		/*?><pre> <?php echo print_r($dsr);exit;*/
-			/*?> <?php echo print_r($tool);exit;*/
-		if($id ==  'today' || $id == 'yesterday'){
+		/*?> <?php echo print_r($tool);exit;*/
+		if ($id ==  'today' || $id == 'yesterday') {
 			//calculation total lanes and closed lanes in all tollplazas
 			$dsr[2]['all_tool'] = $this->dashboardst->data($id, NULL);
 			//calculation total lanes and closed lanes in all tollplazas
@@ -103,60 +159,60 @@ class Omc extends CI_Controller
 			$toolplaza_st['faulty_cameras'] =  $dsr[2]['all_tool_lane_cameras'][0]['faulty_cameras'];
 		}
 		$t = 0;
-		foreach($tool as $toll){
+		foreach ($tool as $toll) {
 
-			$toolplaza_st['tool'][$t]['id'] = $toll['id']; 
+			$toolplaza_st['tool'][$t]['id'] = $toll['id'];
 			$toolplaza_st['tool'][$t]['name'] = $toll['name'];
 			$this->page_data['tool']['tool'][$t]['id'] = $toolplaza_st['tool'][$t]['id'];
-			$this->page_data['tool']['tool'][$t]['name'] = $toolplaza_st['tool'][$t]['name']; 
-			if($id == 'today' || $id == 'yesterday'){
-				if(isset($dsr[1])){
+			$this->page_data['tool']['tool'][$t]['name'] = $toolplaza_st['tool'][$t]['name'];
+			if ($id == 'today' || $id == 'yesterday') {
+				if (isset($dsr[1])) {
 					$k = 0;
-					foreach($dsr[1] as $d){
-						if($d['toolplaza_id'] == $toll['id']){
+					foreach ($dsr[1] as $d) {
+						if ($d['toolplaza_id'] == $toll['id']) {
 
-								$table = 'view_dsr_lanes'; $where = array('dsr_id' => $d['id'], 'toolplaza_id' => $d['toolplaza_id']);
-								$dsr[1][$k]['lanes'] = $d_lane = $this->database_model->get_where($table, $where)->result_array();
-								//calculating total lanes and closed lanes in respective tollplazas
-								$dsr[2]['toolplaza'] = $this->dashboardst->data($id, $d['toolplaza_id']);
+							$table = 'view_dsr_lanes';
+							$where = array('dsr_id' => $d['id'], 'toolplaza_id' => $d['toolplaza_id']);
+							$dsr[1][$k]['lanes'] = $d_lane = $this->database_model->get_where($table, $where)->result_array();
+							//calculating total lanes and closed lanes in respective tollplazas
+							$dsr[2]['toolplaza'] = $this->dashboardst->data($id, $d['toolplaza_id']);
 
-								//calculating total lanes and closed lanes in respective tollplazas
-								$dsr[2]['tool_lane_cameras'] = $this->dashboardst->lane_cameras($id, $d['toolplaza_id']);
+							//calculating total lanes and closed lanes in respective tollplazas
+							$dsr[2]['tool_lane_cameras'] = $this->dashboardst->lane_cameras($id, $d['toolplaza_id']);
 
-								$tollplaza[$k] = $d['toolplaza_id'];
-								/*?><pre> <?php echo print_r($dsr[2]);exit;*/
-								$toolplaza_st['tool'][$t]['dsr'][$k]['id'] = $d['id'];
-								$toolplaza_st['tool'][$t]['dsr'][$k]['status'] = $d['status'];
-								if(isset($toolplaza_st['tool'][$t]['dsr'][$k]['status'])){
-									if($toolplaza_st['tool'][$t]['dsr'][$k]['status'] != 0){
-										$toolplaza_st['tool'][$t]['dsr'][$k]['omc_name'] = $d['omc_name'];
-										$toolplaza_st['tool'][$t]['dsr'][$k]['closed_lanes'] = $dsr[2]['toolplaza'][0]['closed_lanes'];
-										$toolplaza_st['tool'][$t]['dsr'][$k]['total_lanes'] = $dsr[2]['toolplaza'][0]['total_lanes'];
+							$tollplaza[$k] = $d['toolplaza_id'];
+							/*?><pre> <?php echo print_r($dsr[2]);exit;*/
+							$toolplaza_st['tool'][$t]['dsr'][$k]['id'] = $d['id'];
+							$toolplaza_st['tool'][$t]['dsr'][$k]['status'] = $d['status'];
+							if (isset($toolplaza_st['tool'][$t]['dsr'][$k]['status'])) {
+								if ($toolplaza_st['tool'][$t]['dsr'][$k]['status'] != 0) {
+									$toolplaza_st['tool'][$t]['dsr'][$k]['omc_name'] = $d['omc_name'];
+									$toolplaza_st['tool'][$t]['dsr'][$k]['closed_lanes'] = $dsr[2]['toolplaza'][0]['closed_lanes'];
+									$toolplaza_st['tool'][$t]['dsr'][$k]['total_lanes'] = $dsr[2]['toolplaza'][0]['total_lanes'];
 
-										$toolplaza_st['tool'][$t]['dsr'][$k]['faulty_cameras'] = $dsr[2]['tool_lane_cameras'][0]['faulty_cameras'];
+									$toolplaza_st['tool'][$t]['dsr'][$k]['faulty_cameras'] = $dsr[2]['tool_lane_cameras'][0]['faulty_cameras'];
 
-										$toolplaza_st['tool'][$t]['dsr'][$k]['total_cameras'] = $dsr[2]['tool_lane_cameras'][0]['total_cameras'];
-									}
-									if($toolplaza_st['tool'][$t]['dsr'][$k]['status'] == 0){
-										$toolplaza_st['tool'][$t]['dsr'][$k]['message'] = 'Pending';
-									}elseif($toolplaza_st['tool'][$t]['dsr'][$k]['status'] == 1){
-										$toolplaza_st['tool'][$t]['dsr'][$k]['message'] = 'Approved';
-									}elseif($toolplaza_st['tool'][$t]['dsr'][$k]['status'] == 2){
-										$toolplaza_st['tool'][$t]['dsr'][$k]['message'] = 'Rejected';
-									}
+									$toolplaza_st['tool'][$t]['dsr'][$k]['total_cameras'] = $dsr[2]['tool_lane_cameras'][0]['total_cameras'];
 								}
-								$k++;
-								$this->page_data['toolplaza_st']['tool'][$t]['dsr'] = $toolplaza_st['tool'][$t]['dsr'];
-								$this->page_data['tool']['tool'] = $toolplaza_st['tool'];
-								$this->page_data['tool']['tool'][$t]['dsr'] = $toolplaza_st['tool'][$t]['dsr'];
+								if ($toolplaza_st['tool'][$t]['dsr'][$k]['status'] == 0) {
+									$toolplaza_st['tool'][$t]['dsr'][$k]['message'] = 'Pending';
+								} elseif ($toolplaza_st['tool'][$t]['dsr'][$k]['status'] == 1) {
+									$toolplaza_st['tool'][$t]['dsr'][$k]['message'] = 'Approved';
+								} elseif ($toolplaza_st['tool'][$t]['dsr'][$k]['status'] == 2) {
+									$toolplaza_st['tool'][$t]['dsr'][$k]['message'] = 'Rejected';
+								}
+							}
+							$k++;
+							$this->page_data['toolplaza_st']['tool'][$t]['dsr'] = $toolplaza_st['tool'][$t]['dsr'];
+							$this->page_data['tool']['tool'] = $toolplaza_st['tool'];
+							$this->page_data['tool']['tool'][$t]['dsr'] = $toolplaza_st['tool'][$t]['dsr'];
 						}
 					}
 				}
+			} else {
+				$this->page_data['tool']['tool'][$t]['count'] = $this->dashboardst->data($id, $toll['id']);
 			}
-			else{
-				$this->page_data['tool']['tool'][$t]['count'] = $this->dashboardst->data($id, $toll['id']); 
-			}
-	
+
 			$t++;
 		}
 		$this->page_data['dsr'] = $dsr;
@@ -167,127 +223,133 @@ class Omc extends CI_Controller
 	Function: To get and display data for DSR portion in Dashboard ST
 	Date Creation: 5/7/2020
 	Optimized date : 5/10/2020*/
-	public function dash_dtr($id, $tool){
+	public function dash_dtr($id, $tool)
+	{
 		date_default_timezone_set("Asia/Karachi");
 		$dtr = $this->dashboardst->main($id);
 
 		$t = 0;
-		foreach($tool as $toll){
+		foreach ($tool as $toll) {
 			$toolplaza_st['tool'][$t]['id'] = $toll['id'];
 			$toolplaza_st['tool'][$t]['name'] = $toll['name'];
 			$this->page_data['tool']['tool'][$t]['id'] = $toolplaza_st['tool'][$t]['id'];
 			$this->page_data['tool']['tool'][$t]['name'] = $toolplaza_st['tool'][$t]['name'];
-			if($id == 'today-dtr' || $id == 'yesterday-dtr'){
+			if ($id == 'today-dtr' || $id == 'yesterday-dtr') {
 				$dtr[2] = $this->dashboardst->total_traffic();
 				$this->page_data['tool']['total_traffic'] = $dtr[2][0]['traffic'];
 				$this->page_data['tool']['total_revenue'] = $dtr[2][0]['revenue'];
 				$k = 0;
-				foreach($dtr[1] as $d){
-					if($d['toolplaza_id'] == $toll['id']){
+				foreach ($dtr[1] as $d) {
+					if ($d['toolplaza_id'] == $toll['id']) {
 						$toolplaza_st['tool'][$t]['dtr'][0]['id'] = $d['id'];
 						$toolplaza_st['tool'][$t]['dtr'][0]['status'] = $d['status'];
-						if($toolplaza_st['tool'][$t]['dtr'][0]['status'] != 0){
+						if ($toolplaza_st['tool'][$t]['dtr'][0]['status'] != 0) {
 							$toolplaza_st['tool'][$t]['dtr'][0]['omc_name'] = $d['omc_name'];
 							$toolplaza_st['tool'][$t]['dtr'][0]['total'] = $d['total'];
 							$toolplaza_st['tool'][$t]['dtr'][0]['revenue'] = $d['revenue'];
-							if($toolplaza_st['tool'][$t]['dtr'][0]['status'] == 1){
+							if ($toolplaza_st['tool'][$t]['dtr'][0]['status'] == 1) {
 								$toolplaza_st['tool'][$t]['dtr'][0]['message'] = 'Approved';
-							}elseif($toolplaza_st['tool'][$t]['dtr'][0]['status'] == 2){
+							} elseif ($toolplaza_st['tool'][$t]['dtr'][0]['status'] == 2) {
 								$toolplaza_st['tool'][$t]['dtr'][0]['message'] = 'Rejected';
 							}
 						}
-						if($toolplaza_st['tool'][$t]['dtr'][0]['status'] == 0)
-								$toolplaza_st['tool'][$t]['dtr'][0]['message'] = 'Pending';
-						
+						if ($toolplaza_st['tool'][$t]['dtr'][0]['status'] == 0)
+							$toolplaza_st['tool'][$t]['dtr'][0]['message'] = 'Pending';
+
 						$this->page_data['toolplaza_st']['tool'][$t]['dtr'] = $toolplaza_st['tool'][$t]['dtr'];
 						$this->page_data['tool']['tool'][$t]['dtr'] = $toolplaza_st['tool'][$t]['dtr'];
 					}
 					$k++;
 				}
-			}
-			else{
-				$this->page_data['tool']['tool'][$t]['count'] = $this->dashboardst->data($id, $toll['id']); 
+			} else {
+				$this->page_data['tool']['tool'][$t]['count'] = $this->dashboardst->data($id, $toll['id']);
 			}
 			/*$this->page_data['tool'] = $toolplaza_st;*/
 			$t++;
 		}
-		
+
 		/*?><pre> <?php echo print_r($this->page_data['tool']);exit;*/
 		$this->page_data['dtr'] = $dtr;
 	}
 
-	public function daily_comprehensive_site_report(){
+	public function daily_comprehensive_site_report()
+	{
 		date_default_timezone_set("Asia/Karachi");
-		if(!$this->session->userdata('omcid')){	
+		if (!$this->session->userdata('omcid')) {
 			return redirect('omc/login');
 		}
 		$date = date('Y-m-d');
-		$data = $this->dsr_model->comprehensive($date);	
+		$data = $this->dsr_model->comprehensive($date);
 		$this->page_data['toolplaza'] = $data['toolplaza'];
 		$this->page_data['inventory'] = $data['inventory'];
 		$this->page_data['today'] = date('d-m-Y');
 		$this->page_data['page'] = "Daily Comprehensive Site Report";
 		$this->load->view('back/includes/omcdashboarddtrdsr/sitereport', $this->page_data);
 	}
-	public function dashboard_dsr(){
+	public function dashboard_dsr()
+	{
 		$id = $this->input->post('id');
-		
-		if($id == "today"){ 
-			$querydsr = 'SELECT * FROM dsr_updated WHERE DATE(datecreated) = DATE(NOW()) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
+
+		if ($id == "today") {
+			$querydsr = 'SELECT * FROM dsr_updated WHERE DATE(datecreated) = DATE(NOW()) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
 			$dsrmonth = $this->db->query($querydsr);
 			$dsr = $dsrmonth->result_array();
 			$dsr_count = $dsrmonth->num_rows();
-			$toolplaza = $this->db->get_where('toolplaza', array('status' => '1','omc'=>$this->session->userdata('omcid')))->num_rows();
+			$toolplaza = $this->db->get_where('toolplaza', array('status' => '1', 'omc' => $this->session->userdata('omcid')))->num_rows();
 			$today = date("d");
-			$toolplaza_dsr = $toolplaza - $dsr_count;$k = 0; $closed_lanes = 0; $open_lanes = 0; $cameras = 0; $total_lanes = 0; $faulty_cameras = 0;
-			if($dsr){
-				$cameras = 0; $faulty_cameras = $dsr[$k]['faulty_cameras'] = 0; 
+			$toolplaza_dsr = $toolplaza - $dsr_count;
+			$k = 0;
+			$closed_lanes = 0;
+			$open_lanes = 0;
+			$cameras = 0;
+			$total_lanes = 0;
+			$faulty_cameras = 0;
+			if ($dsr) {
+				$cameras = 0;
+				$faulty_cameras = $dsr[$k]['faulty_cameras'] = 0;
 				$total_lanes = 0;
-				foreach($dsr as $d){
+				foreach ($dsr as $d) {
 
-					$dsr[$k]['tool'] = $toll[$k] = $this->db->select('*')->from('toolplaza')->where(array('id' => $d['toolplaza_id'],'omc'=>$this->session->userdata('omcid')))->get()->result_array();
+					$dsr[$k]['tool'] = $toll[$k] = $this->db->select('*')->from('toolplaza')->where(array('id' => $d['toolplaza_id'], 'omc' => $this->session->userdata('omcid')))->get()->result_array();
 					$omc[$k]['name'] = $this->db->select('name')->from('omc')->where(array('id' => $d['omc']))->get()->row()->name;
 					$r = 0;
-					foreach($toll[$k] as $tool){
+					foreach ($toll[$k] as $tool) {
 						$dsr[$k]['lanes'] = $d_lane = $this->db->get_where('dsr_lane', array('dsr_id' => $d['id'], 'toolplaza_id' => $tool['id']))->result_array();
 						$l = 0;
-						$dsr[$k]['closed_lanes'] = 0; $dsr[$k]['faulty_cameras'] = 0; $dsr[$k]['open_lanes'] = $open_lanes =  0;  
-						foreach($dsr[$k]['lanes'] as $lane){
+						$dsr[$k]['closed_lanes'] = 0;
+						$dsr[$k]['faulty_cameras'] = 0;
+						$dsr[$k]['open_lanes'] = $open_lanes =  0;
+						foreach ($dsr[$k]['lanes'] as $lane) {
 
-							if($lane){
+							if ($lane) {
 
 								$lanes = $dsr[$k]['total_lanes'] = $dsr[$k]['total_lane_cameras'] = count($dsr[$k]['lanes']);
 
 
 								/*?> <pre><?php echo '$total_lanes = '.$total_lanes;*/
-								if(isset($lane['lane_status'])){
-										if($lane['lane_status'] == 1){
-											$dsr[$k]['closed_lanes']++;
-											$closed_lanes++;
-										}
-										if($lane['lane_status'] == 0){
-											$dsr[$k]['open_lanes']++;
+								if (isset($lane['lane_status'])) {
+									if ($lane['lane_status'] == 1) {
+										$dsr[$k]['closed_lanes']++;
+										$closed_lanes++;
+									}
+									if ($lane['lane_status'] == 0) {
+										$dsr[$k]['open_lanes']++;
 										/*?> <pre><?php echo '$closed_lanes = '.$closed_lanes; exit;*/
-										}
-
-
+									}
 								}
 
-								if(isset($lane['lane_camera_status'])){
-										if($lane['lane_camera_status'] == 1){
-											$dsr[$k]['faulty_cameras']++;
-											$faulty_cameras++;
+								if (isset($lane['lane_camera_status'])) {
+									if ($lane['lane_camera_status'] == 1) {
+										$dsr[$k]['faulty_cameras']++;
+										$faulty_cameras++;
 										/*?> <pre><?php echo '$closed_lanes = '.$closed_lanes; exit;*/
-										}
 									}
-
-
+								}
 							}
-							if(!$lane){
-
+							if (!$lane) {
 							}
 							$l++;
-						}				
+						}
 						$c_lanes = $dsr[$k]['closed_lanes'];
 						$r++;
 					}
@@ -309,15 +371,11 @@ class Omc extends CI_Controller
 					$k++;
 					$this->page_data['toolplaza_st'] = $toolplaza_st;
 				}
-
-
-
-			}
-			else{
+			} else {
 				$this->page_data['message_dsr'] = "Today, DSR is not uploaded yet.";
 			}
 			/*?> <pre><?php echo print_r($toolplaza_st);exit;*/
-			
+
 			$this->page_data['dsr_count'] = $dsr_count;
 			$this->page_data['toolplaza_dsr'] = $toolplaza_dsr;
 			$total_lanes = $open_lanes;
@@ -327,53 +385,50 @@ class Omc extends CI_Controller
 			$this->page_data['id'] = $id;
 			$this->page_data['page'] = 'Dashboard ST';
 			$this->load->view("back/includes/omcdashboarddtrdsr/dsr", $this->page_data);
-			
-		}
-		elseif($id == "current-month"){ 
-			$querydsr = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW()) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
+		} elseif ($id == "current-month") {
+			$querydsr = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW()) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
 			$dsrmonth = $this->db->query($querydsr);
 			$dsr = $dsrmonth->result_array();
 			$dsr_count = $dsrmonth->num_rows();
-			$tolplaza = $this->db->get_where('toolplaza', array('status' => '1','omc' => $this->session->userdata('omcid')));
-            /*?> <pre> <?php echo print_r($tolplaza->result_array());exit;*/
-            $toolplaza = $tolplaza->num_rows();
+			$tolplaza = $this->db->get_where('toolplaza', array('status' => '1', 'omc' => $this->session->userdata('omcid')));
+			/*?> <pre> <?php echo print_r($tolplaza->result_array());exit;*/
+			$toolplaza = $tolplaza->num_rows();
 			$today = date("d");
 			$toolplaza = $toolplaza * $today;
 			$toolplaza_dsr = $toolplaza - $dsr_count;
-			$k = 0; 
-			if($dsr){
-				foreach($dsr as $d){
+			$k = 0;
+			if ($dsr) {
+				foreach ($dsr as $d) {
 					$tollplaza[$k] = $d['toolplaza_id'];
 					$k++;
 					$this->page_data['tollplaza'] = $tollplaza;
 				}
-			}
-			else{
+			} else {
 				$this->page_data['message'] = "Today, DSR is not uploaded yet.";
 			}
 			$j = 0;
-			foreach($tolplaza->result_array() as $toll){
-				$query_dsr_toll = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW()) AND status = 1 AND toolplaza_id = '.$toll['id'].' ORDER BY ID DESC';
+			foreach ($tolplaza->result_array() as $toll) {
+				$query_dsr_toll = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW()) AND status = 1 AND toolplaza_id = ' . $toll['id'] . ' ORDER BY ID DESC';
 				$dsr_toll[$j] = $this->db->query($query_dsr_toll);
-				$dsr_tool[$j]['count']= $dsr_toll[$j]->num_rows();
+				$dsr_tool[$j]['count'] = $dsr_toll[$j]->num_rows();
 				$dsr_tool[$j]['not_uploaded'] = $today - $dsr_tool[$j]['count'];
-				if($dsr_tool[$j]['count'] > $today){
+				if ($dsr_tool[$j]['count'] > $today) {
 					$dsr_tool[$j]['error'] = 'Approve/Disapprove';
 				}
-				if($dsr_tool[$j]['count'] < $today){
+				if ($dsr_tool[$j]['count'] < $today) {
 					$dsr_tool[$j]['error'] = 'DSR missing';
 				}
-				if($dsr_tool[$j]['count'] == 0){
+				if ($dsr_tool[$j]['count'] == 0) {
 					$dsr_tool[$j]['error'] = 'DSRs do not exist';
 				}
-				if($dsr_tool[$j]['count'] == $today){
+				if ($dsr_tool[$j]['count'] == $today) {
 					$dsr_tool[$j]['success'] = 'All DSR uploaded';
 				}
 				$j++;
 			}
 			$this->page_data['tool'] = $tolplaza->result_array();
-			$this->page_data['days_count'] = $today; 
-			$this->page_data['dsr_tool'] = $dsr_tool; 
+			$this->page_data['days_count'] = $today;
+			$this->page_data['dsr_tool'] = $dsr_tool;
 			$this->page_data['toolplaza_dsr'] = $toolplaza_dsr;
 			$this->page_data['dsr_count'] = $dsr_count;
 			$this->page_data['toolplaza'] = $toolplaza;
@@ -381,11 +436,10 @@ class Omc extends CI_Controller
 			$this->page_data['id'] = $id;
 			$this->page_data['page'] = 'Dashboard ST';
 			$this->load->view("back/includes/omcdashboarddtrdsr/dsr", $this->page_data);
-		}
-		elseif($id == "current-quarter"){
-			$querydsr = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW()) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydsr1 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydsr2 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
+		} elseif ($id == "current-quarter") {
+			$querydsr = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW()) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydsr1 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydsr2 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
 			$dsrmonth = $this->db->query($querydsr);
 			$dsrmonth1 = $this->db->query($querydsr1);
 			$dsrmonth2 = $this->db->query($querydsr2);
@@ -393,7 +447,7 @@ class Omc extends CI_Controller
 			$dsr1 = $dsrmonth1->result_array();
 			$dsr2 = $dsrmonth2->result_array();
 			$dsr_count = $dsrmonth->num_rows() + $dsrmonth1->num_rows() + $dsrmonth2->num_rows();
-			$tolplaza = $this->db->get_where('toolplaza', array('status' => '1','omc'=>$this->session->userdata('omcid')));
+			$tolplaza = $this->db->get_where('toolplaza', array('status' => '1', 'omc' => $this->session->userdata('omcid')));
 			$toolplaza = $tolplaza->num_rows();
 			$one_month_day = date('d', strtotime('last day of -1 month'));
 			$two_month_day =  date('d', strtotime('last day of -2 month'));
@@ -403,44 +457,43 @@ class Omc extends CI_Controller
 			$toolplaza_dsr = $toolplaza_all - $dsr_count;
 			/*?><pre> <?php  echo print_r($dsr2) ?> </pre><?php exit;*/
 
-			$k = 0; 
-			if($dsr){
-				foreach($dsr as $d){
+			$k = 0;
+			if ($dsr) {
+				foreach ($dsr as $d) {
 					$tollplaza[$k] = $d['toolplaza_id'];
 					$k++;
 					$this->page_data['tollplaza'] = $tollplaza;
 				}
-			}
-			else{
+			} else {
 				$this->page_data['message'] = "DSR is not uploaded yet.";
 			}
 			$j = 0;
-			foreach($tolplaza->result_array() as $toll){
-				$query_dsr_toll_month_now = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW()) AND status = 1 AND toolplaza_id = '.$toll['id'].' ORDER BY ID DESC';
-				$query_dsr_toll_month_last = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND toolplaza_id = '.$toll['id'].' ORDER BY ID DESC';
-				$query_dsr_toll_month_last_2 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND toolplaza_id = '.$toll['id'].' ORDER BY ID DESC';
+			foreach ($tolplaza->result_array() as $toll) {
+				$query_dsr_toll_month_now = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW()) AND status = 1 AND toolplaza_id = ' . $toll['id'] . ' ORDER BY ID DESC';
+				$query_dsr_toll_month_last = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND toolplaza_id = ' . $toll['id'] . ' ORDER BY ID DESC';
+				$query_dsr_toll_month_last_2 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND toolplaza_id = ' . $toll['id'] . ' ORDER BY ID DESC';
 				$dsr_toll_month[$j] = $this->db->query($query_dsr_toll_month_now)->num_rows();
 				$dsr_toll_month_last[$j] = $this->db->query($query_dsr_toll_month_last)->num_rows();
 				$dsr_toll_month_last_2[$j] = $this->db->query($query_dsr_toll_month_last_2)->num_rows();
-				$dsr_tool[$j]['count']= $dsr_toll_month[$j] + $dsr_toll_month_last[$j] + $dsr_toll_month_last_2[$j];
+				$dsr_tool[$j]['count'] = $dsr_toll_month[$j] + $dsr_toll_month_last[$j] + $dsr_toll_month_last_2[$j];
 				$dsr_tool[$j]['not_uploaded'] = $days_count - $dsr_tool[$j]['count'];
-				if($dsr_tool[$j]['count'] > $days_count){
+				if ($dsr_tool[$j]['count'] > $days_count) {
 					$dsr_tool[$j]['error'] = 'Approve/Disapprove';
 				}
-				if($dsr_tool[$j]['count'] < $days_count){
+				if ($dsr_tool[$j]['count'] < $days_count) {
 					$dsr_tool[$j]['error'] = 'DSR missing';
 				}
-				if($dsr_tool[$j]['count'] == 0){
+				if ($dsr_tool[$j]['count'] == 0) {
 					$dsr_tool[$j]['error'] = 'DSRs do not exist';
 				}
-				if($dsr_tool[$j]['count'] == $days_count){
+				if ($dsr_tool[$j]['count'] == $days_count) {
 					$dsr_tool[$j]['success'] = 'All DSR uploaded';
 				}
 				$j++;
 			}
 			$this->page_data['tool'] = $tolplaza->result_array();
-			$this->page_data['days_count'] = $days_count; 
-			$this->page_data['dsr_tool'] = $dsr_tool; 
+			$this->page_data['days_count'] = $days_count;
+			$this->page_data['dsr_tool'] = $dsr_tool;
 			$this->page_data['toolplaza_dsr'] = $toolplaza_dsr;
 			$this->page_data['dsr_count'] = $dsr_count;
 			$this->page_data['toolplaza'] = $toolplaza;
@@ -448,15 +501,13 @@ class Omc extends CI_Controller
 			$this->page_data['id'] = $id;
 			$this->page_data['page'] = 'Dashboard ST';
 			$this->load->view("back/includes/omcdashboarddtrdsr/dsr", $this->page_data);
-			
-		}
-		elseif($id == "current-semiannual"){
-			$querydsr = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW()) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydsr1 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydsr2 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydsr3 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 3 MONTH) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydsr4 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 4 MONTH) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydsr5 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 5 MONTH) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
+		} elseif ($id == "current-semiannual") {
+			$querydsr = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW()) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydsr1 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydsr2 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydsr3 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 3 MONTH) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydsr4 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 4 MONTH) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydsr5 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 5 MONTH) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
 			$dsrmonth = $this->db->query($querydsr);
 			$dsrmonth1 = $this->db->query($querydsr1);
 			$dsrmonth2 = $this->db->query($querydsr2);
@@ -467,7 +518,7 @@ class Omc extends CI_Controller
 			$dsr1 = $dsrmonth1->result_array();
 			$dsr2 = $dsrmonth2->result_array();
 			$dsr_count = $dsrmonth->num_rows() + $dsrmonth1->num_rows() + $dsrmonth2->num_rows() + $dsrmonth3->num_rows() + $dsrmonth4->num_rows() + $dsrmonth5->num_rows();
-			$tolplaza = $this->db->get_where('toolplaza', array('status' => '1','omc'=>$this->session->userdata('omcid')));
+			$tolplaza = $this->db->get_where('toolplaza', array('status' => '1', 'omc' => $this->session->userdata('omcid')));
 			$toolplaza = $tolplaza->num_rows();
 			$one_month_day = date('d', strtotime('last day of -1 month'));
 			$two_month_day =  date('d', strtotime('last day of -2 month'));
@@ -480,50 +531,49 @@ class Omc extends CI_Controller
 			$toolplaza_dsr = $toolplaza_all - $dsr_count;
 			/*?><pre> <?php  echo print_r($dsr_count) ?> </pre><?php exit;*/
 
-			$k = 0; 
-			if($dsr){
-				foreach($dsr as $d){
+			$k = 0;
+			if ($dsr) {
+				foreach ($dsr as $d) {
 					$tollplaza[$k] = $d['toolplaza_id'];
 					$k++;
 					$this->page_data['tollplaza'] = $tollplaza;
 				}
-			}
-			else{
+			} else {
 				$this->page_data['message'] = "Today, DSR is not uploaded yet.";
 			}
 			$j = 0;
-			foreach($tolplaza->result_array() as $toll){
-				$query_dsr_toll_month_now = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW()) AND status = 1 AND toolplaza_id = '.$toll['id'].' AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-				$query_dsr_toll_month_last = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND toolplaza_id = '.$toll['id'].' AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-				$query_dsr_toll_month_last_2 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND toolplaza_id = '.$toll['id'].' AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-				$query_dsr_toll_month_last_3 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 3 MONTH) AND status = 1 AND toolplaza_id = '.$toll['id'].' AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-				$query_dsr_toll_month_last_4 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 4 MONTH) AND status = 1 AND toolplaza_id = '.$toll['id'].' AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-				$query_dsr_toll_month_last_5 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 5 MONTH) AND status = 1 AND toolplaza_id = '.$toll['id'].' AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
+			foreach ($tolplaza->result_array() as $toll) {
+				$query_dsr_toll_month_now = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW()) AND status = 1 AND toolplaza_id = ' . $toll['id'] . ' AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+				$query_dsr_toll_month_last = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND toolplaza_id = ' . $toll['id'] . ' AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+				$query_dsr_toll_month_last_2 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND toolplaza_id = ' . $toll['id'] . ' AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+				$query_dsr_toll_month_last_3 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 3 MONTH) AND status = 1 AND toolplaza_id = ' . $toll['id'] . ' AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+				$query_dsr_toll_month_last_4 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 4 MONTH) AND status = 1 AND toolplaza_id = ' . $toll['id'] . ' AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+				$query_dsr_toll_month_last_5 = 'SELECT * FROM dsr_updated WHERE MONTH(datecreated) = MONTH(NOW() - INTERVAL 5 MONTH) AND status = 1 AND toolplaza_id = ' . $toll['id'] . ' AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
 				$dsr_toll_month[$j] = $this->db->query($query_dsr_toll_month_now)->num_rows();
 				$dsr_toll_month_last[$j] = $this->db->query($query_dsr_toll_month_last)->num_rows();
 				$dsr_toll_month_last_2[$j] = $this->db->query($query_dsr_toll_month_last_2)->num_rows();
 				$dsr_toll_month_last_3[$j] = $this->db->query($query_dsr_toll_month_last_3)->num_rows();
 				$dsr_toll_month_last_4[$j] = $this->db->query($query_dsr_toll_month_last_4)->num_rows();
 				$dsr_toll_month_last_5[$j] = $this->db->query($query_dsr_toll_month_last_5)->num_rows();
-				$dsr_tool[$j]['count']= $dsr_toll_month[$j] + $dsr_toll_month_last[$j] + $dsr_toll_month_last_2[$j] + $dsr_toll_month_last_3[$j] + $dsr_toll_month_last_4[$j] + $dsr_toll_month_last_5[$j];
+				$dsr_tool[$j]['count'] = $dsr_toll_month[$j] + $dsr_toll_month_last[$j] + $dsr_toll_month_last_2[$j] + $dsr_toll_month_last_3[$j] + $dsr_toll_month_last_4[$j] + $dsr_toll_month_last_5[$j];
 				$dsr_tool[$j]['not_uploaded'] = $days_count - $dsr_tool[$j]['count'];
-				if($dsr_tool[$j]['count'] > $days_count){
+				if ($dsr_tool[$j]['count'] > $days_count) {
 					$dsr_tool[$j]['error'] = 'Approve/Disapprove';
 				}
-				if($dsr_tool[$j]['count'] < $days_count){
+				if ($dsr_tool[$j]['count'] < $days_count) {
 					$dsr_tool[$j]['error'] = 'DSR missing';
 				}
-				if($dsr_tool[$j]['count'] == 0){
+				if ($dsr_tool[$j]['count'] == 0) {
 					$dsr_tool[$j]['error'] = 'DSRs do not exist';
 				}
-				if($dsr_tool[$j]['count'] == $days_count){
+				if ($dsr_tool[$j]['count'] == $days_count) {
 					$dsr_tool[$j]['success'] = 'All DSR uploaded';
 				}
 				$j++;
 			}
 			$this->page_data['tool'] = $tolplaza->result_array();
-			$this->page_data['days_count'] = $days_count; 
-			$this->page_data['dsr_tool'] = $dsr_tool; 
+			$this->page_data['days_count'] = $days_count;
+			$this->page_data['dsr_tool'] = $dsr_tool;
 			$this->page_data['toolplaza_dsr'] = $toolplaza_dsr;
 			$this->page_data['dsr_count'] = $dsr_count;
 			$this->page_data['toolplaza'] = $toolplaza;
@@ -531,25 +581,25 @@ class Omc extends CI_Controller
 			$this->page_data['id'] = $id;
 			$this->page_data['page'] = 'Dashboard ST';
 			$this->load->view("back/includes/omcdashboarddtrdsr/dsr", $this->page_data);
-			
-		}
-		elseif($id == "today-dtr"){
-			$querydtr = 'SELECT * FROM dtr WHERE DATE(for_date) = DATE(NOW() - INTERVAL 1 DAY) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
+		} elseif ($id == "today-dtr") {
+			$querydtr = 'SELECT * FROM dtr WHERE DATE(for_date) = DATE(NOW() - INTERVAL 1 DAY) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
 			$dtrmonth = $this->db->query($querydtr);
 			$dtr = $dtrmonth->result_array();
 			$dtr_count = $dtrmonth->num_rows();
-			$toolplaza = $this->db->get_where('toolplaza', array('status' => '1','omc'=>$this->session->userdata('omcid')))->num_rows();
+			$toolplaza = $this->db->get_where('toolplaza', array('status' => '1', 'omc' => $this->session->userdata('omcid')))->num_rows();
 			$today = date("d");
 			$toolplaza = $toolplaza;
 			$toolplaza = $toolplaza - $dtr_count;
-			
-			if($dtr){
-				$k = 0; $total_traffic = 0; $total_revenue = 0;
-				foreach($dtr as $d){
+
+			if ($dtr) {
+				$k = 0;
+				$total_traffic = 0;
+				$total_revenue = 0;
+				foreach ($dtr as $d) {
 					$start_date = $d['for_date'];
 					$end_date = $d['for_date'];
-					$sql = "Select * From terrif Where FIND_IN_SET (".$d['toolplaza']." ,toolplaza) AND (start_date <= 		'".$start_date."' AND end_date >= '".$end_date."')";
-					$tarrif =  $this->db->query($sql)->result_array();				
+					$sql = "Select * From terrif Where FIND_IN_SET (" . $d['toolplaza'] . " ,toolplaza) AND (start_date <= 		'" . $start_date . "' AND end_date >= '" . $end_date . "')";
+					$tarrif =  $this->db->query($sql)->result_array();
 					$toll = $this->db->select('name')->from('toolplaza')->where(array('id' => $d['toolplaza']))->get()->result_array();
 
 					$toolplaza_ts[$k]['id'] = $d['toolplaza'];
@@ -561,141 +611,137 @@ class Omc extends CI_Controller
 					$k++;
 				}
 				$this->page_data['toolplaza_ts'] = $toolplaza_ts;
-			}
-			else{
+			} else {
 				$this->page_data['message_dtr'] = "Today, DTR is not uploaded yet.";
-			} 
+			}
 			$this->page_data['dtr_count'] = $dtr_count;
 			$this->page_data['toolplaza_dtr'] = $toolplaza;
-			
+
 			$this->page_data['dtr'] = $dtr;
-			
+
 			$this->page_data['id'] = $id;
 			$this->page_data['page'] = 'Dashboard ST';
 			$this->load->view("back/includes/omcdashboarddtrdsr/dtr", $this->page_data);
-		}
-		elseif($id == "current-month-dtr"){
-			$querydtr = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW()) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
+		} elseif ($id == "current-month-dtr") {
+			$querydtr = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW()) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
 			$dtrmonth = $this->db->query($querydtr);
 			$dtr = $dtrmonth->result_array();
 			$dtr_count = $dtrmonth->num_rows();
-			$tolplaza = $this->db->get_where('toolplaza', array('status' => '1','omc'=>$this->session->userdata('omcid')));
+			$tolplaza = $this->db->get_where('toolplaza', array('status' => '1', 'omc' => $this->session->userdata('omcid')));
 			$toolplaza = $tolplaza->num_rows();
 			$today = (date("d")) - 1;
 			$toolplaza = $toolplaza * $today;
-				if(!$dtr){
-						//$dtr_count = 0;
-						$this->page_data['message_dtr'] = "Today, DTR is not uploaded yet.";
-					}
-				$j = 0;
-				foreach($tolplaza->result_array() as $toll){
-					$query_dtr_toll[$j] = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW()) AND status = 1 AND toolplaza = '.$toll['id'].' ORDER BY ID DESC';
+			if (!$dtr) {
+				//$dtr_count = 0;
+				$this->page_data['message_dtr'] = "Today, DTR is not uploaded yet.";
+			}
+			$j = 0;
+			foreach ($tolplaza->result_array() as $toll) {
+				$query_dtr_toll[$j] = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW()) AND status = 1 AND toolplaza = ' . $toll['id'] . ' ORDER BY ID DESC';
 
-					$dtr_toll[$j] = $this->db->query($query_dtr_toll[$j]);
-					$dtr_tool[$j]['count']= $dtr_toll[$j]->num_rows();
-					$dtr_tool[$j]['not_uploaded'] = $today - $dtr_tool[$j]['count'];
-					if($dtr_tool[$j]['count'] > $today){
-						$dtr_tool[$j]['error'] = 'Approve/Disapprove';
-					}
-					if($dtr_tool[$j]['count'] < $today){
-						$dtr_tool[$j]['error'] = 'DTR missing';
-					}
-					if($dtr_tool[$j]['count'] == 0){
-						$dtr_tool[$j]['error'] = 'DTRs do not exist';
-					}
-					if($dtr_tool[$j]['count'] == $today){
-						$dtr_tool[$j]['success'] = 'All DTR uploaded';
-					}
-					
-					$j++;
+				$dtr_toll[$j] = $this->db->query($query_dtr_toll[$j]);
+				$dtr_tool[$j]['count'] = $dtr_toll[$j]->num_rows();
+				$dtr_tool[$j]['not_uploaded'] = $today - $dtr_tool[$j]['count'];
+				if ($dtr_tool[$j]['count'] > $today) {
+					$dtr_tool[$j]['error'] = 'Approve/Disapprove';
 				}
+				if ($dtr_tool[$j]['count'] < $today) {
+					$dtr_tool[$j]['error'] = 'DTR missing';
+				}
+				if ($dtr_tool[$j]['count'] == 0) {
+					$dtr_tool[$j]['error'] = 'DTRs do not exist';
+				}
+				if ($dtr_tool[$j]['count'] == $today) {
+					$dtr_tool[$j]['success'] = 'All DTR uploaded';
+				}
+
+				$j++;
+			}
 			$toolplaza = $toolplaza - $dtr_count;
 			$this->page_data['tool'] = $tolplaza->result_array();
-			$this->page_data['days_count'] = $today; 
-			$this->page_data['dtr_tool'] = $dtr_tool; 
+			$this->page_data['days_count'] = $today;
+			$this->page_data['dtr_tool'] = $dtr_tool;
 			/*?> <pre> <?php echo print_r($dtr_tool);exit;*/
-			
+
 			$this->page_data['dtr_count'] = $dtr_count;
 			$this->page_data['toolplaza_dtr'] = $toolplaza;
 			$this->page_data['dtr'] = $dtr;
-			
+
 			$this->page_data['id'] = $id;
 			$this->page_data['page'] = 'Dashboard ST';
 			$this->load->view("back/includes/omcdashboarddtrdsr/dtr", $this->page_data);
-		}
-		elseif($id == "current-quarter-dtr"){
-			$querydtr = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW()) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydtr1 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydtr2 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1  AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
+		} elseif ($id == "current-quarter-dtr") {
+			$querydtr = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW()) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydtr1 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydtr2 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1  AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
 			$dtrmonth = $this->db->query($querydtr);
 			$dtrmonth1 = $this->db->query($querydtr1);
 			$dtrmonth2 = $this->db->query($querydtr2);
 			$dtr = $dtrmonth->result_array();
 			$dtr1 = $dtrmonth1->result_array();
 			$dtr2 = $dtrmonth2->result_array();
-			$dtr_count = $dtrmonth->num_rows() + $dtrmonth1->num_rows() + $dtrmonth2->num_rows() ;
-			$tolplaza = $this->db->get_where('toolplaza', array('status' => '1', 'omc'=>$this->session->userdata('omcid')));
+			$dtr_count = $dtrmonth->num_rows() + $dtrmonth1->num_rows() + $dtrmonth2->num_rows();
+			$tolplaza = $this->db->get_where('toolplaza', array('status' => '1', 'omc' => $this->session->userdata('omcid')));
 			$toolplaza = $tolplaza->num_rows();
 			$one_month_day = date('d', strtotime('last day of -1 month'));
 			$two_month_day =  date('d', strtotime('last day of -2 month'));
-			$today = date("d")-1;
+			$today = date("d") - 1;
 			$days_count = $today + $one_month_day + $two_month_day;
 			$toolplaza_all = $toolplaza * $days_count;
 			$toolplaza_r = $toolplaza_all - $dtr_count;
 			/*?><pre> <?php  echo print_r($dtr2) ?> </pre><?php exit;*/
-				if($dtr_count == 0){
-						$this->page_data['message_dtr'] = "DTR is not uploaded yet.";
-					}
-				$j = 0;
-				foreach($tolplaza->result_array() as $toll){
-					$query_dtr_toll_month_now = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW()) AND status = 1 AND toolplaza = '.$toll['id'].' ORDER BY ID DESC';
-					$query_dtr_toll_month_last = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND toolplaza = '.$toll['id'].' ORDER BY ID DESC';
-					$query_dtr_toll_month_last_2 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND toolplaza = '.$toll['id'].' ORDER BY ID DESC';
+			if ($dtr_count == 0) {
+				$this->page_data['message_dtr'] = "DTR is not uploaded yet.";
+			}
+			$j = 0;
+			foreach ($tolplaza->result_array() as $toll) {
+				$query_dtr_toll_month_now = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW()) AND status = 1 AND toolplaza = ' . $toll['id'] . ' ORDER BY ID DESC';
+				$query_dtr_toll_month_last = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND toolplaza = ' . $toll['id'] . ' ORDER BY ID DESC';
+				$query_dtr_toll_month_last_2 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND toolplaza = ' . $toll['id'] . ' ORDER BY ID DESC';
 
-					$dtr_toll_month[$j] = $this->db->query($query_dtr_toll_month_now)->num_rows();
-					$dtr_toll_month_last[$j] = $this->db->query($query_dtr_toll_month_last)->num_rows();
-					$dtr_toll_month_last_2[$j] = $this->db->query($query_dtr_toll_month_last_2)->num_rows();
+				$dtr_toll_month[$j] = $this->db->query($query_dtr_toll_month_now)->num_rows();
+				$dtr_toll_month_last[$j] = $this->db->query($query_dtr_toll_month_last)->num_rows();
+				$dtr_toll_month_last_2[$j] = $this->db->query($query_dtr_toll_month_last_2)->num_rows();
 
-					$dtr_tool[$j]['count']= $dtr_toll_month[$j] + $dtr_toll_month_last[$j] + $dtr_toll_month_last_2[$j];
-					$dtr_tool[$j]['not_uploaded'] = $days_count - $dtr_tool[$j]['count'];
-					if($dtr_tool[$j]['count'] > $days_count){
-						$dtr_tool[$j]['error'] = 'Approve/Disapprove';
-					}
-					if($dtr_tool[$j]['count'] < $days_count){
-						$dtr_tool[$j]['error'] = 'DTR missing';
-					}
-					if($dtr_tool[$j]['count'] == 0){
-						$dtr_tool[$j]['error'] = 'DTRs do not exist';
-					}
-					if($dtr_tool[$j]['count'] == $days_count){
-						$dtr_tool[$j]['success'] = 'All DTR uploaded';
-					}
-					
-					$j++;
+				$dtr_tool[$j]['count'] = $dtr_toll_month[$j] + $dtr_toll_month_last[$j] + $dtr_toll_month_last_2[$j];
+				$dtr_tool[$j]['not_uploaded'] = $days_count - $dtr_tool[$j]['count'];
+				if ($dtr_tool[$j]['count'] > $days_count) {
+					$dtr_tool[$j]['error'] = 'Approve/Disapprove';
 				}
-			
-			
+				if ($dtr_tool[$j]['count'] < $days_count) {
+					$dtr_tool[$j]['error'] = 'DTR missing';
+				}
+				if ($dtr_tool[$j]['count'] == 0) {
+					$dtr_tool[$j]['error'] = 'DTRs do not exist';
+				}
+				if ($dtr_tool[$j]['count'] == $days_count) {
+					$dtr_tool[$j]['success'] = 'All DTR uploaded';
+				}
+
+				$j++;
+			}
+
+
 			$this->page_data['tool'] = $tolplaza->result_array();
-			$this->page_data['days_count'] = $days_count; 
-			$this->page_data['dtr_tool'] = $dtr_tool; 
+			$this->page_data['days_count'] = $days_count;
+			$this->page_data['dtr_tool'] = $dtr_tool;
 			/*?> <pre> <?php  echo print_r($dtr);exit;*/
-	
+
 			$this->page_data['dtr_count'] = $dtr_count;
 			$this->page_data['toolplaza_dtr'] = $toolplaza_r;
-			
+
 			$this->page_data['dtr'] = $dtr;
-			
+
 			$this->page_data['id'] = $id;
 			$this->page_data['page'] = 'Dashboard ST';
 			$this->load->view("back/includes/omcdashboarddtrdsr/dtr", $this->page_data);
-		}
-		elseif($id == "current-semiannual-dtr"){
-			$querydtr = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW()) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydtr1 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydtr2 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydtr3 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 3 MONTH) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydtr4 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 4 MONTH) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-			$querydtr5 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 5 MONTH) AND status = 1 AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
+		} elseif ($id == "current-semiannual-dtr") {
+			$querydtr = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW()) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydtr1 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydtr2 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydtr3 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 3 MONTH) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydtr4 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 4 MONTH) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+			$querydtr5 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 5 MONTH) AND status = 1 AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
 			$dtrmonth = $this->db->query($querydtr);
 			$dtrmonth1 = $this->db->query($querydtr1);
 			$dtrmonth2 = $this->db->query($querydtr2);
@@ -705,9 +751,9 @@ class Omc extends CI_Controller
 			$dtr = $dtrmonth->result_array();
 			$dtr1 = $dtrmonth1->result_array();
 			$dtr2 = $dtrmonth2->result_array();
-			$dtr_count = $dtrmonth->num_rows() + $dtrmonth1->num_rows() + $dtrmonth2->num_rows() + $dtrmonth3->num_rows() + $dtrmonth4->num_rows() + $dtrmonth5->num_rows() ;
-			
-			$tolplaza = $this->db->get_where('toolplaza', array('status' => '1','omc'=>$this->session->userdata('omcid')));
+			$dtr_count = $dtrmonth->num_rows() + $dtrmonth1->num_rows() + $dtrmonth2->num_rows() + $dtrmonth3->num_rows() + $dtrmonth4->num_rows() + $dtrmonth5->num_rows();
+
+			$tolplaza = $this->db->get_where('toolplaza', array('status' => '1', 'omc' => $this->session->userdata('omcid')));
 			$toolplaza = $tolplaza->num_rows();
 			$one_month_day = date('d', strtotime('last day of -1 month'));
 			$two_month_day =  date('d', strtotime('last day of -2 month'));
@@ -719,126 +765,126 @@ class Omc extends CI_Controller
 			$toolplaza_all = $toolplaza * $days_count;
 			$toolplaza_r = $toolplaza_all - $dtr_count;
 			/*?><pre> <?php  echo print_r($dtr_count) ?> </pre><?php exit;*/
-			if($dtr_count == 0){
+			if ($dtr_count == 0) {
 				$this->page_data['message_dtr'] = "DTR is not uploaded yet.";
 			}
-				$j = 0;
-				foreach($tolplaza->result_array() as $toll){
-					$query_dtr_toll_month_now = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW()) AND status = 1 AND toolplaza = '.$toll['id'].' AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-					$query_dtr_toll_month_last = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND toolplaza = '.$toll['id'].' AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-					$query_dtr_toll_month_last_2 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND toolplaza = '.$toll['id'].' AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-					$query_dtr_toll_month_last_3 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 3 MONTH) AND status = 1 AND toolplaza = '.$toll['id'].' AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-					$query_dtr_toll_month_last_4 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 4 MONTH) AND status = 1 AND toolplaza = '.$toll['id'].' AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-					$query_dtr_toll_month_last_5 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 5 MONTH) AND status = 1 AND toolplaza = '.$toll['id'].' AND omc = '.$this->session->userdata('omcid').' ORDER BY ID DESC';
-					$dtr_toll_month[$j] = $this->db->query($query_dtr_toll_month_now)->num_rows();
-					$dtr_toll_month_last[$j] = $this->db->query($query_dtr_toll_month_last)->num_rows();
-					$dtr_toll_month_last_2[$j] = $this->db->query($query_dtr_toll_month_last_2)->num_rows();
-					$dtr_toll_month_last_3[$j] = $this->db->query($query_dtr_toll_month_last_3)->num_rows();
-					$dtr_toll_month_last_4[$j] = $this->db->query($query_dtr_toll_month_last_4)->num_rows();
-					$dtr_toll_month_last_5[$j] = $this->db->query($query_dtr_toll_month_last_5)->num_rows();
-					$dtr_tool[$j]['count']= $dtr_toll_month[$j] + $dtr_toll_month_last[$j] + $dtr_toll_month_last_2[$j] + $dtr_toll_month_last_3[$j] + $dtr_toll_month_last_4[$j] + $dtr_toll_month_last_5[$j];
-					$dtr_tool[$j]['not_uploaded'] = $days_count - $dtr_tool[$j]['count'];
-					if($dtr_tool[$j]['count'] > $days_count){
-						$dtr_tool[$j]['error'] = 'Approve/Disapprove';
-					}
-					if($dtr_tool[$j]['count'] < $days_count){
-						$dtr_tool[$j]['error'] = 'DTR missing';
-					}
-					if($dtr_tool[$j]['count'] == 0){
-						$dtr_tool[$j]['error'] = 'DTRs do not exist';
-					}
-					if($dtr_tool[$j]['count'] == $days_count){
-						$dtr_tool[$j]['success'] = 'All DTR uploaded';
-					}
-					if(!$dtr){
-						$this->page_data['message_dtr'] = "Today, DTR is not uploaded yet.";
-					}
-					$j++;
+			$j = 0;
+			foreach ($tolplaza->result_array() as $toll) {
+				$query_dtr_toll_month_now = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW()) AND status = 1 AND toolplaza = ' . $toll['id'] . ' AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+				$query_dtr_toll_month_last = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 1 MONTH) AND status = 1 AND toolplaza = ' . $toll['id'] . ' AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+				$query_dtr_toll_month_last_2 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 2 MONTH) AND status = 1 AND toolplaza = ' . $toll['id'] . ' AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+				$query_dtr_toll_month_last_3 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 3 MONTH) AND status = 1 AND toolplaza = ' . $toll['id'] . ' AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+				$query_dtr_toll_month_last_4 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 4 MONTH) AND status = 1 AND toolplaza = ' . $toll['id'] . ' AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+				$query_dtr_toll_month_last_5 = 'SELECT * FROM dtr WHERE MONTH(for_date) = MONTH(NOW() - INTERVAL 5 MONTH) AND status = 1 AND toolplaza = ' . $toll['id'] . ' AND omc = ' . $this->session->userdata('omcid') . ' ORDER BY ID DESC';
+				$dtr_toll_month[$j] = $this->db->query($query_dtr_toll_month_now)->num_rows();
+				$dtr_toll_month_last[$j] = $this->db->query($query_dtr_toll_month_last)->num_rows();
+				$dtr_toll_month_last_2[$j] = $this->db->query($query_dtr_toll_month_last_2)->num_rows();
+				$dtr_toll_month_last_3[$j] = $this->db->query($query_dtr_toll_month_last_3)->num_rows();
+				$dtr_toll_month_last_4[$j] = $this->db->query($query_dtr_toll_month_last_4)->num_rows();
+				$dtr_toll_month_last_5[$j] = $this->db->query($query_dtr_toll_month_last_5)->num_rows();
+				$dtr_tool[$j]['count'] = $dtr_toll_month[$j] + $dtr_toll_month_last[$j] + $dtr_toll_month_last_2[$j] + $dtr_toll_month_last_3[$j] + $dtr_toll_month_last_4[$j] + $dtr_toll_month_last_5[$j];
+				$dtr_tool[$j]['not_uploaded'] = $days_count - $dtr_tool[$j]['count'];
+				if ($dtr_tool[$j]['count'] > $days_count) {
+					$dtr_tool[$j]['error'] = 'Approve/Disapprove';
 				}
-			
+				if ($dtr_tool[$j]['count'] < $days_count) {
+					$dtr_tool[$j]['error'] = 'DTR missing';
+				}
+				if ($dtr_tool[$j]['count'] == 0) {
+					$dtr_tool[$j]['error'] = 'DTRs do not exist';
+				}
+				if ($dtr_tool[$j]['count'] == $days_count) {
+					$dtr_tool[$j]['success'] = 'All DTR uploaded';
+				}
+				if (!$dtr) {
+					$this->page_data['message_dtr'] = "Today, DTR is not uploaded yet.";
+				}
+				$j++;
+			}
+
 			$this->page_data['tool'] = $tolplaza->result_array();
-			$this->page_data['days_count'] = $days_count; 
-			$this->page_data['dtr_tool'] = $dtr_tool; 
-			
-			
+			$this->page_data['days_count'] = $days_count;
+			$this->page_data['dtr_tool'] = $dtr_tool;
+
+
 			$this->page_data['dtr_count'] = $dtr_count;
 			$this->page_data['toolplaza_dtr'] = $toolplaza_r;
-			
+
 			$this->page_data['dtr'] = $dtr;
-			
+
 			$this->page_data['id'] = $id;
 			$this->page_data['page'] = 'Dashboard ST';
 			$this->load->view("back/includes/omcdashboarddtrdsr/dtr", $this->page_data);
 		}
 	}
-	public function dashboard_dtr(){
+	public function dashboard_dtr()
+	{
 		$dat = "DATE(for_date) = DATE(NOW() - INTERVAL 1 DAY)";
 		$href = "all-summary-pday";
-		$current = explode("-",$href);
-		$datatoday = $this->Admin_model->dashboard_dtr($dat,$href, $current);
+		$current = explode("-", $href);
+		$datatoday = $this->Admin_model->dashboard_dtr($dat, $href, $current);
 		$this->page_data['dtr'] = $datatoday['dtr'];
-		
+
 		$this->page_data['date'] = $dat;
-		$this->page_data['current'] = $current[1].$current[2];	
+		$this->page_data['current'] = $current[1] . $current[2];
 		$this->page_data['section'] = $current[1];
 		$this->page_data['duration'] = $current[2];
-		
-		if($this->page_data['dtr']){
-			
+
+		if ($this->page_data['dtr']) {
+
 			$this->page_data['toolplazatoday'] = $datatoday['toolplaza'];
 			$this->page_data['tollplazatoday'] = $datatoday['tollplaza'];
-		}
-		else{
+		} else {
 			$this->page_data['message'] = "DTR is not uploaded Yesterday";
 			$this->page_data['toolplazatoday'] = $datatoday['toolplaza'];
 			$this->page_data['tollplazatoday'] = $datatoday['tollplaza'];
 		}
-		
+
 
 		$this->page_data['page'] = 'DTR Dashboard';
 		$this->load->view('back/dashboard_dtr', $this->page_data);
 	}
-	public function dashboard_dtr_day(){
+	public function dashboard_dtr_day()
+	{
 		$dat = $this->input->post('date');
 		$href = $this->input->post('href');
 
-		if($dat && $href){
+		if ($dat && $href) {
 			$this->page_data['date'] = $dat;
 			$this->page_data['href'] = $href;
-			
-			$current = explode("-",$href);
 
-			$datatoday = $this->Admin_model->dashboard_dtr($dat,$href,$current);
-			
+			$current = explode("-", $href);
+
+			$datatoday = $this->Admin_model->dashboard_dtr($dat, $href, $current);
+
 			$this->page_data['dtr'] = $datatoday['dtr'];
-			
 
-			
-			
-			$this->page_data['current'] = $current[1].$current[2];
+
+
+
+			$this->page_data['current'] = $current[1] . $current[2];
 
 			$this->page_data['section'] = $current[1];
 			$this->page_data['duration'] = $current[2];
-			
-			
 
-			if($this->page_data['dtr']){
+
+
+			if ($this->page_data['dtr']) {
 
 				$this->page_data['toolplazatoday'] = $datatoday['toolplaza'];
 				$this->page_data['tollplazatoday'] = $datatoday['tollplaza'];
-			}
-			else{
-				if($current[2] == 'pday'){
+			} else {
+				if ($current[2] == 'pday') {
 					$day = 'Yesterday';
-				}elseif($current[2] == 'pweek'){
+				} elseif ($current[2] == 'pweek') {
 					$day = 'Previous Week';
-				}elseif($current[2] == 'pmonth'){
+				} elseif ($current[2] == 'pmonth') {
 					$day = 'Previous Month';
-				}elseif($current[2] == 'today'){
+				} elseif ($current[2] == 'today') {
 					$day = 'Today';
 				}
-				$this->page_data['message'] = "DTR is not uploaded ".$day;
-				
+				$this->page_data['message'] = "DTR is not uploaded " . $day;
+
 				$this->page_data['toolplazatoday'] = $datatoday['toolplaza'];
 				$this->page_data['tollplazatoday'] = $datatoday['tollplaza'];
 			}
@@ -846,53 +892,49 @@ class Omc extends CI_Controller
 			$this->page_data['page'] = 'DTR Dashboard';
 
 			$this->load->view('back/chartsdashboarddtr', $this->page_data);
-			
 		}
-			
-
-
-		
-		
 	}
 	////TollPlaza Live Data
-	public function toolplaza_live_data(){
-		if(!$this->session->userdata('adminid')){	
+	public function toolplaza_live_data()
+	{
+		if (!$this->session->userdata('adminid')) {
 			return redirect('admin/login');
 		}
 		$info = scandir('C:\Mandra');
 		$j = 0;
-		foreach($info as $fl){
-			if(strpos($fl, 'TSaveBatchDBMessage')){
+		foreach ($info as $fl) {
+			if (strpos($fl, 'TSaveBatchDBMessage')) {
 				$direct[$j] = explode('_TSaveBatchDBMessage.txt', $fl);
 				$file_name[$j] = $direct[$j][0];
 			}
 			$j++;
 		}
 		$k = 0;
-		foreach($file_name as $file_number){
-			if($file_number){
-				$filed[$k] = file_get_contents('C:\Mandra\\'.$file_number.'_TSaveBatchDBMessage.txt');
-				
-				$data[$k] = explode('End of Record',$filed[$k]);
-				$i= 0;
-				
-				foreach($data[$k] as $transaction){
-					if(strpos($transaction ,'SaveTransaction')){
-						$internal[$k]['transaction'][$i] = explode('TSaveTransactionMessage',$transaction);
-						
+		foreach ($file_name as $file_number) {
+			if ($file_number) {
+				$filed[$k] = file_get_contents('C:\Mandra\\' . $file_number . '_TSaveBatchDBMessage.txt');
+
+				$data[$k] = explode('End of Record', $filed[$k]);
+				$i = 0;
+
+				foreach ($data[$k] as $transaction) {
+					if (strpos($transaction, 'SaveTransaction')) {
+						$internal[$k]['transaction'][$i] = explode('TSaveTransactionMessage', $transaction);
+
 						$array[$k][$i] = array_map(
-											function($v){
-												return explode(PHP_EOL,$v);
-											}, $internal[$k]['transaction'][$i]
-										);
+							function ($v) {
+								return explode(PHP_EOL, $v);
+							},
+							$internal[$k]['transaction'][$i]
+						);
 						$array[$k][$i][0] = '';
 						$count = 0;
-						if($array[$k][$i]){
-							foreach($array[$k][$i][1] as $entry){
-								if(strpos($entry, '=')){
+						if ($array[$k][$i]) {
+							foreach ($array[$k][$i][1] as $entry) {
+								if (strpos($entry, '=')) {
 									$array[$k][$i][1][$count] = explode('=', $entry);
-									
-									$toll_entry[$k][$i]['type'] = 'Transaction'; 
+
+									$toll_entry[$k][$i]['type'] = 'Transaction';
 									$toll_entry[$k][$i]['Send mode'] = $array[$k][$i][1][1][1];
 									$toll_entry[$k][$i]['pl_id'] = $array[$k][$i][1][2][1];
 									$toll_entry[$k][$i]['ln_id'] = $array[$k][$i][1][3][1];
@@ -953,34 +995,29 @@ class Omc extends CI_Controller
 									$toll_entry[$k][$i]['tg_serv_prov_id'] = $array[$k][$i][1][58][1];
 									$toll_entry[$k][$i]['tg_issuer'] = $array[$k][$i][1][59][1];
 									$toll_entry[$k][$i]['tg_tx_seq_nr'] = $array[$k][$i][1][60][1];
-									
 								}
-								
+
 								$count++;
 							}
-							
+						} else {
 						}
-						else{
-							
-						}
-						
-					}
-					elseif(strpos($transaction ,'SaveIncident')){
-						$internal[$k]['transaction'][$i] = explode('TSaveIncidentMessage',$transaction);
-						
+					} elseif (strpos($transaction, 'SaveIncident')) {
+						$internal[$k]['transaction'][$i] = explode('TSaveIncidentMessage', $transaction);
+
 						$array[$k][$i] = array_map(
-											function($v){
-												return explode(PHP_EOL,$v);
-											}, $internal[$k]['transaction'][$i]
-										);
+							function ($v) {
+								return explode(PHP_EOL, $v);
+							},
+							$internal[$k]['transaction'][$i]
+						);
 						$array[$k][$i][0] = '';
 						$count = 0;
-						if($array[$k][$i]){
-							foreach($array[$k][$i][1] as $entry){
-								if(strpos($entry, '=')){
+						if ($array[$k][$i]) {
+							foreach ($array[$k][$i][1] as $entry) {
+								if (strpos($entry, '=')) {
 									$array[$k][$i][1][$count] = explode('=', $entry);
-									
-									$toll_entry[$k][$i]['type'] = 'Incident'; 
+
+									$toll_entry[$k][$i]['type'] = 'Incident';
 									$toll_entry[$k][$i]['Send mode'] = $array[$k][$i][1][1][1];
 									$toll_entry[$k][$i]['pl_id'] = $array[$k][$i][1][2][1];
 									$toll_entry[$k][$i]['ln_id'] = $array[$k][$i][1][3][1];
@@ -1017,30 +1054,27 @@ class Omc extends CI_Controller
 									$toll_entry[$k][$i]['tg_card_type'] = $array[$k][$i][1][34][1];
 									$toll_entry[$k][$i]['tg_reader'] = $array[$k][$i][1][35][1];
 									$toll_entry[$k][$i]['tg_tx_seq_nr'] = $array[$k][$i][1][36][1];
-									
 								}
-								
+
 								$count++;
 							}
 						}
-					}
-					else{
+					} else {
 						$internal[$k]['transaction'][$i] = '';
 						$array[$k][$i] = '';
 					}
 					$i++;
 				}
-			}
-			else{
+			} else {
 				$filed[$k] = '';
 				$data[$k] = '';
-				
 			}
 			$k++;
 		}
-		?><pre> <?php echo print_r($toll_entry); ?></pre> <?php exit;
-		/*?><pre> <?php echo print_r($array); ?></pre> <?php exit;*/
-		/*$i= 0;
+?>
+		<pre> <?php echo print_r($toll_entry); ?></pre> <?php exit;
+														/*?><pre> <?php echo print_r($array); ?></pre> <?php exit;*/
+														/*$i= 0;
 		
 		foreach($file as $line){
 			if(strpos($line, 'SaveTransaction')){
@@ -1053,7 +1087,7 @@ class Omc extends CI_Controller
 			
 			$i++;
 		}*/
-		/*$data['file'] = file_get_contents('C:\Mandra\0000000294_TSaveBatchDBMessage.txt');
+														/*$data['file'] = file_get_contents('C:\Mandra\0000000294_TSaveBatchDBMessage.txt');
     	if(sizeof($data['file']) > 1){
     	foreach($data['file'] as $file){
     	$data['exp'] = explode('C:\Mandra\0000000294_TSaveBatchDBMessage.txt',$file);
@@ -1061,1661 +1095,1684 @@ class Omc extends CI_Controller
     	}else{
      $data['exp'] = explode('C:\Mandra\0000000294_TSaveBatchDBMessage.txt',$data['file']);
     	}	*/
-			
-		?><pre><?php echo print_r($data[$k]['file']); ?></pre><?php exit; 
-		$this->load->view('back/toolplaza_data', $data_end);
-	}
-	///////////////////////////////////////////////////////////////
-	////	/** Login Logout START  *////////////////////
-	///////////////////////////////////////////////////////////////
-	
-	public function login(){
-		$this->load->view('back/omc_login');
-	}
-	public function do_login(){
 
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('username', 'Email', 'required');
-		$this->form_validation->set_rules('password','Password','required');
-		if($this->form_validation->run() == FALSE){
-			echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+														?>
+		<pre><?php echo print_r($data[$k]['file']); ?></pre><?php exit;
+															$this->load->view('back/toolplaza_data', $data_end);
+														}
+														///////////////////////////////////////////////////////////////
+														////	/** Login Logout START  *////////////////////
+														///////////////////////////////////////////////////////////////
 
-		}else{
+														public function login()
+														{
+															$this->load->view('back/omc_login');
+														}
+														public function do_login()
+														{
+															$this->load->library('form_validation');
+															$this->form_validation->set_rules('username', 'Email', 'required');
+															$this->form_validation->set_rules('password', 'Password', 'required');
+															if ($this->form_validation->run() == FALSE) {
+																echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+															} else {
 
-			$omc_info  = $this->db->get_where('omc', array(
-					'username' => $this->input->post('username'),
-					'password' => sha1($this->input->post('password'))
-				))->result_array();
+																$omc_info  = $this->db->get_where('omc', array(
+																	'username' => $this->input->post('username'),
+																	'password' => sha1($this->input->post('password'))
+																))->result_array();
 
-			if($omc_info){
-				$this->session->set_userdata('omcid',$omc_info[0]['id']);
-				$this->session->set_userdata('omcname',$omc_info[0]['name']);
-				$this->session->set_userdata('user',$omc_info[0]['username']);
-				// echo "<pre>"; print_r($this->session->userdata()); exit;
-				// $this->session->set_userdata('lname',$omc_info[0]['lname']);
-				// $this->session->set_userdata('role',$omc_info[0]['role']);
-			 	// $this->session->set_userdata('site',$omc_info[0]['site']);
-                // echo "<pre>"; print_r($this->session->userdata('site')); exit;
-				echo json_encode(array('response' => TRUE , 'message' => 'Successfull Login', 'is_redirect' => TRUE , 'redirect_url' => base_url().'omc/index'));				
-			}else{
+																if ($omc_info) {
+																	$this->session->set_userdata('omcid', $omc_info[0]['id']);
+																	$this->session->set_userdata('omcname', $omc_info[0]['name']);
+																	$this->session->set_userdata('user', $omc_info[0]['username']);
+																	// echo "<pre>"; print_r($this->session->userdata()); exit;
+																	// $this->session->set_userdata('lname',$omc_info[0]['lname']);
+																	// $this->session->set_userdata('role',$omc_info[0]['role']);
+																	// $this->session->set_userdata('site',$omc_info[0]['site']);
+																	// echo "<pre>"; print_r($this->session->userdata('site')); exit;
+																	echo json_encode(array('response' => TRUE, 'message' => 'Successfull Login', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'omc/index'));
+																} else {
 
-				echo json_encode(array('response' => FALSE , 'message' => 'Invalid Username or wrong Passord')); exit;
-			}
-		}
-	}
-	public function logout(){
+																	echo json_encode(array('response' => FALSE, 'message' => 'Invalid Username or wrong Passord'));
+																	exit;
+																}
+															}
+														}
+														public function logout()
+														{
 
-		$this->session->sess_destroy();
-		redirect(base_url().'omc','refresh');
-	}
-	public function settings($para1 = ''){
-		if(!$this->session->userdata('adminid'))
-		{	
-			return redirect('admin/login');
-		}
-		$this->load->library('form_validation');
-		if($para1 == 'update_basic_info'){
-			$this->form_validation->set_rules('fname','First Name','required|trim');
-			$this->form_validation->set_rules('lname','Last Name','required|trim');
-			$this->form_validation->set_rules('username','Username Name','required|trim');
-			//$this->form_validation->set_rules('contact','First Name','required|trim');
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('response' => FALSE , 'message' => validation_errors())); exit;
-			}else{
-				$data = array();
-				$data['fname'] = $this->input->post('fname');
-				$data['lname'] = $this->input->post('lname');
-				$data['username'] = $this->input->post('username');
-				$this->db->where('id', $this->session->userdata('adminid'));
-				$this->db->update('admin', $data);
-				echo json_encode(array('response' => TRUE , 'message' => 'Updated Successfully', 'is_redirect' => TRUE , 'redirect_url' => base_url().'admin/settings'));
-            }		
-		}elseif($para1 == 'update_pwd'){ 
-				 $config=array(
-				     array(
-				          'field' => 'newpwd',
-				          'label' => 'New Password',
-				          'rules' => 'trim|required'
-				          ),
-				     array(
-				          'field' => 'repwd',
-				          'label' => 'Confirm Password',
-				          'rules' => 'trim|required|matches[newpwd]'
-				          )
-				 );
-				  $this->form_validation->set_rules('oldpwd','Old Password','required|trim');
-				  $this->form_validation->set_rules($config);
-				  if($this->form_validation->run() == FALSE){
-				  		echo json_encode(array('response' => FALSE , 'message' => validation_errors())); exit;
-			
-				  }else{
-				  		$check_old = $this->db->get_where('admin',array('id' => $this->session->userdata('adminid'), 'password' => sha1($this->input->post('oldpwd'))))->result_array();
-				  		//echo $this->db->last_query(); exit;
-				  		if(empty($check_old)){
-				  			echo json_encode(array('response' => FALSE , 'message' => 'You have enter incorrect old password')); exit;
-				  		}else{
-				  			$data = array();
-				  			$data['password'] = sha1($this->input->post('newpwd'));
-				  			$this->db->where('id', $this->session->userdata('adminid'));
-							$this->db->update('admin', $data);
-							echo json_encode(array('response' => TRUE , 'message' => 'Updated Successfully', 'is_redirect' => TRUE , 'redirect_url' => base_url().'admin/settings'));
-				  		}
-				  }
-		}
-		else
-		{
-			$this->page_data['user'] = $this->db->get_where('admin',array('id' => $this->session->userdata('adminid')))->result_array();
-			$this->page_data['page'] = 'settings';
-			$this->load->view('back/settings',$this->page_data);
-		}
-		
-	}
-	
-	///////////////////////////////////////////////////////////////
-	////	/** Charts START  *////////////////////
-	///////////////////////////////////////////////////////////////
-	
-	public function check_tollplaza_dates($tollplaza = ''){
-		$data = $this->Admin_model->get_tollplaza_dates($tollplaza);
-		echo json_encode($data);
-	}	
-	public function searchforchart($para1 = ''){
+															$this->session->sess_destroy();
+															redirect(base_url() . 'omc', 'refresh');
+														}
+														public function settings($para1 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+																return redirect('admin/login');
+															}
+															$this->load->library('form_validation');
+															if ($para1 == 'update_basic_info') {
+																$this->form_validation->set_rules('fname', 'First Name', 'required|trim');
+																$this->form_validation->set_rules('lname', 'Last Name', 'required|trim');
+																$this->form_validation->set_rules('username', 'Username Name', 'required|trim');
+																//$this->form_validation->set_rules('contact','First Name','required|trim');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$data = array();
+																	$data['fname'] = $this->input->post('fname');
+																	$data['lname'] = $this->input->post('lname');
+																	$data['username'] = $this->input->post('username');
+																	$this->db->where('id', $this->session->userdata('adminid'));
+																	$this->db->update('admin', $data);
+																	echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/settings'));
+																}
+															} elseif ($para1 == 'update_pwd') {
+																$config = array(
+																	array(
+																		'field' => 'newpwd',
+																		'label' => 'New Password',
+																		'rules' => 'trim|required'
+																	),
+																	array(
+																		'field' => 'repwd',
+																		'label' => 'Confirm Password',
+																		'rules' => 'trim|required|matches[newpwd]'
+																	)
+																);
+																$this->form_validation->set_rules('oldpwd', 'Old Password', 'required|trim');
+																$this->form_validation->set_rules($config);
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$check_old = $this->db->get_where('admin', array('id' => $this->session->userdata('adminid'), 'password' => sha1($this->input->post('oldpwd'))))->result_array();
+																	//echo $this->db->last_query(); exit;
+																	if (empty($check_old)) {
+																		echo json_encode(array('response' => FALSE, 'message' => 'You have enter incorrect old password'));
+																		exit;
+																	} else {
+																		$data = array();
+																		$data['password'] = sha1($this->input->post('newpwd'));
+																		$this->db->where('id', $this->session->userdata('adminid'));
+																		$this->db->update('admin', $data);
+																		echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/settings'));
+																	}
+																}
+															} else {
+																$this->page_data['user'] = $this->db->get_where('admin', array('id' => $this->session->userdata('adminid')))->result_array();
+																$this->page_data['page'] = 'settings';
+																$this->load->view('back/settings', $this->page_data);
+															}
+														}
 
-		$tollplaza = $this->input->post('tollplaza');
-		$month  = $this->input->post('formonth');
-		$data = $this->Admin_model->get_chartdata($tollplaza, $month);
-		
-		$previous_year = date("Y-m-d",strtotime(@$data['chart']['month'].' -1 year'));
-		$previous_monthDate = date("Y-m-d", strtotime( date( "Y-m-d", strtotime( @$data['chart']['month'] ) ) . "-1 month" ) );
-		$pre_year_data = $this->Admin_model->get_chart_by( @$data['chart']['toolplaza_id'], $previous_year);
-		
-		$pre_month_data = $this->Admin_model->get_chart_by( @$data['chart']['toolplaza_id'], $previous_monthDate);
-		
-		$this->page_data['mtr'] = $this->db->get_where('mtr',array('id' => $data['mtr_id'] ))->result_array();
-		$month_year = explode('-',$this->page_data['mtr'][0]['for_month']);
-		$start_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['start_date'];
-		$end_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['end_date'];
-        $sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['mtr'][0]['toolplaza']." ,toolplaza) AND (start_date <= '".$start_date."' AND end_date >= '".$end_date."')";
-		$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
-		
-		$this->page_data['mtrid'] = $data['mtr_id'];
-		$this->page_data['page'] = 'Dashboard';
-		$this->page_data['tollplaza'] = $this->db->get_where('toolplaza',array('status' => 1,'omc'=>$this->session->userdata('omcid')))->result_array();
-		$this->page_data['chart'] = $data['chart'];
+														///////////////////////////////////////////////////////////////
+														////	/** Charts START  *////////////////////
+														///////////////////////////////////////////////////////////////
 
-		$this->page_data['revenue'] = $data['revenue'];
-		$this->page_data['custom'] = 'custom_search';
-		$this->page_data['pre_month_chart'] = $pre_month_data['chart'];
-        $this->page_data['pre_month_revenue'] = $pre_month_data['revenue'];
-        $this->page_data['pre_year_chart'] = $pre_year_data['chart'];
-		$this->page_data['pre_year_revenue'] = $pre_year_data['revenue'];
-		
-		$this->load->view('back/omccustomize_chart_search', $this->page_data);
-	}
-	public function check_dtrtollplaza_dates($tollplaza = ''){
-		$data = $this->Admin_model->get_dtrtollplaza_dates($tollplaza);
-		
-		
-		echo json_encode($data);
-	}		
-	public function getdesiredchart(){
-		if(!$this->session->userdata('adminid'))
-		{	
-			return redirect('admin/login');
-		}
-		$data = $this->Admin_model->chartdata();
-		$previous_previous_month = date("Y-m-d", strtotime( date( "Y-m-d", strtotime( @$data['chart']['month'] ) ) . "-2 month" ) );
-		//echo $previous_previous_month; exit;
-		$previous_monthDate = date("Y-m-d", strtotime( date( "Y-m-d", strtotime( @$data['chart']['month'] ) ) . "-1 month" ) );
-		$pre_pre_month_data = $this->Admin_model->get_chart_by( @$data['chart']['toolplaza_id'], $previous_previous_month);
-		$pre_month_data = $this->Admin_model->get_chart_by( @$data['chart']['toolplaza_id'], $previous_monthDate);
-		
-		$this->page_data['mtr'] = $this->db->get_where('mtr',array('id' => $data['mtr_id'] ))->result_array();
-	    $month_year = explode('-',$this->page_data['mtr'][0]['for_month']);
-		//echo "<pre>";
-		//print_r($month_year); exit;
-		$start_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['start_date'];
-		$end_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['end_date'];
-        $sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['mtr'][0]['toolplaza']." ,toolplaza) AND (start_date <= '".$start_date."' AND end_date >= '".$end_date."')";
-		$this->page_data['terrif'] = $this->db->query($sql)->result_array();
-		
-		$this->page_data['mtrid'] = $data['mtr_id'];
-		$this->page_data['plaza_id'] = $data['chart']['toolplaza_id'];
-		$this->page_data['month'] = $data['chart']['month'];
+														public function check_tollplaza_dates($tollplaza = '')
+														{
+															$data = $this->Admin_model->get_tollplaza_dates($tollplaza);
+															echo json_encode($data);
+														}
+														public function searchforchart($para1 = '')
+														{
+
+															$tollplaza = $this->input->post('tollplaza');
+															$month  = $this->input->post('formonth');
+															$data = $this->Admin_model->get_chartdata($tollplaza, $month);
+
+															$previous_year = date("Y-m-d", strtotime(@$data['chart']['month'] . ' -1 year'));
+															$previous_monthDate = date("Y-m-d", strtotime(date("Y-m-d", strtotime(@$data['chart']['month'])) . "-1 month"));
+															$pre_year_data = $this->Admin_model->get_chart_by(@$data['chart']['toolplaza_id'], $previous_year);
+
+															$pre_month_data = $this->Admin_model->get_chart_by(@$data['chart']['toolplaza_id'], $previous_monthDate);
+
+															$this->page_data['mtr'] = $this->db->get_where('mtr', array('id' => $data['mtr_id']))->result_array();
+															$month_year = explode('-', $this->page_data['mtr'][0]['for_month']);
+															$start_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['start_date'];
+															$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['end_date'];
+															$sql = "Select * From terrif Where FIND_IN_SET (" . $this->page_data['mtr'][0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
+															$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
+
+															$this->page_data['mtrid'] = $data['mtr_id'];
+															$this->page_data['page'] = 'Dashboard';
+															$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1, 'omc' => $this->session->userdata('omcid')))->result_array();
+															$this->page_data['chart'] = $data['chart'];
+
+															$this->page_data['revenue'] = $data['revenue'];
+															$this->page_data['custom'] = 'custom_search';
+															$this->page_data['pre_month_chart'] = $pre_month_data['chart'];
+															$this->page_data['pre_month_revenue'] = $pre_month_data['revenue'];
+															$this->page_data['pre_year_chart'] = $pre_year_data['chart'];
+															$this->page_data['pre_year_revenue'] = $pre_year_data['revenue'];
+
+															$this->load->view('back/omccustomize_chart_search', $this->page_data);
+														}
+														public function check_dtrtollplaza_dates($tollplaza = '')
+														{
+															$data = $this->Admin_model->get_dtrtollplaza_dates($tollplaza);
 
 
-		$this->page_data['tollplaza'] = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-		$this->page_data['chart'] = $data['chart'];
+															echo json_encode($data);
+														}
+														public function getdesiredchart()
+														{
+															if (!$this->session->userdata('adminid')) {
+																return redirect('admin/login');
+															}
+															$data = $this->Admin_model->chartdata();
+															$previous_previous_month = date("Y-m-d", strtotime(date("Y-m-d", strtotime(@$data['chart']['month'])) . "-2 month"));
+															//echo $previous_previous_month; exit;
+															$previous_monthDate = date("Y-m-d", strtotime(date("Y-m-d", strtotime(@$data['chart']['month'])) . "-1 month"));
+															$pre_pre_month_data = $this->Admin_model->get_chart_by(@$data['chart']['toolplaza_id'], $previous_previous_month);
+															$pre_month_data = $this->Admin_model->get_chart_by(@$data['chart']['toolplaza_id'], $previous_monthDate);
 
-		$this->page_data['revenue'] = $data['revenue'];
-		$this->page_data['pre_month_chart'] = $pre_month_data['chart'];
-        $this->page_data['pre_month_revenue'] = $pre_month_data['revenue'];
-        $this->page_data['pre_pre_month_chart'] = $pre_pre_month_data['chart'];
-        $this->page_data['pre_pre_month_revenue'] = $pre_pre_month_data['revenue'];
-		$this->page_data['page'] = 'Desired Chart';
-		// echo "<pre>";
-		// print_r($this->page_data); exit;
-		$this->load->view('back/omcdesired_chart', $this->page_data);
-	}
-	public function searchfordtrchart($para1 = ''){
+															$this->page_data['mtr'] = $this->db->get_where('mtr', array('id' => $data['mtr_id']))->result_array();
+															$month_year = explode('-', $this->page_data['mtr'][0]['for_month']);
+															//echo "<pre>";
+															//print_r($month_year); exit;
+															$start_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['start_date'];
+															$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['end_date'];
+															$sql = "Select * From terrif Where FIND_IN_SET (" . $this->page_data['mtr'][0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
+															$this->page_data['terrif'] = $this->db->query($sql)->result_array();
 
-		$tollplaza = $this->input->post('tollplaza');
-		$month  = $this->input->post('formonth');
-		
-		$data = $this->Admin_model->dtr_chart_tooldata_month($tollplaza, $month);
-		$this->page_data['month'] = $data['month'];
-		$this->page_data['year'] = $data['year'];
-		$this->page_data['dtr1'] = $data['dtr_first'];
-		$this->page_data['dtr2'] = $data['dtr_first'];
-		$this->page_data['page'] = 'Monthly DTR Chart';
-		$this->page_data['custom'] = 'custom_search';
-		$this->page_data['tollplaza'] = $data['tollplaza'];
-		
-		$this->load->view('back/customize_dtrchart_search', $this->page_data);
-	}	
-	public function searchfordtrmchart($para1 = ''){
+															$this->page_data['mtrid'] = $data['mtr_id'];
+															$this->page_data['plaza_id'] = $data['chart']['toolplaza_id'];
+															$this->page_data['month'] = $data['chart']['month'];
 
-		$month  = $this->input->post('formonth');
-		
-		$data = $this->Admin_model->dtrmchart_tooldata_month($month);
-		/*?> <pre> <?php echo print_r($data);  ?> </pre> <?php exit;*/
 
-		$this->page_data['month'] = $data['month'];
-		$this->page_data['year'] = $data['year'];
-		$this->page_data['dtr1'] = $data['dtr_tool_min'];
-		$this->page_data['dtr2'] = $data['dtr_tool_min'];
-		$this->page_data['page'] = 'M Traffic Chart';
-		$this->page_data['custom'] = 'custom_search';
-		$this->page_data['toll'] = $data['tollplaza'];
-		$this->page_data['toolplaza'] = $data['toolplaza'];
-		$this->load->view('back/customize_dtrmchart_search', $this->page_data);
-	}
-	public function searchfordesiredchart($para1 = ''){
+															$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+															$this->page_data['chart'] = $data['chart'];
 
-		$tollplaza = $this->input->post('tollplaza');
-		$month  = $this->input->post('formonth');
-		$data = $this->Admin_model->get_chartdata($tollplaza, $month);
-		$previous_previous_month = date("Y-m-d", strtotime( date( "Y-m-d", strtotime( @$data['chart']['month'] ) ) . "-2 month" ) );
-		//echo $previous_previous_month; exit;
-		$previous_monthDate = date("Y-m-d", strtotime( date( "Y-m-d", strtotime( @$data['chart']['month'] ) ) . "-1 month" ) );
-		$pre_pre_month_data = $this->Admin_model->get_chart_by( @$data['chart']['toolplaza_id'], $previous_previous_month);
-		
-		//$previous_year = date("Y-m-d",strtotime(@$data['chart']['month'].' -1 year'));
-		//$previous_monthDate = date("Y-m-d", strtotime( date( "Y-m-d", strtotime( @$data['chart']['month'] ) ) . "-1 month" ) );
-		//$pre_year_data = $this->Admin_model->get_chart_by( @$data['chart']['toolplaza_id'], $previous_year);
-		$pre_month_data = $this->Admin_model->get_chart_by( @$data['chart']['toolplaza_id'], $previous_monthDate);
-		
-		
-		$this->page_data['mtr'] = $this->db->get_where('mtr',array('id' => $data['mtr_id'] ))->result_array();
-		$month_year = explode('-',$this->page_data['mtr'][0]['for_month']);
-		$start_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['start_date'];
-		$end_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['end_date'];
-        $sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['mtr'][0]['toolplaza']." ,toolplaza) AND (start_date <= '".$start_date."' AND end_date >= '".$end_date."')";
-		$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
-		
-		$this->page_data['mtrid'] = $data['mtr_id'];
-		$this->page_data['page'] = 'Dashboard';
-		$this->page_data['tollplaza'] = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-		$this->page_data['chart'] = $data['chart'];
+															$this->page_data['revenue'] = $data['revenue'];
+															$this->page_data['pre_month_chart'] = $pre_month_data['chart'];
+															$this->page_data['pre_month_revenue'] = $pre_month_data['revenue'];
+															$this->page_data['pre_pre_month_chart'] = $pre_pre_month_data['chart'];
+															$this->page_data['pre_pre_month_revenue'] = $pre_pre_month_data['revenue'];
+															$this->page_data['page'] = 'Desired Chart';
+															// echo "<pre>";
+															// print_r($this->page_data); exit;
+															$this->load->view('back/omcdesired_chart', $this->page_data);
+														}
+														public function searchfordtrchart($para1 = '')
+														{
 
-		$this->page_data['revenue'] = $data['revenue'];
-		$this->page_data['custom'] = 'custom_search';
-		$this->page_data['pre_month_chart'] = $pre_month_data['chart'];
-        $this->page_data['pre_month_revenue'] = $pre_month_data['revenue'];
-        $this->page_data['pre_pre_month_chart'] = $pre_pre_month_data['chart'];
-        $this->page_data['pre_pre_month_revenue'] = $pre_pre_month_data['revenue'];
-        //echo '<pre>';
-        //print_r($this->page_data); exit;
-		$this->load->view('back/omccustomize_desiredchart_search', $this->page_data);
-	}
-	
-	///////////////////////////////////////////////////////////////
-	////	/** DTR Charts START  *////////////////////
-	///////////////////////////////////////////////////////////////
-	public function dtr_chart($para1=''){
-		if(!$this->session->userdata('adminid'))
-		{	
-			return redirect('admin/login');
-		}
-		$data = $this->Admin_model->dtr_chartdata();
-		
-		$datadtr = $this->db->select('*')->order_by('id','desc')->limit(1)->get('dtr')->result_array();
-		$date_latest = date('n', strtotime($datadtr[0]['for_date']));
-		$dtr_month_min=$this->db->where('MONTH(for_date)', $date_latest)->where('toolplaza',$datadtr[0]['toolplaza'])->order_by('for_date', 'asc')->get('dtr')->result_array();
-		$dtr_month=$this->db->where('MONTH(for_date)', $date_latest)->where('toolplaza',$datadtr[0]['toolplaza'])->order_by('for_date', 'desc')->get('dtr')->result_array();
-		$exempt = $this->db->get_where('dtr_exempt',array('dtr_id' => $datadtr[0]['id']))->result_array();
-		
-		$start_date = $dtr_month_min[0]['for_date'];
-        $end_date = $dtr_month[0]['for_date'];
-        
-		$sql = "Select * From terrif Where FIND_IN_SET (".$dtr_month_min[0]['toolplaza']." ,toolplaza) AND (start_date <= '".$start_date."' AND end_date >= '".$end_date."')";
-        $tarrif =  $this->db->query($sql)->result_array();
-		$this->page_data['dtr_month']=$data['chart']['month'];	
-		$this->page_data['plaza_id'] = $data['chart']['toolplaza_id'];
-		$this->page_data['month'] = $data['chart']['month'];
+															$tollplaza = $this->input->post('tollplaza');
+															$month  = $this->input->post('formonth');
 
-		$this->page_data['dtr'] = $dtr_month_min;
-		$this->page_data['dtrid'] = $data['dtr_id'];
-		$this->page_data['exempt'] = $this->db->get_where('dtr_exempt',array('dtr_id' => $this->page_data['dtrid']))->result_array();
-		$this->page_data['tollplaza'] = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-		$this->page_data['chart'] = $data['chart'];
-		$this->page_data['revenue'] = $data['revenue'];
-		/*?> <pre> <?php echo print_r($this->page_data); exit; ?> </pre> <?php*/
-		
-		$this->page_data['page'] = 'Monthly DTR Chart';
-				
-		$this->load->view('back/dtr_chart', $this->page_data);
-	}
-	public function dtr_chart_tool($para1=''){
-		if(!$this->session->userdata('adminid'))
-		{	
-			return redirect('admin/login');
-		}
-		$data = $this->Admin_model->dtr_chart_tooldata_asc();
-		/*$datadesc = $this->Admin_model->dtr_chart_tooldata_desc();*/
-		/*?> <pre> <?php echo print_r($data);  ?> </pre> <?php exit;*/
+															$data = $this->Admin_model->dtr_chart_tooldata_month($tollplaza, $month);
+															$this->page_data['month'] = $data['month'];
+															$this->page_data['year'] = $data['year'];
+															$this->page_data['dtr1'] = $data['dtr_first'];
+															$this->page_data['dtr2'] = $data['dtr_first'];
+															$this->page_data['page'] = 'Monthly DTR Chart';
+															$this->page_data['custom'] = 'custom_search';
+															$this->page_data['tollplaza'] = $data['tollplaza'];
 
-		$datadtr = $this->db->select('*')->order_by('id','desc')->limit(1)->get('dtr')->result_array();
-		$this->page_data['month_asc']	= $data['month'];
-		$this->page_data['tollplaza_asc'] = $data['tollplaza'];
-		/*$this->page_data['month_desc']	= $datadesc['month'];
+															$this->load->view('back/customize_dtrchart_search', $this->page_data);
+														}
+														public function searchfordtrmchart($para1 = '')
+														{
+
+															$month  = $this->input->post('formonth');
+
+															$data = $this->Admin_model->dtrmchart_tooldata_month($month);
+															/*?> <pre> <?php echo print_r($data);  ?> </pre> <?php exit;*/
+
+															$this->page_data['month'] = $data['month'];
+															$this->page_data['year'] = $data['year'];
+															$this->page_data['dtr1'] = $data['dtr_tool_min'];
+															$this->page_data['dtr2'] = $data['dtr_tool_min'];
+															$this->page_data['page'] = 'M Traffic Chart';
+															$this->page_data['custom'] = 'custom_search';
+															$this->page_data['toll'] = $data['tollplaza'];
+															$this->page_data['toolplaza'] = $data['toolplaza'];
+															$this->load->view('back/customize_dtrmchart_search', $this->page_data);
+														}
+														public function searchfordesiredchart($para1 = '')
+														{
+
+															$tollplaza = $this->input->post('tollplaza');
+															$month  = $this->input->post('formonth');
+															$data = $this->Admin_model->get_chartdata($tollplaza, $month);
+															$previous_previous_month = date("Y-m-d", strtotime(date("Y-m-d", strtotime(@$data['chart']['month'])) . "-2 month"));
+															//echo $previous_previous_month; exit;
+															$previous_monthDate = date("Y-m-d", strtotime(date("Y-m-d", strtotime(@$data['chart']['month'])) . "-1 month"));
+															$pre_pre_month_data = $this->Admin_model->get_chart_by(@$data['chart']['toolplaza_id'], $previous_previous_month);
+
+															//$previous_year = date("Y-m-d",strtotime(@$data['chart']['month'].' -1 year'));
+															//$previous_monthDate = date("Y-m-d", strtotime( date( "Y-m-d", strtotime( @$data['chart']['month'] ) ) . "-1 month" ) );
+															//$pre_year_data = $this->Admin_model->get_chart_by( @$data['chart']['toolplaza_id'], $previous_year);
+															$pre_month_data = $this->Admin_model->get_chart_by(@$data['chart']['toolplaza_id'], $previous_monthDate);
+
+
+															$this->page_data['mtr'] = $this->db->get_where('mtr', array('id' => $data['mtr_id']))->result_array();
+															$month_year = explode('-', $this->page_data['mtr'][0]['for_month']);
+															$start_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['start_date'];
+															$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['end_date'];
+															$sql = "Select * From terrif Where FIND_IN_SET (" . $this->page_data['mtr'][0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
+															$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
+
+															$this->page_data['mtrid'] = $data['mtr_id'];
+															$this->page_data['page'] = 'Dashboard';
+															$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+															$this->page_data['chart'] = $data['chart'];
+
+															$this->page_data['revenue'] = $data['revenue'];
+															$this->page_data['custom'] = 'custom_search';
+															$this->page_data['pre_month_chart'] = $pre_month_data['chart'];
+															$this->page_data['pre_month_revenue'] = $pre_month_data['revenue'];
+															$this->page_data['pre_pre_month_chart'] = $pre_pre_month_data['chart'];
+															$this->page_data['pre_pre_month_revenue'] = $pre_pre_month_data['revenue'];
+															//echo '<pre>';
+															//print_r($this->page_data); exit;
+															$this->load->view('back/omccustomize_desiredchart_search', $this->page_data);
+														}
+
+														///////////////////////////////////////////////////////////////
+														////	/** DTR Charts START  *////////////////////
+														///////////////////////////////////////////////////////////////
+														public function dtr_chart($para1 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+																return redirect('admin/login');
+															}
+															$data = $this->Admin_model->dtr_chartdata();
+
+															$datadtr = $this->db->select('*')->order_by('id', 'desc')->limit(1)->get('dtr')->result_array();
+															$date_latest = date('n', strtotime($datadtr[0]['for_date']));
+															$dtr_month_min = $this->db->where('MONTH(for_date)', $date_latest)->where('toolplaza', $datadtr[0]['toolplaza'])->order_by('for_date', 'asc')->get('dtr')->result_array();
+															$dtr_month = $this->db->where('MONTH(for_date)', $date_latest)->where('toolplaza', $datadtr[0]['toolplaza'])->order_by('for_date', 'desc')->get('dtr')->result_array();
+															$exempt = $this->db->get_where('dtr_exempt', array('dtr_id' => $datadtr[0]['id']))->result_array();
+
+															$start_date = $dtr_month_min[0]['for_date'];
+															$end_date = $dtr_month[0]['for_date'];
+
+															$sql = "Select * From terrif Where FIND_IN_SET (" . $dtr_month_min[0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
+															$tarrif =  $this->db->query($sql)->result_array();
+															$this->page_data['dtr_month'] = $data['chart']['month'];
+															$this->page_data['plaza_id'] = $data['chart']['toolplaza_id'];
+															$this->page_data['month'] = $data['chart']['month'];
+
+															$this->page_data['dtr'] = $dtr_month_min;
+															$this->page_data['dtrid'] = $data['dtr_id'];
+															$this->page_data['exempt'] = $this->db->get_where('dtr_exempt', array('dtr_id' => $this->page_data['dtrid']))->result_array();
+															$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+															$this->page_data['chart'] = $data['chart'];
+															$this->page_data['revenue'] = $data['revenue'];
+															/*?> <pre> <?php echo print_r($this->page_data); exit; ?> </pre> <?php*/
+
+															$this->page_data['page'] = 'Monthly DTR Chart';
+
+															$this->load->view('back/dtr_chart', $this->page_data);
+														}
+														public function dtr_chart_tool($para1 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+																return redirect('admin/login');
+															}
+															$data = $this->Admin_model->dtr_chart_tooldata_asc();
+															/*$datadesc = $this->Admin_model->dtr_chart_tooldata_desc();*/
+															/*?> <pre> <?php echo print_r($data);  ?> </pre> <?php exit;*/
+
+															$datadtr = $this->db->select('*')->order_by('id', 'desc')->limit(1)->get('dtr')->result_array();
+															$this->page_data['month_asc']	= $data['month'];
+															$this->page_data['tollplaza_asc'] = $data['tollplaza'];
+															/*$this->page_data['month_desc']	= $datadesc['month'];
 		$this->page_data['tollplaza_desc'] = $datadesc['tollplaza'];*/
-		
-		
-		/*?> <pre> <?php echo print_r($this->page_data); exit; ?> </pre> <?php*/
-		$this->page_data['page'] = 'M Traffic Chart';
-		$this->load->view('back/dtr_chart_tool', $this->page_data);
-	}
 
-	///////////////////////////////////////////////////////////////
-	////	/** DSR START  *////////////////////
-	///////////////////////////////////////////////////////////////
-	
-	public function dsr($para1 = '', $para2 = '', $para3 = ''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
 
-		}
-		
-		if($para1 == 'list'){
-			$count = $this->input->post('count');
-			if($count){
-				$this->page_data['show'] = $count +200;
-				$this->page_data['less'] = $count - 200;
-				$id = NULL; $tool = NULL; $limit = $count;
-				$dsr = $this->dsr_model->list_dsr_limit($id, $tool, $limit);
-				$this->page_data['dsr']  = $dsr;
-				$this->load->view('back/dsr_list', $this->page_data);
-			}
-			else{
-				$this->page_data['show'] = 400;
-				$id = NULL; $tool = NULL; $limit = 200;
-				$dsr = $this->dsr_model->list_dsr_limit($id, $tool, $limit);
-				$this->page_data['dsr']  = $dsr;
-				$this->load->view('back/dsr_list', $this->page_data);
-			}
-		}
-		elseif($para1 == 'by_tollplaza'){
-			if($para2 != ''){
-				$id = NULL;
-				$table = 'toolplaza'; $where = array('id' => $para2);
-				$toolplaza = $this->dsr_model->get_where($table, $where);
-				$tool = $toolplaza[0]['id'];
-				$dsr = $this->dsr_model->list_dsr($id, $tool);			
-				$edit['dsr']  = $dsr;
-				$this->load->view('back/dsr_list', $edit);
-			}
-			else{
-				$id = NULL; $tool = NULL;
-				$dsr = $this->dsr_model->list_dsr($id, $tool);			
-				$this->page_data['dsr']  = $dsr;
-				$this->load->view('back/dsr_list', $this->page_data);
-			}
-				
-		}
-		elseif($para1 == 'approve'){
-			$data['status'] = 1;
-			$data['updated_at'] = time();
-			$where = 'id'; $table = 'dsr_updated';
-			$this->dsr_model->update_dsr($where, $para2, $table, $data);		
-		}
-		elseif($para1 == 'disapprove'){
-			$edit['id'] = $para2;
-			$this->load->view('back/dsr_disapprove', $edit);
-		}
-		elseif($para1 == 'disapprove_do'){
-			$table = 'dsr_updated'; $where = array('id' => $para2);
-			$check = $this->dsr_model->get_where($table, $where);
-			if($check){
-				if($check[0]['status'] == 0 || $check[0]['status'] == 1){
-					if(empty($this->input->post('dissapprove_reason'))){
-						echo json_encode(array('respose' => FALSE , 'message' => 'Please add reason for dissapproving this daily site report'));exit;	
-					}
-					else{
-						$data['status'] = 2;
-						$data['updated_at'] = time();
-						$data['disapprove_reason'] = $this->input->post('dissapprove_reason');
-						$where = 'id'; $table = 'dsr_updated';
-						$this->dsr_model->update_dsr($where, $para2, $table, $data);
-						echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/dsr')); exit;
-					}
-				}
-				else{
-					echo json_encode(array('respose' => FALSE , 'message' => 'Invalid Requestee'));exit;	
-				}
-			}
-			else{
-				echo json_encode(array('respose' => FALSE , 'message' => 'Invalid Request'));exit;		
-			}
-		}
-		elseif($para1 == 'view_reason'){
-			$table = 'dsr_updated'; $where = array('id' => $para2);
-			$reason = $this->dsr_model->get_where($table, $where);
-			if($reason[0]['status'] == 2){
-				echo "<span class='text-info'>".$reason[0]['disapprove_reason']."</span>";
-			}
-			else{
-				echo "<span class='text-danger'>Invalid Request</span>";
-			}
-		}
-		elseif($para1 == 'delete'){	
-			$table = 'dsr_updated'; $where = array('id' => $para2);
-			$dsr_updated = $this->dsr_model->get_where($table, $where);
-			$id = $dsr_updated[0]['supervisor_id'];
-			$tool = $dsr_updated[0]['toolplaza_id'];
-			$this->dsr_model->delete_dsr($id, $para2);			
-		}
-		else{
-			$edit['page'] = 'dsr'; $edit['page_url'] = $edit['page'];
-			$table = 'toolplaza'; $where = array('status' => 1);
-			$edit['tollplaza'] = $this->dsr_model->get_where($table, $where);
-			$this->load->view('back/dsr', $edit);
-		}
-		
-	}
-	public function daily_site_report($para1 = ''){
-		$table = 'dsr_updated'; $where = array('id' => $para1);
-		$dsr_updated = $this->dsr_model->get_where($table, $where);
-		$id = $dsr_updated[0]['supervisor_id'];
-		$tool =  $dsr_updated[0]['toolplaza_id'];
-		
-		$page = 'R'; //CRUD Read
-		//Some data is loaded to run data into dsr variable like Staff, north, south from dsr_lane, and dsr staff tables
-		$preload_data =$this->dsr_model->sitereport_data_preload($id, $tool, $page, $para1);
-		$edit = $preload_data;	 /*?><pre> <?php echo print_r($edit);exit;*/
-		//data is loaded into dsr variable where new layout data is converted to old layout data so that it can be merged easily with older work
-		$data = $this->dsr_model->dsr_data($id, $tool, $edit,$para1);
-		$edit['dsr'] = $data['dsr'];		
-		//Some data is loaded from dsr variable
-		$data = $this->dsr_model->sitereport_data_post($edit);	
-		$edit = $data; $edit['toolplaza_id'] = $tool;
-		
-		$this->load->view('front/toolplaza/sitereport', $edit);
-	}
-	
-	///////////////////////////////////////////////////////////////
-	////	/** Plaza Staff START  *////////////////////
-	///////////////////////////////////////////////////////////////
-	
-	public function tpstaff($para1 = '', $para2 = '', $para3 = ''){
-		if(!$this->session->userdata('adminid'))
-		{
-			
-			return redirect('admin/login');
+															/*?> <pre> <?php echo print_r($this->page_data); exit; ?> </pre> <?php*/
+															$this->page_data['page'] = 'M Traffic Chart';
+															$this->load->view('back/dtr_chart_tool', $this->page_data);
+														}
 
-		}
-		if($para1 == 'list')
-		{
-			$this->page_data['tpstaff'] = $this->db->get('tpstaff')->result_array();
-			$this->load->view('back/tpstaff_list', $this->page_data);
-		}
-		elseif($para1 == 'delete')
-		{
-			$this->db->where('id', $para2);
-			$this->db->delete('tpstaff');
-		}
-		else
-		{
-			$this->page_data['page'] = 'Toll Plaza Staff';
-			$this->load->view('back/tpstaff', $this->page_data);
-		}
-		
-	}
-	public function tpstaff_add(){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+														///////////////////////////////////////////////////////////////
+														////	/** DSR START  *////////////////////
+														///////////////////////////////////////////////////////////////
 
-		}
-		$this->page_data['toolplaza'] = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-		$this->load->view('back/add_tpstaff', $this->page_data);
-	}
-	public function tpstaff_edit($para1 = ''){
-		if(!$para1){
-			echo '<div class="alert alert-dismissible alert-danger">
+														public function dsr($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+
+																return redirect('admin/login');
+															}
+
+															if ($para1 == 'list') {
+																$count = $this->input->post('count');
+																if ($count) {
+																	$this->page_data['show'] = $count + 200;
+																	$this->page_data['less'] = $count - 200;
+																	$id = NULL;
+																	$tool = NULL;
+																	$limit = $count;
+																	$dsr = $this->dsr_model->list_dsr_limit($id, $tool, $limit);
+																	$this->page_data['dsr']  = $dsr;
+																	$this->load->view('back/dsr_list', $this->page_data);
+																} else {
+																	$this->page_data['show'] = 400;
+																	$id = NULL;
+																	$tool = NULL;
+																	$limit = 200;
+																	$dsr = $this->dsr_model->list_dsr_limit($id, $tool, $limit);
+																	$this->page_data['dsr']  = $dsr;
+																	$this->load->view('back/dsr_list', $this->page_data);
+																}
+															} elseif ($para1 == 'by_tollplaza') {
+																if ($para2 != '') {
+																	$id = NULL;
+																	$table = 'toolplaza';
+																	$where = array('id' => $para2);
+																	$toolplaza = $this->dsr_model->get_where($table, $where);
+																	$tool = $toolplaza[0]['id'];
+																	$dsr = $this->dsr_model->list_dsr($id, $tool);
+																	$edit['dsr']  = $dsr;
+																	$this->load->view('back/dsr_list', $edit);
+																} else {
+																	$id = NULL;
+																	$tool = NULL;
+																	$dsr = $this->dsr_model->list_dsr($id, $tool);
+																	$this->page_data['dsr']  = $dsr;
+																	$this->load->view('back/dsr_list', $this->page_data);
+																}
+															} elseif ($para1 == 'approve') {
+																$data['status'] = 1;
+																$data['updated_at'] = time();
+																$where = 'id';
+																$table = 'dsr_updated';
+																$this->dsr_model->update_dsr($where, $para2, $table, $data);
+															} elseif ($para1 == 'disapprove') {
+																$edit['id'] = $para2;
+																$this->load->view('back/dsr_disapprove', $edit);
+															} elseif ($para1 == 'disapprove_do') {
+																$table = 'dsr_updated';
+																$where = array('id' => $para2);
+																$check = $this->dsr_model->get_where($table, $where);
+																if ($check) {
+																	if ($check[0]['status'] == 0 || $check[0]['status'] == 1) {
+																		if (empty($this->input->post('dissapprove_reason'))) {
+																			echo json_encode(array('respose' => FALSE, 'message' => 'Please add reason for dissapproving this daily site report'));
+																			exit;
+																		} else {
+																			$data['status'] = 2;
+																			$data['updated_at'] = time();
+																			$data['disapprove_reason'] = $this->input->post('dissapprove_reason');
+																			$where = 'id';
+																			$table = 'dsr_updated';
+																			$this->dsr_model->update_dsr($where, $para2, $table, $data);
+																			echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/dsr'));
+																			exit;
+																		}
+																	} else {
+																		echo json_encode(array('respose' => FALSE, 'message' => 'Invalid Requestee'));
+																		exit;
+																	}
+																} else {
+																	echo json_encode(array('respose' => FALSE, 'message' => 'Invalid Request'));
+																	exit;
+																}
+															} elseif ($para1 == 'view_reason') {
+																$table = 'dsr_updated';
+																$where = array('id' => $para2);
+																$reason = $this->dsr_model->get_where($table, $where);
+																if ($reason[0]['status'] == 2) {
+																	echo "<span class='text-info'>" . $reason[0]['disapprove_reason'] . "</span>";
+																} else {
+																	echo "<span class='text-danger'>Invalid Request</span>";
+																}
+															} elseif ($para1 == 'delete') {
+																$table = 'dsr_updated';
+																$where = array('id' => $para2);
+																$dsr_updated = $this->dsr_model->get_where($table, $where);
+																$id = $dsr_updated[0]['supervisor_id'];
+																$tool = $dsr_updated[0]['toolplaza_id'];
+																$this->dsr_model->delete_dsr($id, $para2);
+															} else {
+																$edit['page'] = 'dsr';
+																$edit['page_url'] = $edit['page'];
+																$table = 'toolplaza';
+																$where = array('status' => 1);
+																$edit['tollplaza'] = $this->dsr_model->get_where($table, $where);
+																$this->load->view('back/dsr', $edit);
+															}
+														}
+														public function daily_site_report($para1 = '')
+														{
+															$table = 'dsr_updated';
+															$where = array('id' => $para1);
+															$dsr_updated = $this->dsr_model->get_where($table, $where);
+															$id = $dsr_updated[0]['supervisor_id'];
+															$tool =  $dsr_updated[0]['toolplaza_id'];
+
+															$page = 'R'; //CRUD Read
+															//Some data is loaded to run data into dsr variable like Staff, north, south from dsr_lane, and dsr staff tables
+															$preload_data = $this->dsr_model->sitereport_data_preload($id, $tool, $page, $para1);
+															$edit = $preload_data;	 /*?><pre> <?php echo print_r($edit);exit;*/
+															//data is loaded into dsr variable where new layout data is converted to old layout data so that it can be merged easily with older work
+															$data = $this->dsr_model->dsr_data($id, $tool, $edit, $para1);
+															$edit['dsr'] = $data['dsr'];
+															//Some data is loaded from dsr variable
+															$data = $this->dsr_model->sitereport_data_post($edit);
+															$edit = $data;
+															$edit['toolplaza_id'] = $tool;
+
+															$this->load->view('front/toolplaza/sitereport', $edit);
+														}
+
+														///////////////////////////////////////////////////////////////
+														////	/** Plaza Staff START  *////////////////////
+														///////////////////////////////////////////////////////////////
+
+														public function tpstaff($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$this->page_data['tpstaff'] = $this->db->get('tpstaff')->result_array();
+																$this->load->view('back/tpstaff_list', $this->page_data);
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('tpstaff');
+															} else {
+																$this->page_data['page'] = 'Toll Plaza Staff';
+																$this->load->view('back/tpstaff', $this->page_data);
+															}
+														}
+														public function tpstaff_add()
+														{
+															if (!$this->session->userdata('adminid')) {
+
+																return redirect('admin/login');
+															}
+															$this->page_data['toolplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+															$this->load->view('back/add_tpstaff', $this->page_data);
+														}
+														public function tpstaff_edit($para1 = '')
+														{
+															if (!$para1) {
+																echo '<div class="alert alert-dismissible alert-danger">
   					<button type="button" class="close" data-dismiss="alert">&times;</button>
   					<strong>OOPS!</strong> Invalid Request
-					</div>'; exit;
+					</div>';
+																exit;
+															}
+															$this->page_data['tpstaff'] = $this->db->get_where('tpstaff', array('id' => $para1))->result_array();
+															$this->page_data['toolplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+															$this->load->view('back/edit_tpstaff', $this->page_data);
+														}
+														public function tpstaff_add_do()
+														{ {
+																if (!$this->session->userdata('adminid')) {
 
-		}
-		$this->page_data['tpstaff'] = $this->db->get_where('tpstaff',array('id' => $para1))->result_array();
-		$this->page_data['toolplaza'] = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-		$this->load->view('back/edit_tpstaff', $this->page_data);
-	}
-   	public function tpstaff_add_do(){
-		{
-		if(!$this->session->userdata('adminid')){
-			
-			echo json_encode(array('respose' => FALSE , 'message' => "Please Login to continue"));exit;
+																	echo json_encode(array('respose' => FALSE, 'message' => "Please Login to continue"));
+																	exit;
+																}
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('first_name', 'First name', 'required|trim');
+																$this->form_validation->set_rules('last_name', 'Last Name', 'required|trim');
+																$this->form_validation->set_rules('toolplaza', 'Tool Plaza', 'required|trim');
+																$this->form_validation->set_rules('designation', 'Designation', 'required|trim');
+																$this->form_validation->set_rules('contact', 'Contact', 'required|trim');
+																if ($this->form_validation->run() == TRUE) {
+																	$data = array(
+																		'tollplaza' 	=> $this->input->post('toolplaza'),
+																		'fname' 		=> $this->input->post('first_name'),
+																		'lname' 		=> $this->input->post('last_name'),
+																		'designation' 	=> $this->input->post('designation'),
+																		'contact' 		=> $this->input->post('contact'),
+																	);
+																	$this->db->insert('tpstaff', $data);
+																	echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/tpstaff'));
+																	exit;
+																} else {
 
-		}
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('first_name','First name','required|trim');
-		$this->form_validation->set_rules('last_name','Last Name','required|trim');
-		$this->form_validation->set_rules('toolplaza','Tool Plaza','required|trim');
-		$this->form_validation->set_rules('designation','Designation','required|trim');
-		$this->form_validation->set_rules('contact','Contact','required|trim');
-		if($this->form_validation->run() == TRUE){
-			$data = array(
-					'tollplaza' 	=> $this->input->post('toolplaza'),
-					'fname' 		=> $this->input->post('first_name'),
-					'lname' 		=> $this->input->post('last_name'),
-					'designation' 	=> $this->input->post('designation'),
-					'contact' 		=> $this->input->post('contact'),
-				);
-			$this->db->insert('tpstaff', $data);
-			echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/tpstaff')); exit;
-		}else{
+																	echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																	exit;
+																}
+															}
+														}
+														public function edit_tpstaff_do($staff_id = '')
+														{
+															if (!$staff_id) {
+																echo json_encode(array('response' => TRUE, 'message' => 'Invalid Request'));
+																exit;
+															}
 
-			echo json_encode(array('respose' => FALSE , 'message' => validation_errors()));exit;
-		}
-	}
-	}
-	public function edit_tpstaff_do($staff_id = ''){
-		if(!$staff_id){
-			echo json_encode(array('response' => TRUE , 'message' => 'Invalid Request')); exit;
-		}
+															if (!$this->session->userdata('adminid')) {
 
-		if(!$this->session->userdata('adminid')){
-			
-			echo json_encode(array('respose' => FALSE , 'message' => "Please Login to continue"));exit;
+																echo json_encode(array('respose' => FALSE, 'message' => "Please Login to continue"));
+																exit;
+															}
+															$this->load->library('form_validation');
+															$this->form_validation->set_rules('first_name', 'First name', 'required|trim');
+															$this->form_validation->set_rules('last_name', 'Last Name', 'required|trim');
 
-		}
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('first_name','First name','required|trim');
-		$this->form_validation->set_rules('last_name','Last Name','required|trim');
-		
-		$this->form_validation->set_rules('toolplaza','Tool Plaza','required|trim');
-		$this->form_validation->set_rules('designation','Designation','required|trim');
-		$this->form_validation->set_rules('contact','Contact','required|trim');
-		if($this->form_validation->run() == TRUE){
-			 $this->db->where('fname' , $this->input->post('first_name'));
-			 $this->db->where('lname' , $this->input->post('last_name'));
-			 $this->db->where('designation' , $this->input->post('designation'));
-			 $this->db->where('id != ', $staff_id,FALSE);
-			 $check_id = $this->db->get('tpstaff')->result_array();
-			 if($check_id){
-			 	echo json_encode(array('respose' => FALSE , 'message' => 'This Staff Member already exists'));exit;
+															$this->form_validation->set_rules('toolplaza', 'Tool Plaza', 'required|trim');
+															$this->form_validation->set_rules('designation', 'Designation', 'required|trim');
+															$this->form_validation->set_rules('contact', 'Contact', 'required|trim');
+															if ($this->form_validation->run() == TRUE) {
+																$this->db->where('fname', $this->input->post('first_name'));
+																$this->db->where('lname', $this->input->post('last_name'));
+																$this->db->where('designation', $this->input->post('designation'));
+																$this->db->where('id != ', $staff_id, FALSE);
+																$check_id = $this->db->get('tpstaff')->result_array();
+																if ($check_id) {
+																	echo json_encode(array('respose' => FALSE, 'message' => 'This Staff Member already exists'));
+																	exit;
+																}
+																$data = array(
 
-			 }
-			$data = array(
-					
-					'fname' 	=> $this->input->post('first_name'),
-					'lname' 	=> $this->input->post('last_name'),
-					'tollplaza' => $this->input->post('toolplaza'),
-					'designation' => $this->input->post('designation'),
-					'contact' => $this->input->post('contact')
-				);
-			$this->db->where('id', $staff_id);
-			$this->db->update('tpstaff', $data);
-			echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/tpstaff')); exit;
-		}else{
+																	'fname' 	=> $this->input->post('first_name'),
+																	'lname' 	=> $this->input->post('last_name'),
+																	'tollplaza' => $this->input->post('toolplaza'),
+																	'designation' => $this->input->post('designation'),
+																	'contact' => $this->input->post('contact')
+																);
+																$this->db->where('id', $staff_id);
+																$this->db->update('tpstaff', $data);
+																echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/tpstaff'));
+																exit;
+															} else {
 
-			echo json_encode(array('respose' => FALSE , 'message' => validation_errors()));exit;
-		}
+																echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																exit;
+															}
+														}
 
-	}	
+														///////////////////////////////////////////////////////////////
+														////	/** TollPlaza START  *////////////////////
+														///////////////////////////////////////////////////////////////
 
-	///////////////////////////////////////////////////////////////
-	////	/** TollPlaza START  *////////////////////
-	///////////////////////////////////////////////////////////////
-	
-	public function tollplaza($para1 = '' , $para2 = '', $para3 =''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+														public function tollplaza($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
 
-		}
-		if($para1 == 'list'){
-			$this->page_data['toolplza'] = $this->db->get('toolplaza')->result_array();
-			$this->load->view('back/toolplaza_list', $this->page_data);
-			
-		}elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('toolplaza');
-		}elseif ($para1 == 'tp_publish_set') {
-            $article = $para2;
-            if ($para3 == 'true') {
-                $data['status'] = '1';
-            } else {
-                $data['status'] = '0';
-            }
-            $this->db->where('id', $article);
-            $this->db->update('toolplaza', $data);
-           echo $para3;
-        }elseif ($para1 == 'gm_publish_set') {
-            $plaza = $para2;
-            if ($para3 == 'true') {
-                $data['google_map_status'] = '1';
-            } else {
-                $data['google_map_status'] = '0';
-            }
-            $this->db->where('id', $plaza);
-            $this->db->update('toolplaza', $data);
-			
-           echo $para3;
-        }else{
-        	$this->page_data['page'] = 'Tollplaza';
-			$this->load->view('back/tooolplaza', $this->page_data);
-		}
-		
-		
-	}
-	public function toolplaza_add(){
-		if(!$this->session->userdata('adminid')){
-			return redirect('admin/login');
-		}
-		$this->load->view('back/add_toolplaza');
-	}
-	public function add_plaza_do(){
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$this->page_data['toolplza'] = $this->db->get('toolplaza')->result_array();
+																$this->load->view('back/toolplaza_list', $this->page_data);
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('toolplaza');
+															} elseif ($para1 == 'tp_publish_set') {
+																$article = $para2;
+																if ($para3 == 'true') {
+																	$data['status'] = '1';
+																} else {
+																	$data['status'] = '0';
+																}
+																$this->db->where('id', $article);
+																$this->db->update('toolplaza', $data);
+																echo $para3;
+															} elseif ($para1 == 'gm_publish_set') {
+																$plaza = $para2;
+																if ($para3 == 'true') {
+																	$data['google_map_status'] = '1';
+																} else {
+																	$data['google_map_status'] = '0';
+																}
+																$this->db->where('id', $plaza);
+																$this->db->update('toolplaza', $data);
 
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('toolplazaname',' Tool Plaza Name','required|trim');
-		if($this->form_validation->run() == TRUE){
-			$data = array(
-				'name' => $this->input->post('toolplazaname'),
-				'status' => 0
-				);
-			$this->db->insert('toolplaza',$data);
-			echo json_encode(array('response' => true, 'message' => 'Tool Plaza Added Successfully','is_redirect' => True,'redirect_url' => base_url().'admin/tollplaza')); exit;
-		}else{
+																echo $para3;
+															} else {
+																$this->page_data['page'] = 'Tollplaza';
+																$this->load->view('back/tooolplaza', $this->page_data);
+															}
+														}
+														public function toolplaza_add()
+														{
+															if (!$this->session->userdata('adminid')) {
+																return redirect('admin/login');
+															}
+															$this->load->view('back/add_toolplaza');
+														}
+														public function add_plaza_do()
+														{
 
-			echo json_encode(array('response' => TRUE , 'message' => validation_errors())); exit;
+															$this->load->library('form_validation');
+															$this->form_validation->set_rules('toolplazaname', ' Tool Plaza Name', 'required|trim');
+															if ($this->form_validation->run() == TRUE) {
+																$data = array(
+																	'name' => $this->input->post('toolplazaname'),
+																	'status' => 0
+																);
+																$this->db->insert('toolplaza', $data);
+																echo json_encode(array('response' => true, 'message' => 'Tool Plaza Added Successfully', 'is_redirect' => True, 'redirect_url' => base_url() . 'admin/tollplaza'));
+																exit;
+															} else {
 
-		}
-	}
-	public function toolplaza_edit($para1 = ''){
-		if(!$para1){
-			echo '<div class="alert alert-dismissible alert-danger">
+																echo json_encode(array('response' => TRUE, 'message' => validation_errors()));
+																exit;
+															}
+														}
+														public function toolplaza_edit($para1 = '')
+														{
+															if (!$para1) {
+																echo '<div class="alert alert-dismissible alert-danger">
   				<button type="button" class="close" data-dismiss="alert">&times;</button>
   				<strong>OOPS!</strong> Invalid Request
-				</div>'; exit;
+				</div>';
+																exit;
+															}
+															$this->page_data['toolplza'] = $this->db->get_where('toolplaza', array('id' => $para1))->result_array();
+															$this->load->view('back/edit_toolplaza', $this->page_data);
+														}
+														public function edit_plaza_do($plaza_id = '')
+														{
+															if (!$plaza_id) {
+																echo json_encode(array('response' => TRUE, 'message' => 'Invalid Request'));
+																exit;
+															}
+															$this->load->library('form_validation');
+															$this->form_validation->set_rules('toolplazaname', ' Tool Plaza Name', 'required|trim');
+															if ($this->form_validation->run() == TRUE) {
+																$data['name'] = $this->input->post('toolplazaname');
+																$this->db->where('id', $plaza_id);
+																$this->db->update('toolplaza', $data);
+																echo json_encode(array('response' => true, 'message' => 'Tool plaza updated successfully', 'is_redirect' => True, 'redirect_url' => base_url() . 'admin/tollplaza'));
+																exit;
+															} else {
 
-		}
-		$this->page_data['toolplza'] = $this->db->get_where('toolplaza',array('id' => $para1))->result_array();
-		$this->load->view('back/edit_toolplaza', $this->page_data);
-	}
-	public function edit_plaza_do($plaza_id = ''){
-		if(!$plaza_id){
-			echo json_encode(array('response' => TRUE , 'message' => 'Invalid Request')); exit;
-		}
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('toolplazaname',' Tool Plaza Name','required|trim');
-		if($this->form_validation->run() == TRUE){
-			$data['name'] = $this->input->post('toolplazaname');
-			$this->db->where('id',$plaza_id);
-			$this->db->update('toolplaza',$data);
-				echo json_encode(array('response' => true, 'message' => 'Tool plaza updated successfully','is_redirect' => True,'redirect_url' => base_url().'admin/tollplaza')); exit;
-			}else{
+																echo json_encode(array('response' => TRUE, 'message' => validation_errors()));
+																exit;
+															}
+														}
 
-				echo json_encode(array('response' => TRUE , 'message' => validation_errors())); exit;
+														///////////////////////////////////////////////////////////////
+														////	/** Supervisor START  *////////////////////
+														///////////////////////////////////////////////////////////////
 
-		}
-	}
+														public function toolplaza_supervisor($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
 
-	///////////////////////////////////////////////////////////////
-	////	/** Supervisor START  *////////////////////
-	///////////////////////////////////////////////////////////////
-	
-	public function toolplaza_supervisor($para1 = '' , $para2 = '', $para3 = ''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$this->page_data['supervisor'] = $this->db->get('tpsupervisor')->result_array();
+																$this->load->view('back/toolplaza_supervisor_list', $this->page_data);
+															} elseif ($para1 == 'tps_publish_set') {
+																$article = $para2;
+																if ($para3 == 'true') {
+																	$data['status'] = '1';
+																} else {
+																	$data['status'] = '0';
+																}
+																$this->db->where('id', $article);
+																$this->db->update('tpsupervisor', $data);
 
-		}
-		if($para1 == 'list'){
-			$this->page_data['supervisor'] = $this->db->get('tpsupervisor')->result_array();
-			$this->load->view('back/toolplaza_supervisor_list', $this->page_data);
+																echo $para3;
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('tpsupervisor');
+															} else {
+																$this->page_data['page'] = 'Toll Plaza Supervisor';
+																$this->load->view('back/tp_supervisor', $this->page_data);
+															}
+														}
+														public function toolplaza_supervisor_add()
+														{
+															if (!$this->session->userdata('adminid')) {
+																return redirect('admin/login');
+															}
+															$this->page_data['toolplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+															$this->load->model('Inventory_model');
+															$this->page_data['sites'] = $this->Inventory_model->getsites();
+															$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
+															$this->load->view('back/add_tpsupervisor', $this->page_data);
+														}
+														public function add_tpsupervisor_do()
+														{
+															if (!$this->session->userdata('adminid')) {
 
-		}elseif ($para1 == 'tps_publish_set') {
-            $article = $para2;
-            if ($para3 == 'true') {
-                $data['status'] = '1';
-            } else {
-                $data['status'] = '0';
-            }
-            $this->db->where('id', $article);
-            $this->db->update('tpsupervisor', $data);
-			
-           echo $para3;
-        }elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('tpsupervisor');
-		}else{
-			$this->page_data['page'] = 'Toll Plaza Supervisor';
-			$this->load->view('back/tp_supervisor', $this->page_data);
-		}
+																echo json_encode(array('respose' => FALSE, 'message' => "Please Login to continue"));
+																exit;
+															}
+															$this->load->library('form_validation');
+															$this->form_validation->set_rules('first_name', 'First name', 'required|trim');
+															$this->form_validation->set_rules('last_name', 'Last Name', 'required|trim');
+															$this->form_validation->set_rules('username', 'Username', 'required|trim|is_unique[tpsupervisor.username]');
+															$this->form_validation->set_rules('Password', 'Password', 'required|trim');
+															$this->form_validation->set_rules('role', 'Role', 'required|trim');
+															$this->form_validation->set_rules('toolplaza', 'Tool Plaza', 'required|trim');
+															$this->form_validation->set_rules('tsp_id', 'TSP Name', 'required|trim');
+															$this->form_validation->set_rules('site_id', 'Site Name', 'required|trim');
+															$this->form_validation->set_rules('contact', 'Contact', 'required|trim');
+															if ($this->form_validation->run() == TRUE) {
+																$data = array(
+																	'tollplaza' => $this->input->post('toolplaza'),
+																	'role' 		=> $this->input->post('role'),
+																	'tsp' 		=> $this->input->post('tsp_id'),
+																	'site'		=> $this->input->post('site_id'),
+																	'fname' 	=> $this->input->post('first_name'),
+																	'lname' 	=> $this->input->post('last_name'),
+																	'username' 	=> $this->input->post('username'),
+																	'password'  => sha1($this->input->post('Password')),
+																	'contact' 	=> $this->input->post('contact'),
+																	'adddate'   => time(),
+																	'status' 	=> 0
+																);
+																$this->db->insert('tpsupervisor', $data);
+																echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/toolplaza_supervisor'));
+																exit;
+															} else {
 
-	}
-	public function toolplaza_supervisor_add(){
-		if(!$this->session->userdata('adminid'))
-		{
-			return redirect('admin/login');
-		}
-		$this->page_data['toolplaza'] = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-		$this->load->model('Inventory_model');
-		$this->page_data['sites'] = $this->Inventory_model->getsites();
-		$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
-		$this->load->view('back/add_tpsupervisor', $this->page_data);
-	}
-	public function add_tpsupervisor_do(){
-		if(!$this->session->userdata('adminid')){
-			
-			echo json_encode(array('respose' => FALSE , 'message' => "Please Login to continue"));exit;
-
-		}
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('first_name','First name','required|trim');
-		$this->form_validation->set_rules('last_name','Last Name','required|trim');
-		$this->form_validation->set_rules('username','Username','required|trim|is_unique[tpsupervisor.username]');
-		$this->form_validation->set_rules('Password','Password','required|trim');
-		$this->form_validation->set_rules('role','Role','required|trim');
-		$this->form_validation->set_rules('toolplaza','Tool Plaza','required|trim');
-		$this->form_validation->set_rules('tsp_id','TSP Name','required|trim');
-		$this->form_validation->set_rules('site_id','Site Name','required|trim');
-		$this->form_validation->set_rules('contact','Contact','required|trim');
-		if($this->form_validation->run() == TRUE){
-			$data = array(
-					'tollplaza' => $this->input->post('toolplaza'),
-					'role' 		=> $this->input->post('role'),
-					'tsp' 		=> $this->input->post('tsp_id'),
-					'site'		=> $this->input->post('site_id'),
-					'fname' 	=> $this->input->post('first_name'),
-					'lname' 	=> $this->input->post('last_name'),
-					'username' 	=> $this->input->post('username'),
-					'password'  => sha1($this->input->post('Password')),
-					'contact' 	=> $this->input->post('contact'),
-					'adddate'   => time(),
-					'status' 	=> 0
-				);
-			$this->db->insert('tpsupervisor', $data);
-			echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/toolplaza_supervisor')); exit;
-		}else{
-
-			echo json_encode(array('respose' => FALSE , 'message' => validation_errors()));exit;
-		}
-	}
-	public function toolplaza_supervisor_edit($para1 = ''){
-		if(!$para1){
-			echo '<div class="alert alert-dismissible alert-danger">
+																echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																exit;
+															}
+														}
+														public function toolplaza_supervisor_edit($para1 = '')
+														{
+															if (!$para1) {
+																echo '<div class="alert alert-dismissible alert-danger">
   					<button type="button" class="close" data-dismiss="alert">&times;</button>
   					<strong>OOPS!</strong> Invalid Request
-					</div>'; exit;
+					</div>';
+																exit;
+															}
+															$this->page_data['supervisor'] = $this->db->get_where('tpsupervisor', array('id' => $para1))->result_array();
+															$this->page_data['toolplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+															$this->load->model('Inventory_model');
+															$this->page_data['sites'] = $this->Inventory_model->getsites();
+															$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
+															$this->load->view('back/edit_tpsupervisor', $this->page_data);
+														}
+														public function edit_tpsupervisor_do($supervisor_id = '')
+														{
+															if (!$supervisor_id) {
+																echo json_encode(array('response' => TRUE, 'message' => 'Invalid Request'));
+																exit;
+															}
 
-		}
-		$this->page_data['supervisor'] = $this->db->get_where('tpsupervisor',array('id' => $para1))->result_array();
-		$this->page_data['toolplaza'] = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-		$this->load->model('Inventory_model');
-		$this->page_data['sites'] = $this->Inventory_model->getsites();
-		$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
-		$this->load->view('back/edit_tpsupervisor', $this->page_data);
-	}
-	public function edit_tpsupervisor_do($supervisor_id = '')	{
-		if(!$supervisor_id){
-			echo json_encode(array('response' => TRUE , 'message' => 'Invalid Request')); exit;
-		}
+															if (!$this->session->userdata('adminid')) {
 
-		if(!$this->session->userdata('adminid')){
-			
-			echo json_encode(array('respose' => FALSE , 'message' => "Please Login to continue"));exit;
+																echo json_encode(array('respose' => FALSE, 'message' => "Please Login to continue"));
+																exit;
+															}
+															$this->load->library('form_validation');
+															$this->form_validation->set_rules('first_name', 'First name', 'required|trim');
+															$this->form_validation->set_rules('last_name', 'Last Name', 'required|trim');
+															$this->form_validation->set_rules('username', 'User Name', 'required|trim');
+															$this->form_validation->set_rules('toolplaza', 'Tool Plaza', 'required|trim');
+															$this->form_validation->set_rules('role', 'Role', 'required|trim');
+															$this->form_validation->set_rules('contact', 'Contact', 'required|trim');
+															$this->form_validation->set_rules('tsp_id', 'TSP Name', 'required|trim');
+															$this->form_validation->set_rules('site_id', 'Site Name', 'required|trim');
+															if ($this->form_validation->run() == TRUE) {
+																$this->db->where('username', $this->input->post('username'));
+																$this->db->where('id != ', $supervisor_id, FALSE);
+																$check_email = $this->db->get('tpsupervisor')->result_array();
+																if ($check_email) {
+																	echo json_encode(array('respose' => FALSE, 'message' => 'This Username address already exists'));
+																	exit;
+																}
+																$data = array(
+																	'tollplaza' => $this->input->post('toolplaza'),
+																	'fname' 	=> $this->input->post('first_name'),
+																	'lname' 	=> $this->input->post('last_name'),
+																	'username' 	=> $this->input->post('username'),
+																	'role' 		=> $this->input->post('role'),
+																	'contact' 	=> $this->input->post('contact'),
+																	'tsp' 		=> $this->input->post('tsp_id'),
+																	'site' 		=> $this->input->post('site_id'),
+																	'adddate'   => time(),
+																	'status' 	=> 0
+																);
+																$this->db->where('id', $supervisor_id);
+																$this->db->update('tpsupervisor', $data);
+																echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/toolplaza_supervisor'));
+																exit;
+															} else {
 
-		}
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('first_name','First name','required|trim');
-		$this->form_validation->set_rules('last_name','Last Name','required|trim');
-		$this->form_validation->set_rules('username','User Name','required|trim');
-		$this->form_validation->set_rules('toolplaza','Tool Plaza','required|trim');
-		$this->form_validation->set_rules('role','Role','required|trim');
-		$this->form_validation->set_rules('contact','Contact','required|trim');
-		$this->form_validation->set_rules('tsp_id','TSP Name','required|trim');
-		$this->form_validation->set_rules('site_id','Site Name','required|trim');
-		if($this->form_validation->run() == TRUE){
-			 $this->db->where('username' , $this->input->post('username'));
-			 $this->db->where('id != ', $supervisor_id,FALSE);
-			 $check_email = $this->db->get('tpsupervisor')->result_array();
-			 if($check_email){
-			 	echo json_encode(array('respose' => FALSE , 'message' => 'This Username address already exists'));exit;
-
-			 }
-			$data = array(
-					'tollplaza' => $this->input->post('toolplaza'),
-					'fname' 	=> $this->input->post('first_name'),
-					'lname' 	=> $this->input->post('last_name'),
-					'username' 	=> $this->input->post('username'),
-					'role' 		=> $this->input->post('role'),
-					'contact' 	=> $this->input->post('contact'),
-					'tsp' 		=> $this->input->post('tsp_id'),
-					'site' 		=> $this->input->post('site_id'),
-					'adddate'   => time(),
-					'status' 	=> 0
-				);
-			$this->db->where('id', $supervisor_id);
-			$this->db->update('tpsupervisor', $data);
-			echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/toolplaza_supervisor')); exit;
-		}else{
-
-			echo json_encode(array('respose' => FALSE , 'message' => validation_errors()));exit;
-		}
-
-	}
-	public function toolplaza_supervisor_password($para1 = ''){
-		if(!$para1){
-			echo '<div class="alert alert-dismissible alert-danger">
+																echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																exit;
+															}
+														}
+														public function toolplaza_supervisor_password($para1 = '')
+														{
+															if (!$para1) {
+																echo '<div class="alert alert-dismissible alert-danger">
   				<button type="button" class="close" data-dismiss="alert">&times;</button>
   				<strong>OOPS!</strong> Invalid Request
-				</div>'; exit;
+				</div>';
+																exit;
+															}
+															$this->page_data['supervisor_id'] = $this->db->get_where('tpsupervisor', array('id' => $para1))->row()->id;
+															$this->load->view('back/supervisor_password', $this->page_data);
+														}
+														public function update_tpsupervisor_password($supervisor_id = '')
+														{
+															if (!$this->session->userdata('adminid')) {
 
-		}
-		$this->page_data['supervisor_id'] = $this->db->get_where('tpsupervisor',array('id' => $para1))->row()->id;
-		$this->load->view('back/supervisor_password' , $this->page_data);
-	}
-	public function update_tpsupervisor_password($supervisor_id = ''){
-		if(!$this->session->userdata('adminid')){
-			
-			echo json_encode(array('respose' => FALSE , 'message' => "Please Login to continue"));exit;
+																echo json_encode(array('respose' => FALSE, 'message' => "Please Login to continue"));
+																exit;
+															}
+															if (!$supervisor_id) {
+																echo json_encode(array('response' => TRUE, 'message' => 'Invalid Request'));
+																exit;
+															}
+															$this->load->library('form_validation');
+															$this->form_validation->set_rules('password', 'Password', 'required|trim');
+															$this->form_validation->set_rules('password_confirm', 'Confirm Password', 'required|matches[password]');
+															if ($this->form_validation->run() == TRUE) {
 
-		}
-		if(!$supervisor_id){
-			echo json_encode(array('response' => TRUE , 'message' => 'Invalid Request')); exit;
-		}
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('password','Password','required|trim');
-		$this->form_validation->set_rules('password_confirm', 'Confirm Password', 'required|matches[password]');
-		if($this->form_validation->run() == TRUE){
-			 
-			$data = array(
-					'password' 	=> sha1($this->input->post('password'))
-				);
-			$this->db->where('id', $supervisor_id);
-			$this->db->update('tpsupervisor', $data);
-			echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/toolplaza_supervisor')); exit;
-		}else{
+																$data = array(
+																	'password' 	=> sha1($this->input->post('password'))
+																);
+																$this->db->where('id', $supervisor_id);
+																$this->db->update('tpsupervisor', $data);
+																echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/toolplaza_supervisor'));
+																exit;
+															} else {
 
-			echo json_encode(array('respose' => FALSE , 'message' => validation_errors()));exit;
-		}
+																echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																exit;
+															}
+														}
 
-	}
-	
-	///////////////////////////////////////////////////////////////
-	////	/** Member START  *////////////////////
-	///////////////////////////////////////////////////////////////
-	
-	public function member($para1 = '' , $para2 = '', $para3 = ''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+														///////////////////////////////////////////////////////////////
+														////	/** Member START  *////////////////////
+														///////////////////////////////////////////////////////////////
 
-		}
-		if($para1 == 'list'){
-			$this->page_data['supervisor'] = $this->db->get('member')->result_array();
-			$this->load->view('back/member_list', $this->page_data);
+														public function member($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
 
-		}elseif ($para1 == 'tps_publish_set') {
-            $article = $para2;
-            if ($para3 == 'true') {
-                $data['status'] = '1';
-            } else {
-                $data['status'] = '0';
-            }
-            $this->db->where('id', $article);
-            $this->db->update('member', $data);
-			
-           echo $para3;
-        }elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('member');
-		}else{
-			$this->page_data['page'] = 'Member';
-			$this->load->view('back/member', $this->page_data);
-		}
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$this->page_data['supervisor'] = $this->db->get('member')->result_array();
+																$this->load->view('back/member_list', $this->page_data);
+															} elseif ($para1 == 'tps_publish_set') {
+																$article = $para2;
+																if ($para3 == 'true') {
+																	$data['status'] = '1';
+																} else {
+																	$data['status'] = '0';
+																}
+																$this->db->where('id', $article);
+																$this->db->update('member', $data);
 
-	}
-	public function member_add(){
-		$this->load->model('Inventory_model');
-		$this->page_data['sites'] = $this->Inventory_model->getsites();
-		$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
-		$this->load->view('back/add_member', $this->page_data);
+																echo $para3;
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('member');
+															} else {
+																$this->page_data['page'] = 'Member';
+																$this->load->view('back/member', $this->page_data);
+															}
+														}
+														public function member_add()
+														{
+															$this->load->model('Inventory_model');
+															$this->page_data['sites'] = $this->Inventory_model->getsites();
+															$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
+															$this->load->view('back/add_member', $this->page_data);
+														}
+														public function add_member_do()
+														{
 
-	}
-	public function add_member_do(){
+															if (!$this->session->userdata('adminid')) {
 
-		if(!$this->session->userdata('adminid')){
-			
-			echo json_encode(array('respose' => FALSE , 'message' => "Please Login to continue"));exit;
+																echo json_encode(array('respose' => FALSE, 'message' => "Please Login to continue"));
+																exit;
+															}
+															$this->load->library('form_validation');
+															$this->form_validation->set_rules('first_name', 'First name', 'required|trim');
+															$this->form_validation->set_rules('last_name', 'Last Name', 'required|trim');
+															$this->form_validation->set_rules('username', 'Username', 'required|trim|is_unique[member.username]');
+															$this->form_validation->set_rules('Password', 'Password', 'required|trim');
+															$this->form_validation->set_rules('contact', 'Contact', 'required|trim');
+															$this->form_validation->set_rules('tsp_id', 'TSP Name', 'required|trim');
+															$this->form_validation->set_rules('site_id', 'Site Name', 'required|trim');
+															if ($this->form_validation->run() == TRUE) {
+																$data = array(
+																	'fname' 	=> $this->input->post('first_name'),
+																	'lname' 	=> $this->input->post('last_name'),
+																	'username' 	=> $this->input->post('username'),
+																	'password'  => sha1($this->input->post('Password')),
+																	'contact' => $this->input->post('contact'),
+																	'tsp' => $this->input->post('tsp_id'),
+																	'site' => $this->input->post('site_id'),
+																	'adddate'   => time(),
+																	'status' 	=> 0
+																);
+																$this->db->insert('member', $data);
+																echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/member'));
+																exit;
+															} else {
 
-		}
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('first_name','First name','required|trim');
-		$this->form_validation->set_rules('last_name','Last Name','required|trim');
-		$this->form_validation->set_rules('username','Username','required|trim|is_unique[member.username]');
-		$this->form_validation->set_rules('Password','Password','required|trim');
-		$this->form_validation->set_rules('contact','Contact','required|trim');
-		$this->form_validation->set_rules('tsp_id','TSP Name','required|trim');
-		$this->form_validation->set_rules('site_id','Site Name','required|trim');
-		if($this->form_validation->run() == TRUE){
-			$data = array(
-					'fname' 	=> $this->input->post('first_name'),
-					'lname' 	=> $this->input->post('last_name'),
-					'username' 	=> $this->input->post('username'),
-					'password'  => sha1($this->input->post('Password')),					
-					'contact' => $this->input->post('contact'),
-					'tsp' => $this->input->post('tsp_id'),
-					'site' => $this->input->post('site_id'),
-					'adddate'   => time(),
-					'status' 	=> 0
-				);
-			$this->db->insert('member', $data);
-			echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/member')); exit;
-		}else{
-
-			echo json_encode(array('respose' => FALSE , 'message' => validation_errors()));exit;
-		}
-	}
-	public function member_edit($para1 = ''){
-		if(!$para1){
-			echo '<div class="alert alert-dismissible alert-danger">
+																echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																exit;
+															}
+														}
+														public function member_edit($para1 = '')
+														{
+															if (!$para1) {
+																echo '<div class="alert alert-dismissible alert-danger">
   				<button type="button" class="close" data-dismiss="alert">&times;</button>
   				<strong>OOPS!</strong> Invalid Request
-				</div>'; exit;
+				</div>';
+																exit;
+															}
+															$this->page_data['member'] = $this->db->get_where('member', array('id' => $para1))->result_array();
+															$this->load->model('Inventory_model');
+															$this->page_data['sites'] = $this->Inventory_model->getsites();
+															$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
+															$this->load->view('back/edit_member', $this->page_data);
+														}
+														public function edit_member_do($member_id = '')
+														{
+															if (!$this->session->userdata('adminid')) {
 
-		}
-		$this->page_data['member'] = $this->db->get_where('member',array('id' => $para1))->result_array();
-		$this->load->model('Inventory_model');
-		$this->page_data['sites'] = $this->Inventory_model->getsites();
-		$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
-		$this->load->view('back/edit_member', $this->page_data);
-	}
-	public function edit_member_do($member_id = ''){
-		if(!$this->session->userdata('adminid')){
-			
-			echo json_encode(array('respose' => FALSE , 'message' => "Please Login to continue"));exit;
+																echo json_encode(array('respose' => FALSE, 'message' => "Please Login to continue"));
+																exit;
+															}
+															if (!$member_id) {
+																echo json_encode(array('response' => TRUE, 'message' => 'Invalid Request'));
+																exit;
+															}
+															$this->load->library('form_validation');
+															$this->form_validation->set_rules('first_name', 'First name', 'required|trim');
+															$this->form_validation->set_rules('last_name', 'Last Name', 'required|trim');
+															$this->form_validation->set_rules('username', 'User Name', 'required|trim');
+															$this->form_validation->set_rules('contact', 'Contact', 'required|trim');
+															$this->form_validation->set_rules('tsp_id', 'TSP Name', 'required|trim');
+															$this->form_validation->set_rules('site_id', 'Site Name', 'required|trim');
+															if ($this->form_validation->run() == TRUE) {
+																$this->db->where('username', $this->input->post('username'));
+																$this->db->where('id != ', $member_id, FALSE);
+																$check_email = $this->db->get('member')->result_array();
+																if ($check_email) {
+																	echo json_encode(array('respose' => FALSE, 'message' => 'This Username address already exists'));
+																	exit;
+																}
+																$data = array(
 
-		}
-		if(!$member_id){
-			echo json_encode(array('response' => TRUE , 'message' => 'Invalid Request')); exit;
-		}
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('first_name','First name','required|trim');
-		$this->form_validation->set_rules('last_name','Last Name','required|trim');
-		$this->form_validation->set_rules('username','User Name','required|trim');	
-		$this->form_validation->set_rules('contact','Contact','required|trim');
-		$this->form_validation->set_rules('tsp_id','TSP Name','required|trim');
-		$this->form_validation->set_rules('site_id','Site Name','required|trim');
-		if($this->form_validation->run() == TRUE){
-			 $this->db->where('username' , $this->input->post('username'));
-			 $this->db->where('id != ', $member_id,FALSE);
-			 $check_email = $this->db->get('member')->result_array();
-			 if($check_email){
-			 	echo json_encode(array('respose' => FALSE , 'message' => 'This Username address already exists'));exit;
+																	'fname' 	=> $this->input->post('first_name'),
+																	'lname' 	=> $this->input->post('last_name'),
+																	'username' 	=> $this->input->post('username'),
+																	'contact' => $this->input->post('contact'),
+																	'tsp' => $this->input->post('tsp_id'),
+																	'site' => $this->input->post('site_id'),
+																	'adddate'   => time(),
+																	'status' 	=> 0
+																);
+																$this->db->where('id', $member_id);
+																$this->db->update('member', $data);
+																echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/member'));
+																exit;
+															} else {
 
-			 }
-			$data = array(
-					
-					'fname' 	=> $this->input->post('first_name'),
-					'lname' 	=> $this->input->post('last_name'),
-					'username' 	=> $this->input->post('username'),					
-					'contact' => $this->input->post('contact'),
-					'tsp' => $this->input->post('tsp_id'),
-					'site' => $this->input->post('site_id'),
-					'adddate'   => time(),
-					'status' 	=> 0
-				);
-			$this->db->where('id', $member_id);
-			$this->db->update('member', $data);
-			echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/member')); exit;
-		}else{
-
-			echo json_encode(array('respose' => FALSE , 'message' => validation_errors()));exit;
-		}
-
-	}
-	public function member_password($para1 = ''){
-		if(!$para1){
-			echo '<div class="alert alert-dismissible alert-danger">
+																echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																exit;
+															}
+														}
+														public function member_password($para1 = '')
+														{
+															if (!$para1) {
+																echo '<div class="alert alert-dismissible alert-danger">
   				<button type="button" class="close" data-dismiss="alert">&times;</button>
   				<strong>OOPS!</strong> Invalid Request
-				</div>'; exit;
+				</div>';
+																exit;
+															}
+															$this->page_data['member_id'] = $this->db->get_where('member', array('id' => $para1))->row()->id;
+															$this->load->view('back/member_password', $this->page_data);
+														}
+														public function update_member_password($member_id = '')
+														{
+															if (!$this->session->userdata('adminid')) {
 
-		}
-		$this->page_data['member_id'] = $this->db->get_where('member',array('id' => $para1))->row()->id;
-		$this->load->view('back/member_password' , $this->page_data);
-	}
-	public function update_member_password($member_id = ''){
-		if(!$this->session->userdata('adminid')){
-			
-			echo json_encode(array('respose' => FALSE , 'message' => "Please Login to continue"));exit;
+																echo json_encode(array('respose' => FALSE, 'message' => "Please Login to continue"));
+																exit;
+															}
+															if (!$member_id) {
+																echo json_encode(array('response' => False, 'message' => 'Invalid Request'));
+																exit;
+															}
+															$this->load->library('form_validation');
+															$this->form_validation->set_rules('password', 'Password', 'required|trim');
+															$this->form_validation->set_rules('password_confirm', 'Confirm Password', 'required|matches[password]');
+															if ($this->form_validation->run() == TRUE) {
 
-		}
-		if(!$member_id){
-			echo json_encode(array('response' => False , 'message' => 'Invalid Request')); exit;
-		}
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('password','Password','required|trim');
-		$this->form_validation->set_rules('password_confirm', 'Confirm Password', 'required|matches[password]');
-		if($this->form_validation->run() == TRUE){
-			 
-			$data = array(
-					
-					'password' 	=> sha1($this->input->post('password'))
-					
-					
-				);
-			$this->db->where('id', $member_id);
-			$this->db->update('member', $data);
-			echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/member')); exit;
-		}else{
+																$data = array(
 
-			echo json_encode(array('respnose' => FALSE , 'message' => validation_errors()));exit;
-		}
-	}
-	
-/////////////////////////////////////////////////////
-	/** sub admins START */
-////////////////////////////////////////////////////
-	public function admins($para1 = '' , $para2 = '', $para3 = ''){
-		if(!$this->session->userdata('adminid'))
-		{	
-			return redirect('admin/login');
-		}
-		if($para1 == 'list'){
-			$this->page_data['admin'] = $this->db->get('admin')->result_array();
-			$this->load->view('back/admin_list', $this->page_data);
+																	'password' 	=> sha1($this->input->post('password'))
 
-		}elseif ($para1 == 'tps_publish_set') {
-            $article = $para2;
-            if ($para3 == 'true') {
-                $data['status'] = '1';
-            } else {
-                $data['status'] = '0';
-            }
-            $this->db->where('id', $article);
-            $this->db->update('admin', $data);
-			
-           echo $para3;
-        }elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('admin');
-		}else{
-			$this->page_data['page'] = 'admin';
-			$this->load->view('back/admin', $this->page_data);
-		}
 
-	}
-	public function admin_add(){
-		$this->load->model('Inventory_model');
-		$this->page_data['sites'] = $this->Inventory_model->getsites();
-		$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
-		$this->load->view('back/add_admin', $this->page_data);
-	}
-	public function add_admin_do(){
+																);
+																$this->db->where('id', $member_id);
+																$this->db->update('member', $data);
+																echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/member'));
+																exit;
+															} else {
 
-		if(!$this->session->userdata('adminid')){
-			
-			echo json_encode(array('respose' => FALSE , 'message' => "Please Login to continue"));exit;
+																echo json_encode(array('respnose' => FALSE, 'message' => validation_errors()));
+																exit;
+															}
+														}
 
-		}
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('first_name','First name','required|trim');
-		$this->form_validation->set_rules('last_name','Last Name','required|trim');
-		$this->form_validation->set_rules('username','Username','required|trim|is_unique[member.username]');
-		$this->form_validation->set_rules('Password','Password','required|trim');
-		$this->form_validation->set_rules('contact','Contact','required|trim');
-		$this->form_validation->set_rules('tsp_id','TSP Name','required|trim');
-		$this->form_validation->set_rules('site_id','Site Name','required|trim');
-		if($this->form_validation->run() == TRUE){
-			$data = array(
-					'fname' 	=> $this->input->post('first_name'),
-					'lname' 	=> $this->input->post('last_name'),
-					'username' 	=> $this->input->post('username'),
-					'password'  => sha1($this->input->post('Password')),
-					'tsp' => $this->input->post('tsp_id'),					
-					'site' => $this->input->post('site_id'),
-					'adddate'   => time(),
-					'status' 	=> 0,
-					'role'     =>  $this->input->post('role')
-				);
-			$this->db->insert('admin', $data);
-			echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/admins')); exit;
-		}else{
+														/////////////////////////////////////////////////////
+														/** sub admins START */
+														////////////////////////////////////////////////////
+														public function admins($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$this->page_data['admin'] = $this->db->get('admin')->result_array();
+																$this->load->view('back/admin_list', $this->page_data);
+															} elseif ($para1 == 'tps_publish_set') {
+																$article = $para2;
+																if ($para3 == 'true') {
+																	$data['status'] = '1';
+																} else {
+																	$data['status'] = '0';
+																}
+																$this->db->where('id', $article);
+																$this->db->update('admin', $data);
 
-			echo json_encode(array('respose' => FALSE , 'message' => validation_errors()));exit;
-		}
-	}
-	function admin_edit($para1 = ''){
-		if(!$para1){
-			echo '<div class="alert alert-dismissible alert-danger">
+																echo $para3;
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('admin');
+															} else {
+																$this->page_data['page'] = 'admin';
+																$this->load->view('back/admin', $this->page_data);
+															}
+														}
+														public function admin_add()
+														{
+															$this->load->model('Inventory_model');
+															$this->page_data['sites'] = $this->Inventory_model->getsites();
+															$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
+															$this->load->view('back/add_admin', $this->page_data);
+														}
+														public function add_admin_do()
+														{
+
+															if (!$this->session->userdata('adminid')) {
+
+																echo json_encode(array('respose' => FALSE, 'message' => "Please Login to continue"));
+																exit;
+															}
+															$this->load->library('form_validation');
+															$this->form_validation->set_rules('first_name', 'First name', 'required|trim');
+															$this->form_validation->set_rules('last_name', 'Last Name', 'required|trim');
+															$this->form_validation->set_rules('username', 'Username', 'required|trim|is_unique[member.username]');
+															$this->form_validation->set_rules('Password', 'Password', 'required|trim');
+															$this->form_validation->set_rules('contact', 'Contact', 'required|trim');
+															$this->form_validation->set_rules('tsp_id', 'TSP Name', 'required|trim');
+															$this->form_validation->set_rules('site_id', 'Site Name', 'required|trim');
+															if ($this->form_validation->run() == TRUE) {
+																$data = array(
+																	'fname' 	=> $this->input->post('first_name'),
+																	'lname' 	=> $this->input->post('last_name'),
+																	'username' 	=> $this->input->post('username'),
+																	'password'  => sha1($this->input->post('Password')),
+																	'tsp' => $this->input->post('tsp_id'),
+																	'site' => $this->input->post('site_id'),
+																	'adddate'   => time(),
+																	'status' 	=> 0,
+																	'role'     =>  $this->input->post('role')
+																);
+																$this->db->insert('admin', $data);
+																echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/admins'));
+																exit;
+															} else {
+
+																echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																exit;
+															}
+														}
+														function admin_edit($para1 = '')
+														{
+															if (!$para1) {
+																echo '<div class="alert alert-dismissible alert-danger">
   				<button type="button" class="close" data-dismiss="alert">&times;</button>
   				<strong>OOPS!</strong> Invalid Request
-				</div>'; exit;
+				</div>';
+																exit;
+															}
+															$this->load->model('Inventory_model');
+															$this->page_data['admin'] = $this->db->get_where('admin', array('id' => $para1))->result_array();
+															$this->page_data['sites'] = $this->Inventory_model->getsites();
+															$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
+															$this->load->view('back/edit_admin', $this->page_data);
+														}
+														function edit_admin_do($admin_id = '')
+														{
+															//echo $admin_id; exit;
+															//if(!$this->session->userdata('adminid')){
 
-		}
-		$this->load->model('Inventory_model');
-		$this->page_data['admin'] = $this->db->get_where('admin',array('id' => $para1))->result_array();
-		$this->page_data['sites'] = $this->Inventory_model->getsites();
-		$this->page_data['tsps'] = $this->Inventory_model->get_tsps();
-		$this->load->view('back/edit_admin', $this->page_data);
-	}
-	function edit_admin_do($admin_id = ''){
-		//echo $admin_id; exit;
-		//if(!$this->session->userdata('adminid')){
-			
-		//	echo json_encode(array('respose' => FALSE , 'message' => "Please Login to continue"));exit;
+															//	echo json_encode(array('respose' => FALSE , 'message' => "Please Login to continue"));exit;
 
-		//}
-		if(!$admin_id){
-			echo json_encode(array('response' => TRUE , 'message' => 'Invalid Request')); exit;
-		}
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('first_name','First name','required|trim');
-		$this->form_validation->set_rules('last_name','Last Name','required|trim');
-		$this->form_validation->set_rules('username','User Name','required|trim');
-		$this->form_validation->set_rules('contact','Contact','required|trim');
-		$this->form_validation->set_rules('role','Role','required|trim');
-		$this->form_validation->set_rules('tsp_id','TSP Name','required|trim');
-		$this->form_validation->set_rules('site_id','Site Name','required|trim');
-		if($this->form_validation->run() == TRUE){
-			 $this->db->where('username' , $this->input->post('username'));
-			 $this->db->where('id != ', $admin_id,FALSE);
-			 $check_email = $this->db->get('admin')->result_array();
-			 if($check_email){
-			 	echo json_encode(array('respose' => FALSE , 'message' => 'This Username address already exists'));exit;
+															//}
+															if (!$admin_id) {
+																echo json_encode(array('response' => TRUE, 'message' => 'Invalid Request'));
+																exit;
+															}
+															$this->load->library('form_validation');
+															$this->form_validation->set_rules('first_name', 'First name', 'required|trim');
+															$this->form_validation->set_rules('last_name', 'Last Name', 'required|trim');
+															$this->form_validation->set_rules('username', 'User Name', 'required|trim');
+															$this->form_validation->set_rules('contact', 'Contact', 'required|trim');
+															$this->form_validation->set_rules('role', 'Role', 'required|trim');
+															$this->form_validation->set_rules('tsp_id', 'TSP Name', 'required|trim');
+															$this->form_validation->set_rules('site_id', 'Site Name', 'required|trim');
+															if ($this->form_validation->run() == TRUE) {
+																$this->db->where('username', $this->input->post('username'));
+																$this->db->where('id != ', $admin_id, FALSE);
+																$check_email = $this->db->get('admin')->result_array();
+																if ($check_email) {
+																	echo json_encode(array('respose' => FALSE, 'message' => 'This Username address already exists'));
+																	exit;
+																}
+																$data = array(
 
-			 }
-			$data = array(
-					
-					'fname' => $this->input->post('first_name'),
-					'lname' => $this->input->post('last_name'),
-					'username' => $this->input->post('username'),			
-					'contact' => $this->input->post('contact'),
-					'adddate' => time(),
-					'status' => 0,
-					'role'=>$this->input->post('role'),
-					'tsp' => $this->input->post('tsp_id'),
-					'site' => $this->input->post('site_id')
-				);
-			$this->db->where('id', $admin_id);
-			$this->db->update('admin', $data);
-			echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/admins')); exit;
-		}else{
+																	'fname' => $this->input->post('first_name'),
+																	'lname' => $this->input->post('last_name'),
+																	'username' => $this->input->post('username'),
+																	'contact' => $this->input->post('contact'),
+																	'adddate' => time(),
+																	'status' => 0,
+																	'role' => $this->input->post('role'),
+																	'tsp' => $this->input->post('tsp_id'),
+																	'site' => $this->input->post('site_id')
+																);
+																$this->db->where('id', $admin_id);
+																$this->db->update('admin', $data);
+																echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/admins'));
+																exit;
+															} else {
 
-			echo json_encode(array('respose' => FALSE , 'message' => validation_errors()));exit;
-		}
-
-	}
-	public function admins_password($para1 = ''){
-		if(!$para1){
-			echo '<div class="alert alert-dismissible alert-danger">
+																echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																exit;
+															}
+														}
+														public function admins_password($para1 = '')
+														{
+															if (!$para1) {
+																echo '<div class="alert alert-dismissible alert-danger">
   				<button type="button" class="close" data-dismiss="alert">&times;</button>
   				<strong>OOPS!</strong> Invalid Request
-				</div>'; exit;
+				</div>';
+																exit;
+															}
+															$this->page_data['admin_id'] = $this->db->get_where('admin', array('id' => $para1))->row()->id;
+															$this->load->view('back/admin_password', $this->page_data);
+														}
+														public function update_admins_password($admin_id = '')
+														{
+															if (!$this->session->userdata('adminid')) {
 
-		}
-		$this->page_data['admin_id'] = $this->db->get_where('admin',array('id' => $para1))->row()->id;
-		$this->load->view('back/admin_password' , $this->page_data);
-	}
-	public function update_admins_password($admin_id = ''){
-		if(!$this->session->userdata('adminid')){
-			
-			echo json_encode(array('respose' => FALSE , 'message' => "Please Login to continue"));exit;
+																echo json_encode(array('respose' => FALSE, 'message' => "Please Login to continue"));
+																exit;
+															}
+															if (!$admin_id) {
+																echo json_encode(array('response' => False, 'message' => 'Invalid Request'));
+																exit;
+															}
+															$this->load->library('form_validation');
+															$this->form_validation->set_rules('password', 'Password', 'required|trim');
+															$this->form_validation->set_rules('password_confirm', 'Confirm Password', 'required|matches[password]');
+															if ($this->form_validation->run() == TRUE) {
 
-		}
-		if(!$admin_id){
-			echo json_encode(array('response' => False , 'message' => 'Invalid Request')); exit;
-		}
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('password','Password','required|trim');
-		$this->form_validation->set_rules('password_confirm', 'Confirm Password', 'required|matches[password]');
-		if($this->form_validation->run() == TRUE){
-			 
-			$data = array(
-					
-					'password' 	=> sha1($this->input->post('password'))
-					
-					
-				);
-			$this->db->where('id', $admin_id);
-			$this->db->update('admin', $data);
-			echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/admins')); exit;
-		}else{
+																$data = array(
 
-			echo json_encode(array('respnose' => FALSE , 'message' => validation_errors()));exit;
-		}
-	}
-
-	/** sub admins END */
-
-	///////////////////////////////////////////////////////////////
-	////	/** Tarrif START  *////////////////////
-	///////////////////////////////////////////////////////////////
-	
-	public function tarrif($para1 = '', $para2 = '', $para3 = ''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
-
-		}
-		if($para1 == 'list'){
-			
-			$this->page_data['terrif']  = $this->db->get('terrif')->result_array();
-
-			$this->load->view('back/terrif_list', $this->page_data);
-
-		}elseif($para1 == 'view'){
-			$this->page_data['terrif']  = $this->db->get_where('terrif',array('id' => $para2))->result_array();
-
-			$this->load->view('back/view_terrif', $this->page_data);
-
-		}elseif($para1 == 'add'){
-			$this->page_data['plaza']  = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-			$this->load->view('back/tarrif_add', $this->page_data);
-
-		}elseif($para1 == 'edit'){
-			$this->page_data['plaza']  = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-			$this->page_data['terrif']  = $this->db->get_where('terrif',array('id' => $para2))->result_array();
-
-			$this->load->view('back/edit_terrif', $this->page_data);
-
-		}elseif($para1 == 'add_tarrif'){
-
-			$plaza = $this->input->post('plaza');
-			if(empty($plaza)){
-				echo json_encode(array('respose' => FALSE , 'message' => 'Please choose plaza'));exit;	
-			}
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('class_1_desc','Class1 Description','required|trim');
-			$this->form_validation->set_rules('class_1_rate','Class1 Rate','required|trim');
-			$this->form_validation->set_rules('class_2_desc','Class2 Description','required|trim');
-			$this->form_validation->set_rules('class_2_rate','Class2 Rate','required|trim');
-			$this->form_validation->set_rules('class_3_desc','Class3 Description','required|trim');
-			$this->form_validation->set_rules('class_3_rate','Class3 Rate','required|trim');
-			$this->form_validation->set_rules('class_4_desc','Class4 Description','required|trim');
-			$this->form_validation->set_rules('class_4_rate','Class4 Rate','required|trim');
-			$this->form_validation->set_rules('class_5_desc','Class5 Description','required|trim');
-			$this->form_validation->set_rules('class_5_rate','Class5 Rate','required|trim');
-			$this->form_validation->set_rules('class_6_desc','Class6 Description','required|trim');
-			$this->form_validation->set_rules('class_6_rate','Class6 Rate','required|trim');
-			$this->form_validation->set_rules('class_7_desc','Class7 Description','required|trim');
-			$this->form_validation->set_rules('class_7_rate','Class7 Rate','required|trim');
-			$this->form_validation->set_rules('class_8_desc','Class8 Description','required|trim');
-			$this->form_validation->set_rules('class_8_rate','Class8 Rate','required|trim');
-			$this->form_validation->set_rules('class_9_desc','Class9 Description','required|trim');
-			$this->form_validation->set_rules('class_9_rate','Class9 Rate','required|trim');
-			$this->form_validation->set_rules('class_10_desc','Class10 Description','required|trim');
-			$this->form_validation->set_rules('class_10_rate','Class10 Rate','required|trim');
-			$this->form_validation->set_rules('start_date','Effective From','required|trim');
-			$this->form_validation->set_rules('end_date','Effective To','required|trim');
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('respnose' => FALSE , 'message' => validation_errors()));exit;
-			}else{
-				$plazas = implode (",", $plaza);
-				$data['toolplaza'] 				= 	$plazas;
-				$data['class_1_description'] 	= 	$this->input->post('class_1_desc');
-				$data['class_1_value'] 			= 	$this->input->post('class_1_rate');
-				$data['class_2_description'] 	= 	$this->input->post('class_2_desc');
-				$data['class_2_value'] 			= 	$this->input->post('class_2_rate');
-				$data['class_3_description'] 	= 	$this->input->post('class_3_desc');
-				$data['class_3_value'] 			= 	$this->input->post('class_3_rate');
-				$data['class_4_description'] 	= 	$this->input->post('class_4_desc');
-				$data['class_4_value'] 			= 	$this->input->post('class_4_rate');
-				$data['class_5_description'] 	= 	$this->input->post('class_5_desc');
-				$data['class_5_value'] 			= 	$this->input->post('class_5_rate');
-				$data['class_6_description'] 	= 	$this->input->post('class_6_desc');
-				$data['class_6_value'] 			= 	$this->input->post('class_6_rate');
-				$data['class_7_description'] 	= 	$this->input->post('class_7_desc');
-				$data['class_7_value'] 			= 	$this->input->post('class_7_rate');
-				$data['class_8_description'] 	= 	$this->input->post('class_8_desc');
-				$data['class_8_value'] 			= 	$this->input->post('class_8_rate');
-				$data['class_9_description'] 	= 	$this->input->post('class_9_desc');
-				$data['class_9_value'] 			= 	$this->input->post('class_9_rate');
-				$data['class_10_description'] 	= 	$this->input->post('class_10_desc');
-				$data['class_10_value'] 		= 	$this->input->post('class_10_rate');
-				$data['start_date'] 			= 	str_replace('/', '-', $this->input->post('start_date'));
-				$data['end_date'] 				= 	str_replace('/', '-', $this->input->post('end_date'));
-				$data['date'] 					= 	time();
-				$this->db->insert('terrif',$data);
-				echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/tarrif')); exit;
+																	'password' 	=> sha1($this->input->post('password'))
 
 
-			}
+																);
+																$this->db->where('id', $admin_id);
+																$this->db->update('admin', $data);
+																echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/admins'));
+																exit;
+															} else {
 
-		}elseif($para1 == 'update_terrif'){
-			
-			$plaza = $this->input->post('plaza');
-			if(empty($plaza)){
-				echo json_encode(array('respose' => FALSE , 'message' => 'Please choose plaza'));exit;	
-			}
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('class_1_desc','Class1 Description','required|trim');
-			$this->form_validation->set_rules('class_1_rate','Class1 Rate','required|trim');
-			$this->form_validation->set_rules('class_2_desc','Class2 Description','required|trim');
-			$this->form_validation->set_rules('class_2_rate','Class2 Rate','required|trim');
-			$this->form_validation->set_rules('class_3_desc','Class3 Description','required|trim');
-			$this->form_validation->set_rules('class_3_rate','Class3 Rate','required|trim');
-			$this->form_validation->set_rules('class_4_desc','Class4 Description','required|trim');
-			$this->form_validation->set_rules('class_4_rate','Class4 Rate','required|trim');
-			$this->form_validation->set_rules('class_5_desc','Class5 Description','required|trim');
-			$this->form_validation->set_rules('class_5_rate','Class5 Rate','required|trim');
-			$this->form_validation->set_rules('class_6_desc','Class6 Description','required|trim');
-			$this->form_validation->set_rules('class_6_rate','Class6 Rate','required|trim');
-			$this->form_validation->set_rules('class_7_desc','Class7 Description','required|trim');
-			$this->form_validation->set_rules('class_7_rate','Class7 Rate','required|trim');
-			$this->form_validation->set_rules('class_8_desc','Class8 Description','required|trim');
-			$this->form_validation->set_rules('class_8_rate','Class8 Rate','required|trim');
-			$this->form_validation->set_rules('class_9_desc','Class9 Description','required|trim');
-			$this->form_validation->set_rules('class_9_rate','Class9 Rate','required|trim');
-			$this->form_validation->set_rules('class_10_desc','Class10 Description','required|trim');
-			$this->form_validation->set_rules('class_10_rate','Class10 Rate','required|trim');
-			$this->form_validation->set_rules('start_date','Effective From','required|trim');
-			$this->form_validation->set_rules('end_date','Effective To','required|trim');
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('respnose' => FALSE , 'message' => validation_errors()));exit;
-			}else{
-				$plazas = implode (",", $plaza);
-				$data['toolplaza'] 				= 	$plazas;
-				$data['class_1_description'] 	= 	$this->input->post('class_1_desc');
-				$data['class_1_value'] 			= 	$this->input->post('class_1_rate');
-				$data['class_2_description'] 	= 	$this->input->post('class_2_desc');
-				$data['class_2_value'] 			= 	$this->input->post('class_2_rate');
-				$data['class_3_description'] 	= 	$this->input->post('class_3_desc');
-				$data['class_3_value'] 			= 	$this->input->post('class_3_rate');
-				$data['class_4_description'] 	= 	$this->input->post('class_4_desc');
-				$data['class_4_value'] 			= 	$this->input->post('class_4_rate');
-				$data['class_5_description'] 	= 	$this->input->post('class_5_desc');
-				$data['class_5_value'] 			= 	$this->input->post('class_5_rate');
-				$data['class_6_description'] 	= 	$this->input->post('class_6_desc');
-				$data['class_6_value'] 			= 	$this->input->post('class_6_rate');
-				$data['class_7_description'] 	= 	$this->input->post('class_7_desc');
-				$data['class_7_value'] 			= 	$this->input->post('class_7_rate');
-				$data['class_8_description'] 	= 	$this->input->post('class_8_desc');
-				$data['class_8_value'] 			= 	$this->input->post('class_8_rate');
-				$data['class_9_description'] 	= 	$this->input->post('class_9_desc');
-				$data['class_9_value'] 			= 	$this->input->post('class_9_rate');
-				$data['class_10_description'] 	= 	$this->input->post('class_10_desc');
-				$data['class_10_value'] 		= 	$this->input->post('class_10_rate');
-				$data['start_date'] 			= 	str_replace('/', '-', $this->input->post('start_date'));
-				$data['end_date'] 				= 	str_replace('/', '-', $this->input->post('end_date'));
-				$data['date'] 		= 	time();
-				$this->db->where('id', $para2);
-				$this->db->update('terrif', $data);
-				echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/tarrif')); exit;		
-			}
-			
+																echo json_encode(array('respnose' => FALSE, 'message' => validation_errors()));
+																exit;
+															}
+														}
 
-		}else{
-			$this->page_data['page'] = 'Tarrif';
-			$this->load->view('back/terrif', $this->page_data);
-		}
-	}
-	
-	///////////////////////////////////////////////////////////////
-	////	/** MTR START  *////////////////////
-	///////////////////////////////////////////////////////////////
-	public function mtr($para1 = '', $para2 = '', $para3 = ''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+														/** sub admins END */
 
-		}
-		if($para1 == 'list'){
-			$this->db->order_by('id','DESC');
-			$this->page_data['mtr']  = $this->db->get('mtr')->result_array();
-			$this->load->view('back/mtr_list', $this->page_data);
+														///////////////////////////////////////////////////////////////
+														////	/** Tarrif START  *////////////////////
+														///////////////////////////////////////////////////////////////
 
-		}
-		elseif($para1 == 'by_tollplaza'){
-			if($para2 != ''){
-				$this->db->where('toolplaza', $para2);
-			}
-				$this->db->order_by('id','DESC');
-				$this->page_data['mtr']  = $this->db->get('mtr')->result_array();
-				$this->load->view('back/mtr_list', $this->page_data);
+														public function tarrif($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
 
-		}
-		elseif($para1 == 'approve'){
-			$data['status'] = 1;
-			$this->db->where('alert_type',2);
-			$this->db->where('ref_id',$para2);
-			$this->db->delete('alerts');
-			$this->db->where('id',$para2);
-			$this->db->update('mtr',$data);
-		}
-		elseif($para1 == 'delete'){
-			$this->db->where('id',$para2);
-			$record = $this->db->get('mtr');
-			if($record->result_array()){
-				$support = $this->db->get_where('supporting_document',array('mtr_id' => $para2))->result_array();
-				if($support){
-					foreach($support as $val){
-						unlink('./uploads/supporting/'.$val['path']);
-					}
-					$this->db->where('mtr_id', $para2);
-					$this->db->delete('supporting_document');
-				}
-				$file = $this->db->get_where('mtr',array('id' => $para2))->row()->file;
-				unlink('./uploads/mtr/'.$file);
-				$this->db->where('id', $para2);
-				$this->db->delete('mtr');
-			}
-		}
-		elseif($para1 == 'disapprove'){
-			$this->page_data['mtr_id'] = $para2;
-			$this->load->view('back/mtr_disapprove', $this->page_data);
-		}
-		elseif($para1 == 'view_reason'){
-			$reason = $this->db->get_where('mtr',array('id' => $para2))->result_array();
-			if($reason[0]['status'] == 2){
-				echo "<span class='text-info'>".$reason[0]['reason']."</span>";
-			}else{
-				echo "<span class='text-danger'>Invalid Request</span>";
-			}
-			
-		}
-		elseif($para1 == 'disapprove_do'){
-			$check = $this->db->get_where('mtr',array('id' => $para2))->result_array();
-			if($check){
-				// echo "<pre>"; print_r($check); exit;
-				if($check[0]['status'] == 0 || $check[0]['status'] == 1){
-					if(empty($this->input->post('dissapprove_reason'))){
-						echo json_encode(array('respose' => FALSE , 'message' => 'Please add reason for dissapproving this monthly traffic report'));exit;	
-					}
-					else
-					{
-						$data['status'] = 2;
-						$data['reason'] = $this->input->post('dissapprove_reason');
-						$this->db->where('id', $para2);
-						$this->db->update('mtr' , $data);
-                        /**Notifications Start */
-    
-    
-					  $notificatoin_msg = 'Your  '. date("F, Y",strtotime($check[0]['for_month'])) .' mtr disapproved.';
-                      $mtrMonth = explode('-', $check[0]['for_month']);
-                      $mtr_month = $mtrMonth[0].'-'.$mtrMonth[1].'-'.$mtrMonth[2];
-                      
-                      $data11 = array(
-					 'user_type' => 3,
-	   				 'user_id' => $this->session->userdata('adminid'),
-					 'for_user_id' => $check[0]['user_id'],
-					 'for_user_type' => $check[0]['upload_type'],
-					 'alert_type'  => 2,
-					 'ref_id' 	=> $para2,
-					 'date' => date("Y-m-d H:i:s"),
-					 'is_read' => 0,
-					 'notification_msg' => $notificatoin_msg                
-					  );
-                     $this->db->insert('notifications', $data11);             
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
 
-						echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/mtr')); exit;
-					}
-				}
-				else
-				{
-					echo json_encode(array('respose' => FALSE , 'message' => 'Invalid Requestee'));exit;	
-				}
-			}else{
-				echo json_encode(array('respose' => FALSE , 'message' => 'Invalid Request'));exit;		
-			}
-		} /**Notifications END */
-		else{
-			$this->page_data['page'] = 'MTR';
-			$this->page_data['tollplaza'] = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-			$this->load->view('back/mtr', $this->page_data);
-		}
-	}
-	public function monthly_traffic_report($para1 = ''){
-	    $this->page_data['mtr'] = $this->db->get_where('mtr',array('id' => $para1 ))->result_array();
-	
-		$month_year = explode('-',$this->page_data['mtr'][0]['for_month']);
-		$start_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['start_date'];
-		$end_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['end_date'];
+																$this->page_data['terrif']  = $this->db->get('terrif')->result_array();
 
-		$sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['mtr'][0]['toolplaza']." ,toolplaza) AND (start_date <= '".$start_date."' AND end_date >= '".$end_date."')";
-		$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
-		
-		//echo $this->db->last_quer`y();
-		//echo "<pre>";
-		//print_r($this->page_data['terrif']); exit;
-		$this->load->view('back/invoice', $this->page_data);
-	}
-	public function generate_pdf($para1 = ''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+																$this->load->view('back/terrif_list', $this->page_data);
+															} elseif ($para1 == 'view') {
+																$this->page_data['terrif']  = $this->db->get_where('terrif', array('id' => $para2))->result_array();
 
-		}
-		$this->page_data['mtr'] = $this->db->get_where('mtr',array('id' => $para1 ))->result_array();
-		$month_year = explode('-',$this->page_data['mtr'][0]['for_month']);
-		$start_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['start_date'];
-		$end_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['end_date'];
+																$this->load->view('back/view_terrif', $this->page_data);
+															} elseif ($para1 == 'add') {
+																$this->page_data['plaza']  = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+																$this->load->view('back/tarrif_add', $this->page_data);
+															} elseif ($para1 == 'edit') {
+																$this->page_data['plaza']  = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+																$this->page_data['terrif']  = $this->db->get_where('terrif', array('id' => $para2))->result_array();
 
-		//$sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['mtr'][0]['toolplaza']." ,toolplaza)";
-		$sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['mtr'][0]['toolplaza']." ,toolplaza) AND (start_date <= '".$start_date."' AND end_date >= '".$end_date."')";
-		$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
-		//echo "<pre>";
-		//print_r($this->page_data['terrif'] ); exit;
-		$pdfdata = $this->load->view('back/invoice_pdf', $this->page_data, TRUE);
+																$this->load->view('back/edit_terrif', $this->page_data);
+															} elseif ($para1 == 'add_tarrif') {
 
-		$this->load->library("Pdf");
-		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('NHA MTR');
-        $pdf->SetTitle('NHA Monthly Traffic Report');
-        $pdf->SetSubject('MTR');
-        $pdf->SetKeywords('MTR, PDF');
+																$plaza = $this->input->post('plaza');
+																if (empty($plaza)) {
+																	echo json_encode(array('respose' => FALSE, 'message' => 'Please choose plaza'));
+																	exit;
+																}
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('class_1_desc', 'Class1 Description', 'required|trim');
+																$this->form_validation->set_rules('class_1_rate', 'Class1 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_2_desc', 'Class2 Description', 'required|trim');
+																$this->form_validation->set_rules('class_2_rate', 'Class2 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_3_desc', 'Class3 Description', 'required|trim');
+																$this->form_validation->set_rules('class_3_rate', 'Class3 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_4_desc', 'Class4 Description', 'required|trim');
+																$this->form_validation->set_rules('class_4_rate', 'Class4 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_5_desc', 'Class5 Description', 'required|trim');
+																$this->form_validation->set_rules('class_5_rate', 'Class5 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_6_desc', 'Class6 Description', 'required|trim');
+																$this->form_validation->set_rules('class_6_rate', 'Class6 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_7_desc', 'Class7 Description', 'required|trim');
+																$this->form_validation->set_rules('class_7_rate', 'Class7 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_8_desc', 'Class8 Description', 'required|trim');
+																$this->form_validation->set_rules('class_8_rate', 'Class8 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_9_desc', 'Class9 Description', 'required|trim');
+																$this->form_validation->set_rules('class_9_rate', 'Class9 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_10_desc', 'Class10 Description', 'required|trim');
+																$this->form_validation->set_rules('class_10_rate', 'Class10 Rate', 'required|trim');
+																$this->form_validation->set_rules('start_date', 'Effective From', 'required|trim');
+																$this->form_validation->set_rules('end_date', 'Effective To', 'required|trim');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('respnose' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$plazas = implode(",", $plaza);
+																	$data['toolplaza'] 				= 	$plazas;
+																	$data['class_1_description'] 	= 	$this->input->post('class_1_desc');
+																	$data['class_1_value'] 			= 	$this->input->post('class_1_rate');
+																	$data['class_2_description'] 	= 	$this->input->post('class_2_desc');
+																	$data['class_2_value'] 			= 	$this->input->post('class_2_rate');
+																	$data['class_3_description'] 	= 	$this->input->post('class_3_desc');
+																	$data['class_3_value'] 			= 	$this->input->post('class_3_rate');
+																	$data['class_4_description'] 	= 	$this->input->post('class_4_desc');
+																	$data['class_4_value'] 			= 	$this->input->post('class_4_rate');
+																	$data['class_5_description'] 	= 	$this->input->post('class_5_desc');
+																	$data['class_5_value'] 			= 	$this->input->post('class_5_rate');
+																	$data['class_6_description'] 	= 	$this->input->post('class_6_desc');
+																	$data['class_6_value'] 			= 	$this->input->post('class_6_rate');
+																	$data['class_7_description'] 	= 	$this->input->post('class_7_desc');
+																	$data['class_7_value'] 			= 	$this->input->post('class_7_rate');
+																	$data['class_8_description'] 	= 	$this->input->post('class_8_desc');
+																	$data['class_8_value'] 			= 	$this->input->post('class_8_rate');
+																	$data['class_9_description'] 	= 	$this->input->post('class_9_desc');
+																	$data['class_9_value'] 			= 	$this->input->post('class_9_rate');
+																	$data['class_10_description'] 	= 	$this->input->post('class_10_desc');
+																	$data['class_10_value'] 		= 	$this->input->post('class_10_rate');
+																	$data['start_date'] 			= 	str_replace('/', '-', $this->input->post('start_date'));
+																	$data['end_date'] 				= 	str_replace('/', '-', $this->input->post('end_date'));
+																	$data['date'] 					= 	time();
+																	$this->db->insert('terrif', $data);
+																	echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/tarrif'));
+																	exit;
+																}
+															} elseif ($para1 == 'update_terrif') {
 
-        $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-        $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+																$plaza = $this->input->post('plaza');
+																if (empty($plaza)) {
+																	echo json_encode(array('respose' => FALSE, 'message' => 'Please choose plaza'));
+																	exit;
+																}
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('class_1_desc', 'Class1 Description', 'required|trim');
+																$this->form_validation->set_rules('class_1_rate', 'Class1 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_2_desc', 'Class2 Description', 'required|trim');
+																$this->form_validation->set_rules('class_2_rate', 'Class2 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_3_desc', 'Class3 Description', 'required|trim');
+																$this->form_validation->set_rules('class_3_rate', 'Class3 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_4_desc', 'Class4 Description', 'required|trim');
+																$this->form_validation->set_rules('class_4_rate', 'Class4 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_5_desc', 'Class5 Description', 'required|trim');
+																$this->form_validation->set_rules('class_5_rate', 'Class5 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_6_desc', 'Class6 Description', 'required|trim');
+																$this->form_validation->set_rules('class_6_rate', 'Class6 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_7_desc', 'Class7 Description', 'required|trim');
+																$this->form_validation->set_rules('class_7_rate', 'Class7 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_8_desc', 'Class8 Description', 'required|trim');
+																$this->form_validation->set_rules('class_8_rate', 'Class8 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_9_desc', 'Class9 Description', 'required|trim');
+																$this->form_validation->set_rules('class_9_rate', 'Class9 Rate', 'required|trim');
+																$this->form_validation->set_rules('class_10_desc', 'Class10 Description', 'required|trim');
+																$this->form_validation->set_rules('class_10_rate', 'Class10 Rate', 'required|trim');
+																$this->form_validation->set_rules('start_date', 'Effective From', 'required|trim');
+																$this->form_validation->set_rules('end_date', 'Effective To', 'required|trim');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('respnose' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$plazas = implode(",", $plaza);
+																	$data['toolplaza'] 				= 	$plazas;
+																	$data['class_1_description'] 	= 	$this->input->post('class_1_desc');
+																	$data['class_1_value'] 			= 	$this->input->post('class_1_rate');
+																	$data['class_2_description'] 	= 	$this->input->post('class_2_desc');
+																	$data['class_2_value'] 			= 	$this->input->post('class_2_rate');
+																	$data['class_3_description'] 	= 	$this->input->post('class_3_desc');
+																	$data['class_3_value'] 			= 	$this->input->post('class_3_rate');
+																	$data['class_4_description'] 	= 	$this->input->post('class_4_desc');
+																	$data['class_4_value'] 			= 	$this->input->post('class_4_rate');
+																	$data['class_5_description'] 	= 	$this->input->post('class_5_desc');
+																	$data['class_5_value'] 			= 	$this->input->post('class_5_rate');
+																	$data['class_6_description'] 	= 	$this->input->post('class_6_desc');
+																	$data['class_6_value'] 			= 	$this->input->post('class_6_rate');
+																	$data['class_7_description'] 	= 	$this->input->post('class_7_desc');
+																	$data['class_7_value'] 			= 	$this->input->post('class_7_rate');
+																	$data['class_8_description'] 	= 	$this->input->post('class_8_desc');
+																	$data['class_8_value'] 			= 	$this->input->post('class_8_rate');
+																	$data['class_9_description'] 	= 	$this->input->post('class_9_desc');
+																	$data['class_9_value'] 			= 	$this->input->post('class_9_rate');
+																	$data['class_10_description'] 	= 	$this->input->post('class_10_desc');
+																	$data['class_10_value'] 		= 	$this->input->post('class_10_rate');
+																	$data['start_date'] 			= 	str_replace('/', '-', $this->input->post('start_date'));
+																	$data['end_date'] 				= 	str_replace('/', '-', $this->input->post('end_date'));
+																	$data['date'] 		= 	time();
+																	$this->db->where('id', $para2);
+																	$this->db->update('terrif', $data);
+																	echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/tarrif'));
+																	exit;
+																}
+															} else {
+																$this->page_data['page'] = 'Tarrif';
+																$this->load->view('back/terrif', $this->page_data);
+															}
+														}
 
-        // set default monospaced font
-        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+														///////////////////////////////////////////////////////////////
+														////	/** MTR START  *////////////////////
+														///////////////////////////////////////////////////////////////
+														public function mtr($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
 
-        // set margins
-        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-        if (@file_exists(dirname(__FILE__) . '/lang/eng.php')) {
-            require_once(dirname(__FILE__) . '/lang/eng.php');
-            $pdf->setLanguageArray($l);
-        }
-        $pdf->setFontSubsetting(true);
-        $pdf->SetFont('dejavusans', '', 16, '', true);
-        $pdf->AddPage('L', 'A2');
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$this->db->order_by('id', 'DESC');
+																$this->page_data['mtr']  = $this->db->get('mtr')->result_array();
+																$this->load->view('back/mtr_list', $this->page_data);
+															} elseif ($para1 == 'by_tollplaza') {
+																if ($para2 != '') {
+																	$this->db->where('toolplaza', $para2);
+																}
+																$this->db->order_by('id', 'DESC');
+																$this->page_data['mtr']  = $this->db->get('mtr')->result_array();
+																$this->load->view('back/mtr_list', $this->page_data);
+															} elseif ($para1 == 'approve') {
+																$data['status'] = 1;
+																$this->db->where('alert_type', 2);
+																$this->db->where('ref_id', $para2);
+																$this->db->delete('alerts');
+																$this->db->where('id', $para2);
+																$this->db->update('mtr', $data);
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$record = $this->db->get('mtr');
+																if ($record->result_array()) {
+																	$support = $this->db->get_where('supporting_document', array('mtr_id' => $para2))->result_array();
+																	if ($support) {
+																		foreach ($support as $val) {
+																			unlink('./uploads/supporting/' . $val['path']);
+																		}
+																		$this->db->where('mtr_id', $para2);
+																		$this->db->delete('supporting_document');
+																	}
+																	$file = $this->db->get_where('mtr', array('id' => $para2))->row()->file;
+																	unlink('./uploads/mtr/' . $file);
+																	$this->db->where('id', $para2);
+																	$this->db->delete('mtr');
+																}
+															} elseif ($para1 == 'disapprove') {
+																$this->page_data['mtr_id'] = $para2;
+																$this->load->view('back/mtr_disapprove', $this->page_data);
+															} elseif ($para1 == 'view_reason') {
+																$reason = $this->db->get_where('mtr', array('id' => $para2))->result_array();
+																if ($reason[0]['status'] == 2) {
+																	echo "<span class='text-info'>" . $reason[0]['reason'] . "</span>";
+																} else {
+																	echo "<span class='text-danger'>Invalid Request</span>";
+																}
+															} elseif ($para1 == 'disapprove_do') {
+																$check = $this->db->get_where('mtr', array('id' => $para2))->result_array();
+																if ($check) {
+																	// echo "<pre>"; print_r($check); exit;
+																	if ($check[0]['status'] == 0 || $check[0]['status'] == 1) {
+																		if (empty($this->input->post('dissapprove_reason'))) {
+																			echo json_encode(array('respose' => FALSE, 'message' => 'Please add reason for dissapproving this monthly traffic report'));
+																			exit;
+																		} else {
+																			$data['status'] = 2;
+																			$data['reason'] = $this->input->post('dissapprove_reason');
+																			$this->db->where('id', $para2);
+																			$this->db->update('mtr', $data);
+																			/**Notifications Start */
 
-        $pdf->setTextShadow(array('enabled' => true, 'depth_w' => 0.2, 'depth_h' => 0.2, 'color' => array(196, 196, 196), 'opacity' => 1, 'blend_mode' => 'Normal'));
-        $pdf->writeHTMLCell(0, 0, '', '', $pdfdata, 0, 1, 0, true, '', true);
-         $pdf->Output('mtr.pdf','I');
-        //$pdf->Output(SERVER_RELATIVE_PATH . '/uploads/invoices/invoice' . $invoice_name . '.pdf', 'F');
 
-	}	
-	public function specific_mtr($para1 = '', $para2 = '' ){
-		if($para1 == 'list')
-		{
-			$this->page_data['mtr'] = $this->db->get_where('mtr',array('id' => $para2))->result_array();
-		    // $this->db->where('alert_type',2);
-			// $this->db->where('ref_id',$para2);
-			// $this->db->update('notifications',array('is_read' => 1))->result_array();	
-			$this->load->view('back/mtr_list', $this->page_data);
-		}
-		else
-		{
-			
-			$this->page_data['page'] = 'specific_mtr';
-			$this->page_data['mtr_id'] = $para1;			
-			$this->load->view('back/specific_mtr', $this->page_data);	
-		}
-	}
-	public function view_supporting($para1 = ''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+																			$notificatoin_msg = 'Your  ' . date("F, Y", strtotime($check[0]['for_month'])) . ' mtr disapproved.';
+																			$mtrMonth = explode('-', $check[0]['for_month']);
+																			$mtr_month = $mtrMonth[0] . '-' . $mtrMonth[1] . '-' . $mtrMonth[2];
 
-		}
-		$this->page_data['support'] = $this->db->get_where('supporting_document',array('mtr_id' => $para1))->result_array();
-		$this->load->view('back/suppporting_list', $this->page_data);
+																			$data11 = array(
+																				'user_type' => 3,
+																				'user_id' => $this->session->userdata('adminid'),
+																				'for_user_id' => $check[0]['user_id'],
+																				'for_user_type' => $check[0]['upload_type'],
+																				'alert_type'  => 2,
+																				'ref_id' 	=> $para2,
+																				'date' => date("Y-m-d H:i:s"),
+																				'is_read' => 0,
+																				'notification_msg' => $notificatoin_msg
+																			);
+																			$this->db->insert('notifications', $data11);
 
-	}
-	
-	///////////////////////////////////////////////////////////////
-	////	/** DTR START  *////////////////////
-	///////////////////////////////////////////////////////////////
-	
-	public function dtr($para1 = '', $para2 = '', $para3 = ''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+																			echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/mtr'));
+																			exit;
+																		}
+																	} else {
+																		echo json_encode(array('respose' => FALSE, 'message' => 'Invalid Requestee'));
+																		exit;
+																	}
+																} else {
+																	echo json_encode(array('respose' => FALSE, 'message' => 'Invalid Request'));
+																	exit;
+																}
+															}
+															/**Notifications END */
+															else {
+																$this->page_data['page'] = 'MTR';
+																$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+																$this->load->view('back/mtr', $this->page_data);
+															}
+														}
+														public function monthly_traffic_report($para1 = '')
+														{
+															$this->page_data['mtr'] = $this->db->get_where('mtr', array('id' => $para1))->result_array();
 
-		}
-		if($para1 == 'list'){
-			$this->db->order_by('id','DESC');
-			$this->page_data['dtr']  = $this->db->get('dtr')->result_array();
-			$this->load->view('back/dtr_list', $this->page_data);
+															$month_year = explode('-', $this->page_data['mtr'][0]['for_month']);
+															$start_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['start_date'];
+															$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['end_date'];
 
-		}
-		elseif($para1 == 'by_tollplaza'){
-			if($para2 != ''){
-				$this->db->where('toolplaza', $para2);
-			}
-				$this->db->order_by('id','DESC');
-				$this->page_data['dtr']  = $this->db->get('dtr')->result_array();
-				$this->load->view('back/dtr_list', $this->page_data);
+															$sql = "Select * From terrif Where FIND_IN_SET (" . $this->page_data['mtr'][0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
+															$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
 
-		}
-		elseif($para1 == 'approve'){
-			$data['status'] = 1;
-			$this->db->where('alert_type',2);
-			$this->db->where('ref_id',$para2);
-			$this->db->delete('alerts');
-			$this->db->where('id',$para2);
-			$this->db->update('dtr',$data);
-		}
-		elseif($para1 == 'delete'){
-			$this->db->where('id',$para2);
-			$record = $this->db->get('dtr');
-			if($record->result_array()){
-				$support = $this->db->get_where('dtr_supporting_document',array('dtr_id' => $para2))->result_array();
-				if($support){
-					foreach($support as $val){
-						unlink('./uploads/supporting/'.$val['path']);
-					}
-					$this->db->where('dtr_id', $para2);
-					$this->db->delete('dtr_supporting_document');
-				}
-				$file = $this->db->get_where('dtr',array('id' => $para2))->row()->file;
-				unlink('./uploads/dtr/'.$file);
-				$this->db->where('id', $para2);
-				$this->db->delete('dtr');
-			}
-		}
-		elseif($para1 == 'disapprove'){
-			$this->page_data['dtr_id'] = $para2;
-			$this->load->view('back/dtr_disapprove', $this->page_data);
-		}
-		elseif($para1 == 'view_reason'){
-			$reason = $this->db->get_where('dtr',array('id' => $para2))->result_array();
-			if($reason[0]['status'] == 2){
-				echo "<span class='text-info'>".$reason[0]['reason']."</span>";
-			}else{
-				echo "<span class='text-danger'>Invalid Request</span>";
-			}
-			
-		}
-		elseif($para1 == 'disapprove_do'){
-			$check = $this->db->get_where('dtr',array('id' => $para2))->result_array();
-			if($check){
-				// echo "<pre>"; print_r($check); exit;
-				if($check[0]['status'] == 0 || $check[0]['status'] == 1){
-					if(empty($this->input->post('dissapprove_reason'))){
-						echo json_encode(array('response' => FALSE , 'message' => 'Please add reason for dissapproving this daily traffic report'));exit;	
-					}
-					else
-					{
-						$data['status'] = 2;
-						$data['reason'] = $this->input->post('dissapprove_reason');
-						$this->db->where('id', $para2);
-						$this->db->update('dtr' , $data);
-                        /**Notifications Start 
+															//echo $this->db->last_quer`y();
+															//echo "<pre>";
+															//print_r($this->page_data['terrif']); exit;
+															$this->load->view('back/invoice', $this->page_data);
+														}
+														public function generate_pdf($para1 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+
+																return redirect('admin/login');
+															}
+															$this->page_data['mtr'] = $this->db->get_where('mtr', array('id' => $para1))->result_array();
+															$month_year = explode('-', $this->page_data['mtr'][0]['for_month']);
+															$start_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['start_date'];
+															$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['end_date'];
+
+															//$sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['mtr'][0]['toolplaza']." ,toolplaza)";
+															$sql = "Select * From terrif Where FIND_IN_SET (" . $this->page_data['mtr'][0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
+															$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
+															//echo "<pre>";
+															//print_r($this->page_data['terrif'] ); exit;
+															$pdfdata = $this->load->view('back/invoice_pdf', $this->page_data, TRUE);
+
+															$this->load->library("Pdf");
+															$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+															$pdf->SetCreator(PDF_CREATOR);
+															$pdf->SetAuthor('NHA MTR');
+															$pdf->SetTitle('NHA Monthly Traffic Report');
+															$pdf->SetSubject('MTR');
+															$pdf->SetKeywords('MTR, PDF');
+
+															$pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+															$pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+
+															// set default monospaced font
+															$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+
+															// set margins
+															$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+															$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+															$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+															$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+															$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+															if (@file_exists(dirname(__FILE__) . '/lang/eng.php')) {
+																require_once(dirname(__FILE__) . '/lang/eng.php');
+																$pdf->setLanguageArray($l);
+															}
+															$pdf->setFontSubsetting(true);
+															$pdf->SetFont('dejavusans', '', 16, '', true);
+															$pdf->AddPage('L', 'A2');
+
+															$pdf->setTextShadow(array('enabled' => true, 'depth_w' => 0.2, 'depth_h' => 0.2, 'color' => array(196, 196, 196), 'opacity' => 1, 'blend_mode' => 'Normal'));
+															$pdf->writeHTMLCell(0, 0, '', '', $pdfdata, 0, 1, 0, true, '', true);
+															$pdf->Output('mtr.pdf', 'I');
+															//$pdf->Output(SERVER_RELATIVE_PATH . '/uploads/invoices/invoice' . $invoice_name . '.pdf', 'F');
+
+														}
+														public function specific_mtr($para1 = '', $para2 = '')
+														{
+															if ($para1 == 'list') {
+																$this->page_data['mtr'] = $this->db->get_where('mtr', array('id' => $para2))->result_array();
+																// $this->db->where('alert_type',2);
+																// $this->db->where('ref_id',$para2);
+																// $this->db->update('notifications',array('is_read' => 1))->result_array();	
+																$this->load->view('back/mtr_list', $this->page_data);
+															} else {
+
+																$this->page_data['page'] = 'specific_mtr';
+																$this->page_data['mtr_id'] = $para1;
+																$this->load->view('back/specific_mtr', $this->page_data);
+															}
+														}
+														public function view_supporting($para1 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+
+																return redirect('admin/login');
+															}
+															$this->page_data['support'] = $this->db->get_where('supporting_document', array('mtr_id' => $para1))->result_array();
+															$this->load->view('back/suppporting_list', $this->page_data);
+														}
+
+														///////////////////////////////////////////////////////////////
+														////	/** DTR START  *////////////////////
+														///////////////////////////////////////////////////////////////
+
+														public function dtr($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$this->db->order_by('id', 'DESC');
+																$this->page_data['dtr']  = $this->db->get('dtr')->result_array();
+																$this->load->view('back/dtr_list', $this->page_data);
+															} elseif ($para1 == 'by_tollplaza') {
+																if ($para2 != '') {
+																	$this->db->where('toolplaza', $para2);
+																}
+																$this->db->order_by('id', 'DESC');
+																$this->page_data['dtr']  = $this->db->get('dtr')->result_array();
+																$this->load->view('back/dtr_list', $this->page_data);
+															} elseif ($para1 == 'approve') {
+																$data['status'] = 1;
+																$this->db->where('alert_type', 2);
+																$this->db->where('ref_id', $para2);
+																$this->db->delete('alerts');
+																$this->db->where('id', $para2);
+																$this->db->update('dtr', $data);
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$record = $this->db->get('dtr');
+																if ($record->result_array()) {
+																	$support = $this->db->get_where('dtr_supporting_document', array('dtr_id' => $para2))->result_array();
+																	if ($support) {
+																		foreach ($support as $val) {
+																			unlink('./uploads/supporting/' . $val['path']);
+																		}
+																		$this->db->where('dtr_id', $para2);
+																		$this->db->delete('dtr_supporting_document');
+																	}
+																	$file = $this->db->get_where('dtr', array('id' => $para2))->row()->file;
+																	unlink('./uploads/dtr/' . $file);
+																	$this->db->where('id', $para2);
+																	$this->db->delete('dtr');
+																}
+															} elseif ($para1 == 'disapprove') {
+																$this->page_data['dtr_id'] = $para2;
+																$this->load->view('back/dtr_disapprove', $this->page_data);
+															} elseif ($para1 == 'view_reason') {
+																$reason = $this->db->get_where('dtr', array('id' => $para2))->result_array();
+																if ($reason[0]['status'] == 2) {
+																	echo "<span class='text-info'>" . $reason[0]['reason'] . "</span>";
+																} else {
+																	echo "<span class='text-danger'>Invalid Request</span>";
+																}
+															} elseif ($para1 == 'disapprove_do') {
+																$check = $this->db->get_where('dtr', array('id' => $para2))->result_array();
+																if ($check) {
+																	// echo "<pre>"; print_r($check); exit;
+																	if ($check[0]['status'] == 0 || $check[0]['status'] == 1) {
+																		if (empty($this->input->post('dissapprove_reason'))) {
+																			echo json_encode(array('response' => FALSE, 'message' => 'Please add reason for dissapproving this daily traffic report'));
+																			exit;
+																		} else {
+																			$data['status'] = 2;
+																			$data['reason'] = $this->input->post('dissapprove_reason');
+																			$this->db->where('id', $para2);
+																			$this->db->update('dtr', $data);
+																			/**Notifications Start 
     
     
 					  $notificatoin_msg = 'Your  '. date("F, Y",strtotime($check[0]['for_date'])) .' dtr disapproved.';
@@ -2736,612 +2793,592 @@ class Omc extends CI_Controller
                      $this->db->insert('notifications', $data11);             
 
 						echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/dtr')); exit;*/
-					}
-				}
-				else
-				{
-					echo json_encode(array('response' => TRUE , 'message' => 'Disapproved Successfully', 'is_redirect' =>TRUE, 'redirect_url' => base_url().'admin/dtr'));exit;	
-				}
-			}else{
-				echo json_encode(array('response' => FALSE , 'message' => 'Invalid Request'));exit;		
-			} /**Notifications END */
-		}
-		else{
-			$this->page_data['page'] = 'dtr';
-			$this->page_data['tollplaza'] = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-			$this->load->view('back/dtr', $this->page_data);
-		}
-	}
-	public function daily_traffic_report($para1 = ''){
-		$this->page_data['dtr'] = $this->db->get_where('dtr',array('id' => $para1 ))->result_array();
-		$date = date('Y-m-d',strtotime($this->page_data['dtr'][0]['for_date']));
-		$sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['dtr'][0]['toolplaza']." ,toolplaza)  AND (start_date <= '".$date."' AND end_date >= '".$date."')";
-		$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
-		$this->load->view('back/dtr_invoice', $this->page_data);
-	}
-	public function dtr_generate_pdf($para1 = ''){
-		$this->page_data['dtr'] = $this->db->get_where('dtr',array('id' => $para1 ))->result_array();
-		/*$month_year = explode('-',$this->page_data['mtr'][0]['for_month']);
+																		}
+																	} else {
+																		echo json_encode(array('response' => TRUE, 'message' => 'Disapproved Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/dtr'));
+																		exit;
+																	}
+																} else {
+																	echo json_encode(array('response' => FALSE, 'message' => 'Invalid Request'));
+																	exit;
+																}
+																/**Notifications END */
+															} else {
+																$this->page_data['page'] = 'dtr';
+																$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+																$this->load->view('back/dtr', $this->page_data);
+															}
+														}
+														public function daily_traffic_report($para1 = '')
+														{
+															$this->page_data['dtr'] = $this->db->get_where('dtr', array('id' => $para1))->result_array();
+															$date = date('Y-m-d', strtotime($this->page_data['dtr'][0]['for_date']));
+															$sql = "Select * From terrif Where FIND_IN_SET (" . $this->page_data['dtr'][0]['toolplaza'] . " ,toolplaza)  AND (start_date <= '" . $date . "' AND end_date >= '" . $date . "')";
+															$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
+															$this->load->view('back/dtr_invoice', $this->page_data);
+														}
+														public function dtr_generate_pdf($para1 = '')
+														{
+															$this->page_data['dtr'] = $this->db->get_where('dtr', array('id' => $para1))->result_array();
+															/*$month_year = explode('-',$this->page_data['mtr'][0]['for_month']);
 		$start_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['start_date'];
 		$end_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['end_date'];*/
 
-		//$sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['mtr'][0]['toolplaza']." ,toolplaza)";
-		$sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['dtr'][0]['toolplaza']." ,toolplaza)  AND (start_date <= '".$this->page_data['dtr'][0]['for_date']."' AND end_date >= '".$this->page_data['dtr'][0]['for_date']."')";
-		$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
-		$pdfdata = $this->load->view('front/toolplaza/dtr_invoice_pdf', $this->page_data, TRUE);
+															//$sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['mtr'][0]['toolplaza']." ,toolplaza)";
+															$sql = "Select * From terrif Where FIND_IN_SET (" . $this->page_data['dtr'][0]['toolplaza'] . " ,toolplaza)  AND (start_date <= '" . $this->page_data['dtr'][0]['for_date'] . "' AND end_date >= '" . $this->page_data['dtr'][0]['for_date'] . "')";
+															$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
+															$pdfdata = $this->load->view('front/toolplaza/dtr_invoice_pdf', $this->page_data, TRUE);
 
-		$this->load->library("Pdf");
-		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('NHA DTR');
-        $pdf->SetTitle('NHA Daily Traffic Report');
-        $pdf->SetSubject('DTR');
-        $pdf->SetKeywords('DTR, PDF');
+															$this->load->library("Pdf");
+															$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+															$pdf->SetCreator(PDF_CREATOR);
+															$pdf->SetAuthor('NHA DTR');
+															$pdf->SetTitle('NHA Daily Traffic Report');
+															$pdf->SetSubject('DTR');
+															$pdf->SetKeywords('DTR, PDF');
 
-        $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-        $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+															$pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+															$pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
 
-        // set default monospaced font
-        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+															// set default monospaced font
+															$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
-        // set margins
-        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-        if (@file_exists(dirname(__FILE__) . '/lang/eng.php')) {
-            require_once(dirname(__FILE__) . '/lang/eng.php');
-            $pdf->setLanguageArray($l);
-        }
-        $pdf->setFontSubsetting(true);
-        $pdf->SetFont('dejavusans', '', 16, '', true);
-        $pdf->AddPage('L', 'A2');
+															// set margins
+															$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+															$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+															$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+															$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+															$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+															if (@file_exists(dirname(__FILE__) . '/lang/eng.php')) {
+																require_once(dirname(__FILE__) . '/lang/eng.php');
+																$pdf->setLanguageArray($l);
+															}
+															$pdf->setFontSubsetting(true);
+															$pdf->SetFont('dejavusans', '', 16, '', true);
+															$pdf->AddPage('L', 'A2');
 
-        $pdf->setTextShadow(array('enabled' => true, 'depth_w' => 0.2, 'depth_h' => 0.2, 'color' => array(196, 196, 196), 'opacity' => 1, 'blend_mode' => 'Normal'));
-        $pdf->writeHTMLCell(0, 0, '', '', $pdfdata, 0, 1, 0, true, '', true);
-         $pdf->Output('dtr.pdf','I');
-        //$pdf->Output(SERVER_RELATIVE_PATH . '/uploads/invoices/invoice' . $invoice_name . '.pdf', 'F');
+															$pdf->setTextShadow(array('enabled' => true, 'depth_w' => 0.2, 'depth_h' => 0.2, 'color' => array(196, 196, 196), 'opacity' => 1, 'blend_mode' => 'Normal'));
+															$pdf->writeHTMLCell(0, 0, '', '', $pdfdata, 0, 1, 0, true, '', true);
+															$pdf->Output('dtr.pdf', 'I');
+															//$pdf->Output(SERVER_RELATIVE_PATH . '/uploads/invoices/invoice' . $invoice_name . '.pdf', 'F');
 
-	}
-	public function specific_dtr($para1 = '', $para2 = '' ){
-		if($para1 == 'list')
-		{
-			$this->page_data['dtr'] = $this->db->get_where('dtr',array('id' => $para2))->result_array();
-		    // $this->db->where('alert_type',2);
-			// $this->db->where('ref_id',$para2);
-			// $this->db->update('notifications',array('is_read' => 1))->result_array();	
-			$this->load->view('back/dtr_list', $this->page_data);
-		}
-		else
-		{
-			
-			$this->page_data['page'] = 'specific_dtr';
-			$this->page_data['dtr_id'] = $para1;			
-			$this->load->view('back/specific_dtr', $this->page_data);	
-		}
-	}
-	public function view_dtrsupporting($para1 = ''){
-		$this->page_data['support'] = $this->db->get_where('dtr_supporting_document',array('dtr_id' => $para1))->result_array();
-		$this->load->view('back/suppporting_list', $this->page_data);
+														}
+														public function specific_dtr($para1 = '', $para2 = '')
+														{
+															if ($para1 == 'list') {
+																$this->page_data['dtr'] = $this->db->get_where('dtr', array('id' => $para2))->result_array();
+																// $this->db->where('alert_type',2);
+																// $this->db->where('ref_id',$para2);
+																// $this->db->update('notifications',array('is_read' => 1))->result_array();	
+																$this->load->view('back/dtr_list', $this->page_data);
+															} else {
 
-	}
-	
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////// Location ///////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////
+																$this->page_data['page'] = 'specific_dtr';
+																$this->page_data['dtr_id'] = $para1;
+																$this->load->view('back/specific_dtr', $this->page_data);
+															}
+														}
+														public function view_dtrsupporting($para1 = '')
+														{
+															$this->page_data['support'] = $this->db->get_where('dtr_supporting_document', array('dtr_id' => $para1))->result_array();
+															$this->load->view('back/suppporting_list', $this->page_data);
+														}
 
-	public function location($para1 = '' , $para2 = '', $para3 =''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+														/////////////////////////////////////////////////////////////////////////////////////////////////////
+														/////////////////////////////////////////////// Location ///////////////////////////////////////////
+														///////////////////////////////////////////////////////////////////
 
-		}
-		if($para1 == 'list'){
-			$this->page_data['location'] = $this->db->get('location')->result_array();
-			$this->load->view('back/location_list', $this->page_data);
-			
-		}elseif($para1 == 'add'){
-			$this->load->view('back/location_add',$this->page_data);
+														public function location($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
 
-		}elseif($para1 == 'edit'){
-			$this->page_data['location'] = $this->db->get_where('location',array('id' => $para2))->result_array();
-			if(!$this->page_data['location']){
-				echo "<span class='text-danger'>Invalid Request</span>"; exit;
-			}
-			$this->load->view('back/location_edit',$this->page_data);
-		}elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('location');
-		}elseif($para1 == 'update'){
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('location','Tool Plaza Location','required|trim');
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('respose' => FALSE , 'message' => validation_errors()));exit;
-			}else{
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$this->page_data['location'] = $this->db->get('location')->result_array();
+																$this->load->view('back/location_list', $this->page_data);
+															} elseif ($para1 == 'add') {
+																$this->load->view('back/location_add', $this->page_data);
+															} elseif ($para1 == 'edit') {
+																$this->page_data['location'] = $this->db->get_where('location', array('id' => $para2))->result_array();
+																if (!$this->page_data['location']) {
+																	echo "<span class='text-danger'>Invalid Request</span>";
+																	exit;
+																}
+																$this->load->view('back/location_edit', $this->page_data);
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('location');
+															} elseif ($para1 == 'update') {
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('location', 'Tool Plaza Location', 'required|trim');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
 
-				$data['name'] = $this->input->post('location');
-				$this->db->where('id',$para2);
-				$this->db->update('location',$data);
-				echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/location')); exit; 
-			}
-		}elseif($para1 == 'add_do'){
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('location','Tool Plaza Location','required|trim');
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('respose' => FALSE , 'message' => validation_errors()));exit;
-			}else{
+																	$data['name'] = $this->input->post('location');
+																	$this->db->where('id', $para2);
+																	$this->db->update('location', $data);
+																	echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/location'));
+																	exit;
+																}
+															} elseif ($para1 == 'add_do') {
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('location', 'Tool Plaza Location', 'required|trim');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
 
-				$data['name'] = $this->input->post('location');
-				$this->db->insert('location',$data);
-				echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/location')); exit; 
-			}
+																	$data['name'] = $this->input->post('location');
+																	$this->db->insert('location', $data);
+																	echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/location'));
+																	exit;
+																}
+															} else {
+																$this->page_data['page'] = 'Locations';
+																$this->load->view('back/location', $this->page_data);
+															}
+														}
+
+														///////////////////////////////////////////////////////////////
+														////	/** OMC START  *////////////////////
+														///////////////////////////////////////////////////////////////
+
+														public function omc($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$this->page_data['omc'] = $this->db->get('omc')->result_array();
+																$this->load->view('back/omc_list', $this->page_data);
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('omc');
+															} elseif ($para1 == 'tp_publish_set') {
+																$article = $para2;
+																if ($para3 == 'true') {
+																	$data['status'] = '1';
+																} else {
+																	$data['status'] = '0';
+																}
+																$this->db->where('id', $article);
+																$this->db->update('omc', $data);
+
+																echo $para3;
+															} elseif ($para1 == 'add') {
+																$this->page_data['toolplaza'] = $this->Admin_model->getSites();
+																$this->load->view('back/add_omc', $this->page_data);
+															} elseif ($para1 == 'add_do') {
+																// echo "<pre>"; print_r($_POST); exit;
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('omcname', 'OMC Name', 'required|trim');
+																$this->form_validation->set_rules('username', 'OMC User Name', 'required|trim');
+																$this->form_validation->set_rules('Password', 'OMC Password', 'required|trim');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$data  = array();
+																	$data['name'] 	= $this->input->post('omcname');
+																	$data['user_name'] 	= $this->input->post('username');
+																	$data['site'] 	= $this->input->post('omcname');
+																	$data['password'] 	= $this->input->post('Password');
+																	$data['status'] = 0;
+																	$data['date'] 	= time();
+																	$this->db->insert('omc', $data);
+																	echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/omc'));
+																	exit;
+																}
+															} elseif ($para1 == 'edit') {
+																$this->page_data['omc'] = $this->db->get_where('omc', array('id' => $para2))->result_array();
+																$this->load->view('back/edit_omc', $this->page_data);
+															} elseif ($para1 == 'update') {
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('omcname', 'OMC Name', 'required|trim');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+
+																	$data  = array();
+																	$data['name'] 	= $this->input->post('omcname');
+																	$data['date'] 	= time();
+																	$this->db->where('id', $para2);
+																	$this->db->update('omc', $data);
+																	echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/omc'));
+																	exit;
+																}
+															} else {
+																$this->page_data['page'] = 'OMC';
+																$this->load->view('back/omc', $this->page_data);
+															}
+														}
+
+														///////////////////////////////////////////////////////////////
+														////	/** weightstation START  *////////////////////
+														///////////////////////////////////////////////////////////////
+
+														public function weighstation($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$sql = "Select * From weighstation ORDER BY FIELD(`status`, 1, 0)";
+
+																$this->page_data['weigh'] = $this->db->query($sql)->result_array();
+
+																$this->load->view('back/weighstation_list', $this->page_data);
+															} elseif ($para1 == 'add') {
+																$this->load->view('back/weighstation_add', $this->page_data);
+															} elseif ($para1 == 'do_add') {
+
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('name', 'Weighstation name', 'required|trim');
+																if ($this->input->post('type') == 1) {
+																	$this->form_validation->set_rules('ip_address', 'IP address', 'required|trim|valid_ip');
+																} elseif ($this->input->post('type') == 2) {
+																	$this->form_validation->set_rules('ftp_address', 'FTP address', 'required|trim|valid_ip');
+																}
+																// if($this->input->post('sofware_type') == 2){
+																// 	$this->form_validation->set_rules('file_index','Index file Required','required|trim|numeric');
+
+																// }
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$post = $this->input->post();
+																	$insert = $this->Admin_model->add_weighstation($post);
+																	if ($insert) {
+																		echo json_encode(array('response' => TRUE, 'message' => 'Added successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/weighstation'));
+																		exit;
+																	}
+																}
+															} elseif ($para1 == 'edit') {
+																$this->page_data['weigh'] = $this->db->get_where('weighstation', array('id' => $para2))->result_array();
+																$this->load->view('back/weighstation_edit', $this->page_data);
+															} elseif ($para1 == 'update') {
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('name', 'Weighstation name', 'required|trim');
+																if ($this->input->post('type') == 1) {
+																	$this->form_validation->set_rules('ip_address', 'IP address', 'required|trim|valid_ip');
+																} elseif ($this->input->post('type') == 2) {
+																	$this->form_validation->set_rules('ftp_address', 'FTP address', 'required|trim|valid_ip');
+																}
+																if ($this->input->post('sofware_type') == 2) {
+																	$this->form_validation->set_rules('file_index', 'Index file Required', 'required|trim|numeric');
+																}
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$post = $this->input->post();
+																	$weigh_id = $para2;
+																	$update = $this->Admin_model->update_weighstation($weigh_id, $post);
+																	if ($update) {
+																		echo json_encode(array('response' => TRUE, 'message' => 'Updated successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/weighstation'));
+																		exit;
+																	} else {
+																		echo json_encode(array('response' => FALSE, 'message' => 'Invalid Request'));
+																		exit;
+																	}
+																}
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('weighstation');
+															} elseif ($para1 == 'tp_publish_set') {
+																$article = $para2;
+																if ($para3 == 'true') {
+																	$data['status'] = '1';
+																} else {
+																	$data['status'] = '0';
+																}
+																$this->db->where('id', $article);
+																$this->db->update('weighstation', $data);
+
+																echo $para3;
+															} elseif ($para1 == 'gm_publish_set') {
+																$article = $para2;
+																if ($para3 == 'true') {
+																	$data['gm_status'] = '1';
+																} else {
+																	$data['gm_status'] = '0';
+																}
+																$this->db->where('id', $article);
+																$this->db->update('weighstation', $data);
+
+																echo $para3;
+															} else {
+																$this->page_data['page'] = 'Weighstation';
+																$this->load->view('back/weighstation', $this->page_data);
+															}
+														}
+														public function weighlimit($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$this->page_data['weigh'] = $this->db->get('weigh_limit')->result_array();
+																$this->load->view('back/weighlimit_list', $this->page_data);
+															} elseif ($para1 == 'add') {
+																$this->page_data['category'] = $this->db->get('weigh_category')->result_array();
+																$this->load->view('back/weighlimit_add', $this->page_data);
+															} elseif ($para1 == 'do_add') {
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('cat', 'No of Axles', 'required|trim');
+																$this->form_validation->set_rules('weighlimit', 'Weight Limit', 'required|trim|numeric');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	////check weather this category code already exists in weighlimit table////
+																	$post = $this->input->post();
+																	$code = $this->db->get_where('weigh_category', array('id' => $post['cat']))->row()->code;
+																	$check = $this->db->get_where('weigh_limit', array('category_code' => $code))->result_array();
+																	if ($check) {
+
+																		echo json_encode(array('response' => False, 'message' => 'Weighlimit for this category already exists', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/weighlimit'));
+																		exit;
+																	}
+
+																	$insert = $this->Admin_model->add_weighlimit($post);
+																	if ($insert) {
+																		echo json_encode(array('response' => TRUE, 'message' => 'Added successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/weighlimit'));
+																		exit;
+																	}
+																}
+															} elseif ($para1 == 'edit') {
+																//$this->db->where('id !=', $para2);
+																$this->page_data['category'] = $this->db->get('weigh_category')->result_array();
+																$this->page_data['limit'] = $this->db->get_where('weigh_limit', array('id' => $para2))->result_array();
+																$this->load->view('back/weighlimit_edit', $this->page_data);
+															} elseif ($para1 == 'update') {
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('cat', 'No of Axles', 'required|trim');
+																$this->form_validation->set_rules('weighlimit', 'Weight Limit', 'required|trim|numeric');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$post = $this->input->post();
+																	$code = $this->db->get_where('weigh_category', array('id' => $post['cat']))->row()->code;
+																	$this->db->where('id!=', $para2);
+																	$this->db->where('category_code', $code);
+																	$check = $this->db->get('weigh_limit')->result_array();
 
 
-		}else{
-			$this->page_data['page'] = 'Locations';
-			$this->load->view('back/location', $this->page_data);
-		}
-		
-		
-	}
+																	if ($check) {
+																		echo json_encode(array('response' => FALSE, 'message' => 'This axle limit already exist, please choose different one'));
+																		exit;
+																	}
+																	$id = $para2;
+																	$update = $this->Admin_model->update_limit($id, $post);
+																	if ($update) {
+																		echo json_encode(array('response' => TRUE, 'message' => 'Updated successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/weighlimit'));
+																		exit;
+																	} else {
+																		echo json_encode(array('response' => FALSE, 'message' => 'Invalid Request'));
+																		exit;
+																	}
+																}
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('weigh_limit');
+															} else {
+																$this->page_data['page'] = 'Weightlimit';
+																$this->load->view('back/weighlimit', $this->page_data);
+															}
+														}
+														public function weighstation_custom_data()
+														{
+															$this->page_data['page'] = 'weighstation custom data';
+															$this->page_data['weighstations'] = $this->db->get_where('weighstation', array('status' => 1, 'software_type' => 1))->result_array();
+															$this->load->view('back/weighstation_custom_data', $this->page_data);
+														}
 
-	///////////////////////////////////////////////////////////////
-	////	/** OMC START  *////////////////////
-	///////////////////////////////////////////////////////////////
+														public function search_weighstation_custom_data()
+														{
+															$ins_data = array();
+															$allowed = $this->db->get('weigh_limit')->result_array();
+															foreach ($allowed as $key => $val) {
+																$check_cat[$key] = $val['category_code'];
+															}
+															$weigh = $this->input->post('weighstation');
 
-	public function omc($para1 = '' , $para2 = '', $para3 =''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+															$date = rtrim(str_replace('/', '-', $this->input->post('day')), '-');;
+															$new_date = date('Y-m-d', strtotime($date));
+															$weighstation = $this->db->get_where('weighstation', array('id' => $weigh, 'status' => 1))->result_array();
+															// echo $this->db->last_query();
+															// echo '<pre>';
+															// print_r($check); exit;
+															if (!$weighstation) {
+																echo json_encode(array('response' => FALSE, 'message' => 'No weighstation found for your search'));
+																exit;
+															}
+															$getfile =  str_replace('-', '', $date);
+															if ($weighstation[0]['type'] == 1) {
+																$dir = "\\\\" . $weighstation[0]['address'] . "\\daw300nt\\";
+															} elseif ($weighstation[0]['type'] == 2) {
+																$dir = "ftp://" . $weighstation[0]['address'] . "/";
+															}
+															if ($weighstation[0]['type'] == 2) {
+																$conn_id = ftp_connect($weighstation[0]['address']);
+															} elseif ($weighstation[0]['type'] == 1) {
+																//$fp = @fsockopen($row['address'], 80, $errno, $errstr,5);
+															}
 
-		}
-		if($para1 == 'list'){
-			$this->page_data['omc'] = $this->db->get('omc')->result_array();
-			$this->load->view('back/omc_list', $this->page_data);
-			
-		}elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('omc');
-		}elseif ($para1 == 'tp_publish_set') {
-            $article = $para2;
-            if ($para3 == 'true') {
-                $data['status'] = '1';
-            } else {
-                $data['status'] = '0';
-            }
-            $this->db->where('id', $article);
-            $this->db->update('omc', $data);
-			
-           echo $para3;
-        }elseif($para1 == 'add'){
-			$this->page_data['toolplaza'] = $this->Admin_model->getSites();
-        	$this->load->view('back/add_omc', $this->page_data);
-        }elseif($para1 == 'add_do'){
-        	// echo "<pre>"; print_r($_POST); exit;
-        	$this->load->library('form_validation');
-			$this->form_validation->set_rules('omcname','OMC Name','required|trim');
-			$this->form_validation->set_rules('username','OMC User Name','required|trim');
-			$this->form_validation->set_rules('Password','OMC Password','required|trim');
-        	if($this->form_validation->run() == FALSE){
-        		echo json_encode(array('respose' => FALSE , 'message' => validation_errors())); exit;
+															if ($weighstation[0]['type'] == 2 && !$conn_id) {
+																echo json_encode(array('response' => FALSE, 'message' => 'Unable to connect to weighstation'));
+																exit;
+															} else {
+																$id = $weighstation[0]['id'];
+																$newdate = date('Y-m-d', strtotime($date));
 
-        	}else{
-        		$data  = array();
-				$data['name'] 	= $this->input->post('omcname');
-				$data['user_name'] 	= $this->input->post('username');
-				$data['site'] 	= $this->input->post('omcname');
-				$data['password'] 	= $this->input->post('Password');
-        		$data['status'] = 0;
-        		$data['date'] 	= time();
-        		$this->db->insert('omc', $data);
-        		echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/omc')); exit; 
-        	}
-
-        }elseif($para1 == 'edit'){
-        	$this->page_data['omc'] = $this->db->get_where('omc',array('id' => $para2))->result_array();
-        	$this->load->view('back/edit_omc',$this->page_data);
-        
-        }elseif($para1 == 'update'){
-        	$this->load->library('form_validation');
-        	$this->form_validation->set_rules('omcname','OMC Name','required|trim');
-        	if($this->form_validation->run() == FALSE){
-        		echo json_encode(array('respose' => FALSE , 'message' => validation_errors())); exit;
-
-        	}else{
-
-        		$data  = array();
-        		$data['name'] 	= $this->input->post('omcname');
-        		$data['date'] 	= time();
-        		$this->db->where('id', $para2);
-        		$this->db->update('omc', $data);
-        		echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/omc')); exit; 
-        	}
-
-        }else{
-        	$this->page_data['page'] = 'OMC';
-			$this->load->view('back/omc', $this->page_data);
-		}
-		
-		
-	}	
-	
-	///////////////////////////////////////////////////////////////
-	////	/** weightstation START  *////////////////////
-	///////////////////////////////////////////////////////////////
-	
-	public function weighstation($para1 = '' , $para2 = '', $para3 =''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
-
-		}
-		if($para1 == 'list'){
-			$sql = "Select * From weighstation ORDER BY FIELD(`status`, 1, 0)";
-											
-			$this->page_data['weigh'] = $this->db->query($sql)->result_array();
-			
-			$this->load->view('back/weighstation_list', $this->page_data);
-			
-		}elseif($para1 == 'add'){
-			$this->load->view('back/weighstation_add',$this->page_data);
-
-		}elseif($para1 == 'do_add'){
-			
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('name','Weighstation name','required|trim');
-			if($this->input->post('type') == 1){
-				$this->form_validation->set_rules('ip_address','IP address','required|trim|valid_ip');
-			
-			}elseif($this->input->post('type') == 2){
-				$this->form_validation->set_rules('ftp_address','FTP address','required|trim|valid_ip');
-			
-			}
-			// if($this->input->post('sofware_type') == 2){
-			// 	$this->form_validation->set_rules('file_index','Index file Required','required|trim|numeric');
-			
-			// }
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('response' => FALSE,'message' => validation_errors())); exit;
-			}else{
-				$post = $this->input->post();
-				$insert = $this->Admin_model->add_weighstation($post);
-				if($insert){
-					echo json_encode(array('response' => TRUE, 'message' => 'Added successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url().'admin/weighstation')); exit;
-				}
-			}
-
-		}elseif($para1 == 'edit'){
-			$this->page_data['weigh'] = $this->db->get_where('weighstation',array('id' => $para2))->result_array();
-			$this->load->view('back/weighstation_edit', $this->page_data);
-
-		}elseif($para1 == 'update'){
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('name','Weighstation name','required|trim');
-			if($this->input->post('type') == 1){
-				$this->form_validation->set_rules('ip_address','IP address','required|trim|valid_ip');
-			
-			}elseif($this->input->post('type') == 2){
-				$this->form_validation->set_rules('ftp_address','FTP address','required|trim|valid_ip');
-			
-			}
-			if($this->input->post('sofware_type') == 2){
-				$this->form_validation->set_rules('file_index','Index file Required','required|trim|numeric');
-			
-			}
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('response' => FALSE,'message' => validation_errors())); exit;
-			}else{
-				$post = $this->input->post();
-				$weigh_id = $para2;
-				$update = $this->Admin_model->update_weighstation($weigh_id, $post);
-				if($update){
-					echo json_encode(array('response' => TRUE, 'message' => 'Updated successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url().'admin/weighstation')); exit;
-				}else{
-					echo json_encode(array('response' => FALSE,'message' => 'Invalid Request')); exit;
-				}
-			}
-		}elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('weighstation');
-		}elseif ($para1 == 'tp_publish_set') {
-            $article = $para2;
-            if ($para3 == 'true') {
-                $data['status'] = '1';
-            } else {
-                $data['status'] = '0';
-            }
-            $this->db->where('id', $article);
-            $this->db->update('weighstation', $data);
-			
-           echo $para3;
-        }elseif ($para1 == 'gm_publish_set') {
-            $article = $para2;
-            if ($para3 == 'true') {
-                $data['gm_status'] = '1';
-            } else {
-                $data['gm_status'] = '0';
-            }
-            $this->db->where('id', $article);
-            $this->db->update('weighstation', $data);
-			
-           echo $para3;
-        }else{
-        	$this->page_data['page'] = 'Weighstation';
-			$this->load->view('back/weighstation', $this->page_data);
-		}
-		
-		
-	}
-	public function weighlimit($para1 = '' , $para2 = '', $para3 =''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
-
-		}
-		if($para1 == 'list'){
-			$this->page_data['weigh'] = $this->db->get('weigh_limit')->result_array();
-			$this->load->view('back/weighlimit_list', $this->page_data);
-			
-		}elseif($para1 == 'add'){
-			$this->page_data['category'] = $this->db->get('weigh_category')->result_array();
-			$this->load->view('back/weighlimit_add',$this->page_data);
-
-		}elseif($para1 == 'do_add'){
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('cat','No of Axles','required|trim');
-			$this->form_validation->set_rules('weighlimit','Weight Limit','required|trim|numeric');
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('response' => FALSE,'message' => validation_errors())); exit;
-			}else{
-				////check weather this category code already exists in weighlimit table////
-				$post = $this->input->post();
-				$code = $this->db->get_where('weigh_category',array('id'=>$post['cat']))->row()->code;
-       			$check = $this->db->get_where('weigh_limit',array('category_code' => $code))->result_array();
-				if($check){
-					
-						echo json_encode(array('response' => False, 'message' => 'Weighlimit for this category already exists', 'is_redirect' => TRUE, 'redirect_url' => base_url().'admin/weighlimit')); exit;
-					
-				}
-				
-				$insert = $this->Admin_model->add_weighlimit($post);
-				if($insert){
-					echo json_encode(array('response' => TRUE, 'message' => 'Added successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url().'admin/weighlimit')); exit;
-				}
-			}
-
-		}elseif($para1 == 'edit'){
-			//$this->db->where('id !=', $para2);
-			$this->page_data['category'] = $this->db->get('weigh_category')->result_array();
-			$this->page_data['limit'] = $this->db->get_where('weigh_limit',array('id' => $para2))->result_array();
-			$this->load->view('back/weighlimit_edit', $this->page_data);
-
-		}elseif($para1 == 'update'){
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('cat','No of Axles','required|trim');
-			$this->form_validation->set_rules('weighlimit','Weight Limit','required|trim|numeric');
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('response' => FALSE,'message' => validation_errors())); exit;
-			}else{
-				$post = $this->input->post();
-				$code = $this->db->get_where('weigh_category',array('id'=>$post['cat']))->row()->code;
-       			$this->db->where('id!=', $para2);
-       			$this->db->where('category_code', $code);
-       			$check = $this->db->get('weigh_limit')->result_array();
-				
-				
-				if($check){
-					echo json_encode(array('response' => FALSE,'message' => 'This axle limit already exist, please choose different one')); exit;
-				}
-				$id = $para2;
-				$update = $this->Admin_model->update_limit($id, $post);
-				if($update){
-					echo json_encode(array('response' => TRUE, 'message' => 'Updated successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url().'admin/weighlimit')); exit;
-				}else{
-					echo json_encode(array('response' => FALSE,'message' => 'Invalid Request')); exit;
-				}
-			}
-		}elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('weigh_limit');
-		}else{
-        	$this->page_data['page'] = 'Weightlimit';
-			$this->load->view('back/weighlimit', $this->page_data);
-			
-		}
-		
-		
-	}
-	public function weighstation_custom_data(){
-		$this->page_data['page'] = 'weighstation custom data';
-		$this->page_data['weighstations'] = $this->db->get_where('weighstation',array('status' => 1,'software_type' => 1))-> result_array();
-		$this->load->view('back/weighstation_custom_data', $this->page_data);
-			
-	}
-
-	public function search_weighstation_custom_data(){
-		$ins_data = array();
-		$allowed = $this->db->get('weigh_limit')->result_array();
-		foreach($allowed as $key => $val){
-            $check_cat[$key] = $val['category_code']; 
-        }
-		$weigh = $this->input->post('weighstation');
-
-		$date = rtrim(str_replace('/', '-' ,$this->input->post('day')), '-');;
-		$new_date = date('Y-m-d',strtotime($date));
-		$weighstation = $this->db->get_where('weighstation',array('id' => $weigh, 'status' => 1))->result_array();
-		// echo $this->db->last_query();
-		// echo '<pre>';
-		// print_r($check); exit;
-		if(!$weighstation){
-				echo json_encode(array('response' => FALSE,'message' => 'No weighstation found for your search')); exit;
-				
-		}
-		$getfile =  str_replace('-', '',$date);
-	     if($weighstation[0]['type'] == 1){
-                $dir = "\\\\".$weighstation[0]['address']."\\daw300nt\\";  
-         }elseif($weighstation[0]['type'] == 2){
-                $dir = "ftp://".$weighstation[0]['address']."/";
-         }
-         if($weighstation[0]['type'] == 2){
-            $conn_id = ftp_connect($weighstation[0]['address']);
-
-         }elseif($weighstation[0]['type'] == 1){
-                //$fp = @fsockopen($row['address'], 80, $errno, $errstr,5);
-         }
-
-         if ($weighstation[0]['type'] == 2 && !$conn_id) {
-             	echo json_encode(array('response' => FALSE,'message' => 'Unable to connect to weighstation')); exit;
-				
-         }else{
-             	$id = $weighstation[0]['id'];
-                $newdate = date('Y-m-d',strtotime($date));
-                
-                $query = $this->db->query("SELECT COUNT(id) as count_id
+																$query = $this->db->query("SELECT COUNT(id) as count_id
                                FROM weighstation_data
                                WHERE weigh_id = '$id' AND date = '$new_date'");
-                $c = $query->row()->count_id;
-                //echo $this->db->last_query(); exit;
-             	$file = $dir.$getfile.".dat";
-                $file1 = $dir.$getfile.".inf";
-              	if(file_exists($file)){ 
-                    $data = file_get_contents($file);
-                    if(file_exists($file1)){
-                        $data1 = file_get_contents($file1);
-                    }
-                    $data_exp = explode(PHP_EOL , $data);
-                    $data_exp = array_values(array_filter($data_exp));
-                    
-                    //$sku = array_slice($data_exp, ($c)) ;
-                    $sku = $data_exp;
+																$c = $query->row()->count_id;
+																//echo $this->db->last_query(); exit;
+																$file = $dir . $getfile . ".dat";
+																$file1 = $dir . $getfile . ".inf";
+																if (file_exists($file)) {
+																	$data = file_get_contents($file);
+																	if (file_exists($file1)) {
+																		$data1 = file_get_contents($file1);
+																	}
+																	$data_exp = explode(PHP_EOL, $data);
+																	$data_exp = array_values(array_filter($data_exp));
 
-                    if($sku){
-	                    $array = array();
-	                    foreach ($sku as $value) {
-	                        $array[] = explode(';', $value);
-	                    }
+																	//$sku = array_slice($data_exp, ($c)) ;
+																	$sku = $data_exp;
 
-	                    $data_final = $array;
-	                    if(file_exists($file1)){
-	                        $data1 = array_filter(explode(PHP_EOL , $data1));
-	                    	$data1_final = array();
-	                        foreach($data1 as $key11 => $val11){
-	                            $data1_final[$key11] = explode(';', $val11);
-	                       }
-	                    }
-	                  
-	                    if(!empty($data_final)){
-	                       
-	                        foreach ($data_final as $key => $rowval) {
-	                            $cat_code = trim($rowval[7]);
-	                            $index =  array_search($cat_code, array_column($allowed, 'category_code'));
-	                            if(in_array($cat_code, $check_cat)){
-	                                $ins_data[$key]['weigh_id'] = $weighstation[0]['id'];
-	                                $d = explode('/', $rowval[0]);
-	                                $datwe = $d[2].'-'.$d[0].'-'.$d[1];
-	                                $ins_data[$key]['date'] = $datwe;
-	                              
-	                                $ins_data[$key]['time'] = $rowval[1];
-	                                $ins_data[$key]['ticket_no'] = $rowval[4];
-	                                $ins_data[$key]['vehicle_no'] = $rowval[5];
-	                                $type = mb_substr(trim($rowval[7]), 0, 1);
-	                                
-	                                $ins_data[$key]['type'] = $type;
-	                              
-	                                $weight_lmit = $allowed[$index]['weigh_limit'];
+																	if ($sku) {
+																		$array = array();
+																		foreach ($sku as $value) {
+																			$array[] = explode(';', $value);
+																		}
 
-	                                $weight = 0;
-	                                for ($i = 11; $i < 11 + $type ; $i++) {
-	                                    $weight += $rowval[$i];
-	                                }
+																		$data_final = $array;
+																		if (file_exists($file1)) {
+																			$data1 = array_filter(explode(PHP_EOL, $data1));
+																			$data1_final = array();
+																			foreach ($data1 as $key11 => $val11) {
+																				$data1_final[$key11] = explode(';', $val11);
+																			}
+																		}
 
-	                                $ins_data[$key]['weight'] = $weight;
-	                                $ins_data[$key]['vehicle_code'] = $cat_code;
-	                                if($weight_lmit < $weight){
-	                                    $diff = $weight - $weight_lmit;
-	                                    $ins_data[$key]['exces_weight'] = $diff;
-	                                     
-	                                    $ins_data[$key]['percent_overload'] = round(($diff / $weight_lmit) * 100,2); 
-	                                    $ins_data[$key]['status'] = 2;
-	                                }else{
-	                                    $ins_data[$key]['exces_weight'] = 0; 
-	                                    $ins_data[$key]['percent_overload'] = 0;
-	                                    $ins_data[$key]['status'] = 1;
-	                                }
-	                                
-	                                $search = $rowval[4];
-	                                $ins_data[$key]['haulier'] = '';
-	                                $ins_data[$key]['fine'] = '';
-	                                if(file_exists($file1)){
-	                                    foreach($data1_final as $val){
-	                                    //echo "@".trim($val[2])."==".trim($search).".<br>";
-	                                        if(trim($val[2]) == trim($search)){
-	                                            
-	                                            $ins_data[$key]['haulier'] = trim(preg_replace('/[0-9.]+/', '', $val[6]));
-	                                            $ins_data[$key]['fine'] = trim($val[7]);
-	                                        }else{
+																		if (!empty($data_final)) {
 
-	                                        }
+																			foreach ($data_final as $key => $rowval) {
+																				$cat_code = trim($rowval[7]);
+																				$index =  array_search($cat_code, array_column($allowed, 'category_code'));
+																				if (in_array($cat_code, $check_cat)) {
+																					$ins_data[$key]['weigh_id'] = $weighstation[0]['id'];
+																					$d = explode('/', $rowval[0]);
+																					$datwe = $d[2] . '-' . $d[0] . '-' . $d[1];
+																					$ins_data[$key]['date'] = $datwe;
 
-	                                    }
-	                                }
+																					$ins_data[$key]['time'] = $rowval[1];
+																					$ins_data[$key]['ticket_no'] = $rowval[4];
+																					$ins_data[$key]['vehicle_no'] = $rowval[5];
+																					$type = mb_substr(trim($rowval[7]), 0, 1);
 
-	                            }
+																					$ins_data[$key]['type'] = $type;
 
-	                        }
-	                       
-	                    }
-	                }else{
-	                	 echo json_encode(array('response' => FALSE,'message' => 'You already have data for this date')); exit;
-				
-	                }
-                }else{
-                    echo json_encode(array('response' => FALSE,'message' => 'No data found for this date')); exit;
-				
-                }
-                if($ins_data){
-	               	$ins_data = array_values(array_slice($ins_data, $c));
-	               	if($ins_data){
-	               			$this->db->insert_batch('weighstation_data', $ins_data);
-	               	 		echo json_encode(array('response' => TRUE,'message' => 'Data retrieved successfully')); exit;
-				 
-	               	}else{
-	               			echo json_encode(array('response' => FALSE,'message' => 'You already have complete date for this date')); exit;
-				 
-	               	}
-	               
-            	}
-         } 
+																					$weight_lmit = $allowed[$index]['weigh_limit'];
 
+																					$weight = 0;
+																					for ($i = 11; $i < 11 + $type; $i++) {
+																						$weight += $rowval[$i];
+																					}
 
-	}
-	public function weighstation_report($para1 = '' , $para2 = '', $para3 =''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+																					$ins_data[$key]['weight'] = $weight;
+																					$ins_data[$key]['vehicle_code'] = $cat_code;
+																					if ($weight_lmit < $weight) {
+																						$diff = $weight - $weight_lmit;
+																						$ins_data[$key]['exces_weight'] = $diff;
 
-		}
-		
-        	$this->page_data['page'] = 'weighstation daily report';
-        	$this->page_data['weighstation'] = $this->db->get_where('weighstation',array('status' => 1))->result_array();
-			// $sql =	"SELECT weighstation.id, date, name, sum(case when weighstation_data.ticket_no != '' then 1 else 0 end) AS total_vehicles,
-   // 				 		sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded,
-   // 				 		sum(case when weighstation_data.status = 2 then fine else 0 end) fined
-   // 				 		 FROM weighstation
-   //  					LEFT OUTER JOIN weighstation_data ON weighstation.id = weighstation_data.weigh_id
-   //  					WHERE weighstation.status = 1   GROUP BY weighstation.id";
-        	
-    // 		$sql = " SELECT  id , name
-				// FROM    weighstation a
-    //     LEFT OUTER JOIN
-    //     (
-    //         SELECT  weigh_id ,COUNT('weighstation_data.ticket_no') AS total_vehicles , MAX(date) date,sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded,
-   	// 			 		sum(case when weighstation_data.status = 2 then fine else 0 end) fined
-   				 		
-    //         FROM    weighstation_data
-    //         GROUP BY date
-    //     ) b ON a.id = b.weigh_id ";
-		    $sql = 'SELECT weighstation.id , weighstation.name,
+																						$ins_data[$key]['percent_overload'] = round(($diff / $weight_lmit) * 100, 2);
+																						$ins_data[$key]['status'] = 2;
+																					} else {
+																						$ins_data[$key]['exces_weight'] = 0;
+																						$ins_data[$key]['percent_overload'] = 0;
+																						$ins_data[$key]['status'] = 1;
+																					}
+
+																					$search = $rowval[4];
+																					$ins_data[$key]['haulier'] = '';
+																					$ins_data[$key]['fine'] = '';
+																					if (file_exists($file1)) {
+																						foreach ($data1_final as $val) {
+																							//echo "@".trim($val[2])."==".trim($search).".<br>";
+																							if (trim($val[2]) == trim($search)) {
+
+																								$ins_data[$key]['haulier'] = trim(preg_replace('/[0-9.]+/', '', $val[6]));
+																								$ins_data[$key]['fine'] = trim($val[7]);
+																							} else {
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	} else {
+																		echo json_encode(array('response' => FALSE, 'message' => 'You already have data for this date'));
+																		exit;
+																	}
+																} else {
+																	echo json_encode(array('response' => FALSE, 'message' => 'No data found for this date'));
+																	exit;
+																}
+																if ($ins_data) {
+																	$ins_data = array_values(array_slice($ins_data, $c));
+																	if ($ins_data) {
+																		$this->db->insert_batch('weighstation_data', $ins_data);
+																		echo json_encode(array('response' => TRUE, 'message' => 'Data retrieved successfully'));
+																		exit;
+																	} else {
+																		echo json_encode(array('response' => FALSE, 'message' => 'You already have complete date for this date'));
+																		exit;
+																	}
+																}
+															}
+														}
+														public function weighstation_report($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+
+																return redirect('admin/login');
+															}
+
+															$this->page_data['page'] = 'weighstation daily report';
+															$this->page_data['weighstation'] = $this->db->get_where('weighstation', array('status' => 1))->result_array();
+															// $sql =	"SELECT weighstation.id, date, name, sum(case when weighstation_data.ticket_no != '' then 1 else 0 end) AS total_vehicles,
+															// 				 		sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded,
+															// 				 		sum(case when weighstation_data.status = 2 then fine else 0 end) fined
+															// 				 		 FROM weighstation
+															//  					LEFT OUTER JOIN weighstation_data ON weighstation.id = weighstation_data.weigh_id
+															//  					WHERE weighstation.status = 1   GROUP BY weighstation.id";
+
+															// 		$sql = " SELECT  id , name
+															// FROM    weighstation a
+															//     LEFT OUTER JOIN
+															//     (
+															//         SELECT  weigh_id ,COUNT('weighstation_data.ticket_no') AS total_vehicles , MAX(date) date,sum(case when weighstation_data.status = 2 then 1 else 0 end) overloaded,
+															// 			 		sum(case when weighstation_data.status = 2 then fine else 0 end) fined
+
+															//         FROM    weighstation_data
+															//         GROUP BY date
+															//     ) b ON a.id = b.weigh_id ";
+															$sql = 'SELECT weighstation.id , weighstation.name,
 		    weighstation_data.weigh_id,
 			weighstation.last_updated,
 		    weighstation_data.date,
@@ -3355,45 +3392,39 @@ class Omc extends CI_Controller
 			GROUP BY
 		    weighstation.id; ';
 
-			$query= $this->db->query($sql);
-			
-			$this->page_data['record'] = $query->result_array(); 
+															$query = $this->db->query($sql);
 
-			$this->load->view('back/weighstation_data', $this->page_data);
+															$this->page_data['record'] = $query->result_array();
 
-		
-		
-		
-	}
+															$this->load->view('back/weighstation_data', $this->page_data);
+														}
 
-	public function weighstation_daily_report($para1 = '' , $para2 = '', $para3 =''){
-		if($para1 == 'post'){
-			$weighstation = $this->input->post('weighstation');
-			$date = str_replace('/','-', $this->input->post('day'));
-			$this->page_data['weighstation'] = $this->db->select('*')->where('weigh_id',$weighstation)->where('date', $date)->order_by('id','desc')->get('weighstation_data')->result_array();
-			$this->page_data['weigh'] = $weighstation;
-			$this->page_data['date'] = $date;
-			$this->load->view('back/weighstation_daily_report_search', $this->page_data);
-			
-		}
-		elseif($para1 == 'by_weighstation'){
-			$weighstation = $para2;
-			$this->page_data['weigh'] = $weighstation;
-			$data = $this->Admin_model->get_weighstations_dates($weighstation);
-			$this->page_data['dates'] = $data;
-			$this->page_data['weighs'] = $this->db->get_where('weighstation',array('status' => 1))->result_array();
-		//	echo"test"; die;
-			$this->page_data['weighstation'] = $this->Admin_model->get_weighstation_daily_report($weighstation);
-			
-			$this->page_data['page'] = 'weighstation daily report';
-			$this->load->view('back/weighstation_daily_report', $this->page_data);
-			
-		}
+														public function weighstation_daily_report($para1 = '', $para2 = '', $para3 = '')
+														{
+															if ($para1 == 'post') {
+																$weighstation = $this->input->post('weighstation');
+																$date = str_replace('/', '-', $this->input->post('day'));
+																$this->page_data['weighstation'] = $this->db->select('*')->where('weigh_id', $weighstation)->where('date', $date)->order_by('id', 'desc')->get('weighstation_data')->result_array();
+																$this->page_data['weigh'] = $weighstation;
+																$this->page_data['date'] = $date;
+																$this->load->view('back/weighstation_daily_report_search', $this->page_data);
+															} elseif ($para1 == 'by_weighstation') {
+																$weighstation = $para2;
+																$this->page_data['weigh'] = $weighstation;
+																$data = $this->Admin_model->get_weighstations_dates($weighstation);
+																$this->page_data['dates'] = $data;
+																$this->page_data['weighs'] = $this->db->get_where('weighstation', array('status' => 1))->result_array();
+																//	echo"test"; die;
+																$this->page_data['weighstation'] = $this->Admin_model->get_weighstation_daily_report($weighstation);
 
-	}
+																$this->page_data['page'] = 'weighstation daily report';
+																$this->load->view('back/weighstation_daily_report', $this->page_data);
+															}
+														}
 
-	function get_weighstation_data(){
-		$sql = 'SELECT weighstation.id , weighstation.name,
+														function get_weighstation_data()
+														{
+															$sql = 'SELECT weighstation.id , weighstation.name,
 			weighstation.last_updated as last_updated,
     		weighstation_data.weigh_id,
     		weighstation_data.date as date,
@@ -3406,807 +3437,793 @@ class Omc extends CI_Controller
 			WHERE weighstation_data.date = (SELECT MAX(date) FROM weighstation_data WHERE weigh_id = weighstation.id)
 			GROUP BY
    			 weighstation.id;';
-				 $query= $this->db->query($sql);
-			$result = $query->result_array();
-    		 foreach($result as $key => $value){
-				$result[$key]['last_updated'] = date('F j, Y, g:i a', $value['last_updated']);
-				$result[$key]['date'] = date('F j, Y', strtotime( $value['date']));
-			 
-			}
-    		    echo json_encode($result); 
+															$query = $this->db->query($sql);
+															$result = $query->result_array();
+															foreach ($result as $key => $value) {
+																$result[$key]['last_updated'] = date('F j, Y, g:i a', $value['last_updated']);
+																$result[$key]['date'] = date('F j, Y', strtotime($value['date']));
+															}
+															echo json_encode($result);
+														}
+														public function daily_weighstation_pdf($para1 = '', $para2 = '')
+														{
+															$this->page_data['weighstation'] = $this->db->select('*')->where('weigh_id', $para1)->where('date', $para2)->order_by('id', 'desc')->get('weighstation_data')->result_array();
+															$report  = $this->load->view('back/weighstation_data_pdf', $this->page_data, TRUE);
+															$this->load->library("Pdf");
+															$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+															$pdf->SetCreator(PDF_CREATOR);
+															$pdf->SetAuthor('NHA MTR');
+															$pdf->SetTitle('NHA Monthly Traffic Report');
+															$pdf->SetSubject('MTR');
+															$pdf->SetKeywords('MTR, PDF');
 
-	}
-	public function daily_weighstation_pdf($para1 = '', $para2 = ''){
-		$this->page_data['weighstation'] = $this->db->select('*')->where('weigh_id',$para1)->where('date', $para2)->order_by('id','desc')->get('weighstation_data')->result_array();
-		$report  = $this->load->view('back/weighstation_data_pdf', $this->page_data, TRUE);
-		$this->load->library("Pdf");
-		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('NHA MTR');
-        $pdf->SetTitle('NHA Monthly Traffic Report');
-        $pdf->SetSubject('MTR');
-        $pdf->SetKeywords('MTR, PDF');
+															$pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+															$pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
 
-        $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-        $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+															// set default monospaced font
+															$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
-        // set default monospaced font
-        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+															// set margins
+															$pdf->SetMargins(5, 0, 5);
+															$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+															$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+															$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+															$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+															if (@file_exists(dirname(__FILE__) . '/lang/eng.php')) {
+																require_once(dirname(__FILE__) . '/lang/eng.php');
+																$pdf->setLanguageArray($l);
+															}
+															$pdf->setFontSubsetting(true);
+															$pdf->SetFont('dejavusans', '', 12, '', true);
+															$pdf->AddPage('P', 'A4');
 
-        // set margins
-        $pdf->SetMargins(5, 0, 5);
-        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-        if (@file_exists(dirname(__FILE__) . '/lang/eng.php')) {
-            require_once(dirname(__FILE__) . '/lang/eng.php');
-            $pdf->setLanguageArray($l);
-        }
-        $pdf->setFontSubsetting(true);
-        $pdf->SetFont('dejavusans', '', 12, '', true);
-        $pdf->AddPage('P', 'A4');
+															$pdf->setTextShadow(array('enabled' => true, 'depth_w' => 0.2, 'depth_h' => 0.2, 'color' => array(196, 196, 196), 'opacity' => 1, 'blend_mode' => 'Normal'));
+															$pdf->writeHTMLCell(0, 0, '', '', $report, 0, 1, 0, true, '', true);
 
-        $pdf->setTextShadow(array('enabled' => true, 'depth_w' => 0.2, 'depth_h' => 0.2, 'color' => array(196, 196, 196), 'opacity' => 1, 'blend_mode' => 'Normal'));
-        $pdf->writeHTMLCell(0, 0, '', '', $report, 0, 1, 0, true, '', true);
-         
-         $pdf->Output('mtr.pdf','I');
-	}
+															$pdf->Output('mtr.pdf', 'I');
+														}
 
-	public function weighstation_categories($para1 = '' , $para2 = '', $para3 =''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+														public function weighstation_categories($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
 
-		}
-		if($para1 == 'list'){
-			$this->page_data['weigh_cat'] = $this->db->get('weigh_category')->result_array();
-			$this->load->view('back/weighstation_category_list', $this->page_data);
-			
-		}elseif($para1 == 'add'){
-			$this->load->view('back/weighstation_cat_add',$this->page_data);
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$this->page_data['weigh_cat'] = $this->db->get('weigh_category')->result_array();
+																$this->load->view('back/weighstation_category_list', $this->page_data);
+															} elseif ($para1 == 'add') {
+																$this->load->view('back/weighstation_cat_add', $this->page_data);
+															} elseif ($para1 == 'do_add') {
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('name', 'Category Name', 'required|trim');
+																$this->form_validation->set_rules('axle', 'No of Axle', 'required|trim|numeric');
+																$this->form_validation->set_rules('code', 'Category Code', 'required|trim|numeric');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$post = $this->input->post();
+																	$insert = $this->Admin_model->add_weighstation_cat($post);
+																	if ($insert) {
+																		echo json_encode(array('response' => TRUE, 'message' => 'Added successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/weighstation_categories'));
+																		exit;
+																	}
+																}
+															} elseif ($para1 == 'edit') {
+																$this->page_data['weigh'] = $this->db->get_where('weigh_category', array('id' => $para2))->result_array();
+																$this->load->view('back/weighstation_cat_edit', $this->page_data);
+															} elseif ($para1 == 'update') {
 
-		}elseif($para1 == 'do_add'){
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('name','Category Name','required|trim');
-			$this->form_validation->set_rules('axle','No of Axle','required|trim|numeric');
-			$this->form_validation->set_rules('code','Category Code','required|trim|numeric');
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('response' => FALSE,'message' => validation_errors())); exit;
-			}else{
-				$post = $this->input->post();
-				$insert = $this->Admin_model->add_weighstation_cat($post);
-				if($insert){
-					echo json_encode(array('response' => TRUE, 'message' => 'Added successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url().'admin/weighstation_categories')); exit;
-				}
-			}
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('name', 'Category Name', 'required|trim');
+																$this->form_validation->set_rules('axle', 'No of Axle', 'required|trim|numeric');
+																$this->form_validation->set_rules('code', 'Category Code', 'required|trim|numeric');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$post = $this->input->post();
+																	$id = $para2;
+																	$update = $this->Admin_model->update_weighstation_cat($id, $post);
+																	if ($update) {
+																		echo json_encode(array('response' => TRUE, 'message' => 'Updated successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/weighstation_categories'));
+																		exit;
+																	} else {
+																		echo json_encode(array('response' => FALSE, 'message' => 'Invalid Request'));
+																		exit;
+																	}
+																}
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('weigh_category');
+															} else {
+																$this->page_data['page'] = 'Weighstation Category';
+																$this->load->view('back/weighstation_category', $this->page_data);
+															}
+														}
 
-		}elseif($para1 == 'edit'){
-			$this->page_data['weigh'] = $this->db->get_where('weigh_category',array('id' => $para2))->result_array();
-			$this->load->view('back/weighstation_cat_edit', $this->page_data);
 
-		}elseif($para1 == 'update'){
 
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('name','Category Name','required|trim');
-			$this->form_validation->set_rules('axle','No of Axle','required|trim|numeric');
-			$this->form_validation->set_rules('code','Category Code','required|trim|numeric');
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('response' => FALSE,'message' => validation_errors())); exit;
-			}else{
-				$post = $this->input->post();
-				$id = $para2;
-				$update = $this->Admin_model->update_weighstation_cat($id, $post);
-				if($update){
-					echo json_encode(array('response' => TRUE, 'message' => 'Updated successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url().'admin/weighstation_categories')); exit;
-				}else{
-					echo json_encode(array('response' => FALSE,'message' => 'Invalid Request')); exit;
-				}
-			}
-		}elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('weigh_category');
-		}else{
-        	$this->page_data['page'] = 'Weighstation Category';
-			$this->load->view('back/weighstation_category', $this->page_data);
-			
-		}
-		
-		
-	}
+														public function weighstation_monthly_report($para1 = '', $para2 = '', $para3 = '')
+														{
+															if ($para1 == 'post') {
 
-  
-	
-	public function weighstation_monthly_report($para1 = '' , $para2 = '', $para3 =''){
-		if($para1 == 'post'){
+																$weighstation = $this->input->post('weighstation');
+																$date = $this->input->post('day');
+																$this->page_data['weighstation'] = $this->Admin_model->search_weighstation_monthly_report($weighstation, $date);
+																$this->page_data['weigh'] = $weighstation;
+																$this->page_data['date'] = $date;
+																$this->load->view('back/weighstation_monthly_report_search', $this->page_data);
+															} elseif ($para1 == 'by_weighstation') {
+																$weighstation = $para2;
+																$this->page_data['weigh'] = $weighstation;
+																$data = $this->Admin_model->get_weighstations_months($weighstation);
+																$this->page_data['dates'] = $data;
+																$this->page_data['weighs'] = $this->db->get_where('weighstation', array('status' => 1))->result_array();
+																$this->page_data['weighstation'] = $this->Admin_model->get_weighstation_monthly_report($weighstation);
 
-			$weighstation = $this->input->post('weighstation');
-			$date = $this->input->post('day');
-			$this->page_data['weighstation'] = $this->Admin_model->search_weighstation_monthly_report($weighstation,$date);
-			$this->page_data['weigh'] = $weighstation;
-			$this->page_data['date'] = $date;
-			$this->load->view('back/weighstation_monthly_report_search', $this->page_data);
-			
-		}elseif($para1 == 'by_weighstation'){
-			$weighstation = $para2;
-			$this->page_data['weigh'] = $weighstation;
-			$data = $this->Admin_model->get_weighstations_months($weighstation);
-			$this->page_data['dates'] = $data;
-			$this->page_data['weighs'] = $this->db->get_where('weighstation',array('status' => 1))->result_array();
-			$this->page_data['weighstation'] = $this->Admin_model->get_weighstation_monthly_report($weighstation);
-			
-			$this->page_data['page'] = 'weighstation daily report';
-			$this->load->view('back/weighstation_monthly_report', $this->page_data);
-			
-		}
+																$this->page_data['page'] = 'weighstation daily report';
+																$this->load->view('back/weighstation_monthly_report', $this->page_data);
+															}
+														}
 
-	}
-	
-	public function monthly_weighstation_pdf($para1 = '', $para2 = ''){
-		$weighstation = $para1;
-		$date = $para2;
-		$this->page_data['weigh'] = $weighstation;
-		$d = explode('-', $para2);
-		$newdate = implode('/', array($d[1],$d[0]));
-		
-		$this->page_data['weighstation'] = $this->Admin_model->search_weighstation_monthly_report($weighstation,$newdate);
-			
-		$report  = $this->load->view('back/weighstation_monthly_pdf', $this->page_data, TRUE);
-		$this->load->library("Pdf");
-		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('NHA Monthly Weighstation Report');
-        $pdf->SetTitle('NHA Monthly Weighstation Report');
-        $pdf->SetSubject('MWR');
-        $pdf->SetKeywords('MWR, PDF');
+														public function monthly_weighstation_pdf($para1 = '', $para2 = '')
+														{
+															$weighstation = $para1;
+															$date = $para2;
+															$this->page_data['weigh'] = $weighstation;
+															$d = explode('-', $para2);
+															$newdate = implode('/', array($d[1], $d[0]));
 
-        $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-        $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+															$this->page_data['weighstation'] = $this->Admin_model->search_weighstation_monthly_report($weighstation, $newdate);
 
-        // set default monospaced font
-        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+															$report  = $this->load->view('back/weighstation_monthly_pdf', $this->page_data, TRUE);
+															$this->load->library("Pdf");
+															$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+															$pdf->SetCreator(PDF_CREATOR);
+															$pdf->SetAuthor('NHA Monthly Weighstation Report');
+															$pdf->SetTitle('NHA Monthly Weighstation Report');
+															$pdf->SetSubject('MWR');
+															$pdf->SetKeywords('MWR, PDF');
 
-        // set margins
-        $pdf->SetMargins(5, 0, 5);
-        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-        if (@file_exists(dirname(__FILE__) . '/lang/eng.php')) {
-            require_once(dirname(__FILE__) . '/lang/eng.php');
-            $pdf->setLanguageArray($l);
-        }
-        $pdf->setFontSubsetting(true);
-        $pdf->SetFont('dejavusans', '', 12, '', true);
-        $pdf->AddPage('P', 'A4');
+															$pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+															$pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
 
-        $pdf->setTextShadow(array('enabled' => true, 'depth_w' => 0.2, 'depth_h' => 0.2, 'color' => array(196, 196, 196), 'opacity' => 1, 'blend_mode' => 'Normal'));
-        $pdf->writeHTMLCell(0, 0, '', '', $report, 0, 1, 0, true, '', true);
-         
-         $pdf->Output('mtr.pdf','I');
-	}
-	
-   
-//////////////////////////////////////////////////////
-////////** Dashboard Timer START *//////////////
-//////////////////////////////////////////////////////
+															// set default monospaced font
+															$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
- 	public function dashboard_timer($para1=''){
-		$plaza = $this->input->post('plaza_id');
-		$month = $this->input->post('month');
-		$data = $this->Admin_model->omctimer_chartdata($plaza , $month);
-		$previous_year = date("Y-m-d",strtotime(@$data['chart']['month'].' -1 year'));
-		$previous_monthDate = date("Y-m-d", strtotime( date( "Y-m-d", strtotime( @$data['chart']['month'] ) ) . "-1 month" ) );
-		$pre_year_data = $this->Admin_model->get_chart_by( @$data['chart']['toolplaza_id'], $previous_year);
-		$pre_month_data = $this->Admin_model->get_chart_by( @$data['chart']['toolplaza_id'], $previous_monthDate);
-		
-		$this->page_data['mtr'] = $this->db->get_where('mtr',array('id' => $data['mtr_id'] ))->result_array();
-		$month_year = explode('-',$this->page_data['mtr'][0]['for_month']);
-		$start_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['start_date'];
-		$end_date = $month_year[0].'-'.$month_year[1].'-'.$this->page_data['mtr'][0]['end_date'];
-        $sql = "Select * From terrif Where FIND_IN_SET (".$this->page_data['mtr'][0]['toolplaza']." ,toolplaza) AND (start_date <= '".$start_date."' AND end_date >= '".$end_date."')";
-		$this->page_data['terrif'] = $this->db->query($sql)->result_array();
-		$plazaId = $this->input->post('plaza_id');
-	    $month  = $this->input->post('month');
-		$this->page_data['mtrid'] = $data['mtr_id'];
-		$this->page_data['plaza_id'] = $plazaId;
-		$this->page_data['month'] = $month;
+															// set margins
+															$pdf->SetMargins(5, 0, 5);
+															$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+															$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+															$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+															$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+															if (@file_exists(dirname(__FILE__) . '/lang/eng.php')) {
+																require_once(dirname(__FILE__) . '/lang/eng.php');
+																$pdf->setLanguageArray($l);
+															}
+															$pdf->setFontSubsetting(true);
+															$pdf->SetFont('dejavusans', '', 12, '', true);
+															$pdf->AddPage('P', 'A4');
 
-		$this->page_data['tollplaza'] = $this->db->get_where('toolplaza',array('status' => 1,'omc'=>$this->session->userdata('omcid')))->result_array();
-		$this->page_data['chart'] = $data['chart'];
-		
-		$this->page_data['revenue'] = $data['revenue'];
-		$this->page_data['pre_month_chart'] = $pre_month_data['chart'];
-        $this->page_data['pre_month_revenue'] = $pre_month_data['revenue'];
-        $this->page_data['pre_year_chart'] = $pre_year_data['chart'];
-        $this->page_data['pre_year_revenue'] = $pre_year_data['revenue'];
-		$this->page_data['page'] = 'Dashboard';
-		// echo "<pre>";
-		// print_r($this->page_data); exit;
-		$this->load->view('back/omctimereload', $this->page_data);
-	}
-/** Dashboard Timer END */
-	
-	///////////////////////////////////////////////////////////////
-	////	/** Notification START  *////////////////////
-	///////////////////////////////////////////////////////////////
-	
-	public function notify_counter($para1 = ''){	
-		$this->db->where('for_user_type',3);
-		$this->db->where('for_user_id',$this->session->userdata('adminid'));
-		$this->db->where('user_type',1);
-		$this->db->where('is_read',0);
-		$this->db->order_by("id", "desc");
-		$this->db->limit(5);
-		$disapprovedMtrs = $this->db->get('notifications')->result_array();
-		//echo $this->db->last_query(); exit;
-               
-                  if(!empty($disapprovedMtrs))
-                  {
-                    $notifyCounter = 0;
-                    foreach($disapprovedMtrs as $row)
-                    {   
-                      $notifyCounter++;
-					}
-				}
-				if(!empty($disapprovedMtrs))
-                    { 
-                      if($notifyCounter>3)
-                      {
-                       echo "3+"; 
-                      }
-                      else
-                      {
-                        echo $notifyCounter ;
-                      }
-                    }
-	}
-	public function notify_msg($para1 = ''){
-		// $firstname = 'a';
-        // $lastname = 'b';
-        // $customer_mobile = 'd';
-        // $this->db->select('*')->from('users')
-        // ->group_start()
-        //           ->where('a', $firstname)
-        //           ->where('b', $lastname)
-        //           ->where('c', '1')
-        //           ->or_group_start()
-        //                   ->where('d', $customer_mobile)
-        //                   ->where('e', '1')
-        //           ->group_end()
-        //   ->group_end()
-        // ->get();
-	//    echo $this->db->last_query();
-	    $this->db->where('for_user_type',3);
-		$this->db->where('for_user_id',$this->session->userdata('supervisor_id'));
-		$this->db->or_where('user_type',1);
-		$this->db->or_where('user_type',2);
-		$this->db->order_by("id", "desc");
-		$this->db->limit(3);
-		$this->page_data['notifications'] = $this->db->get('notifications')->result();
-		
-		
-		//echo "<pre>";
-		//print_r($this->page_data['notifications']); exit;
-		//echo $this->db->last_query(); exit;
-		$this->load->view('back/notify_msg', $this->page_data);		
-	}
-	public function delete_notification($para1 = '' ){
-		$this->db->where('id', $this->input->post('id'));
-		$this->db->delete('notifications');
-		return redirect('admin/notify_msg/');		
-	}
+															$pdf->setTextShadow(array('enabled' => true, 'depth_w' => 0.2, 'depth_h' => 0.2, 'color' => array(196, 196, 196), 'opacity' => 1, 'blend_mode' => 'Normal'));
+															$pdf->writeHTMLCell(0, 0, '', '', $report, 0, 1, 0, true, '', true);
 
-	/////////////////////google maps section start here/////////////////////////////////////////
+															$pdf->Output('mtr.pdf', 'I');
+														}
 
-	public function googlelocations($para1 = '', $para2 = '', $para3 = ''){
-		if(!$this->session->userdata('adminid')){
-			return redirect('admin/login');
-		}
-		
-		if($para1 == 'list'){
-			$this->page_data['googl'] = $this->db->get('google_locations')->result_array();
-			
-			$this->load->view('back/googlelocations_list', $this->page_data);
 
-			
-		}elseif($para1 == 'add'){
-			$this->page_data['page'] = 'Google Locations';
-			$this->page_data['roads'] = $this->db->get_where('roads',array('status' => 1))->result_array();
-			$this->load->view('back/googlelocations_add',$this->page_data);
+														//////////////////////////////////////////////////////
+														////////** Dashboard Timer START *//////////////
+														//////////////////////////////////////////////////////
 
-		}elseif($para1 == 'do_add'){
-			// echo "<pre>";
-			// print_r($_POST); exit;
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('name','Location name','required|trim');
-			$this->form_validation->set_rules('type','Location','required|trim');
-			$this->form_validation->set_rules('address','Location address','required|trim');
-			$this->form_validation->set_rules('state','Privience','required|trim');
-			//$this->form_validation->set_rules('chainage','Chainage','required|trim');
-			$this->form_validation->set_rules('lat','Latitude','required|trim');
-			$this->form_validation->set_rules('lang','Longitude','required|trim');
-			$this->form_validation->set_rules('road','Road','required|trim');
-			
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('response' => FALSE,'message' => validation_errors())); exit;
-			}else{
-				$post = $this->input->post();
-				$insert = $this->Admin_model->add_googlelocations($post);
-				if($insert){
-					echo json_encode(array('response' => TRUE, 'message' => 'Added successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url().'admin/googlelocations')); exit;
-				}
-			}
+														public function dashboard_timer($para1 = '')
+														{
+															$plaza = $this->input->post('plaza_id');
+															$month = $this->input->post('month');
+															$data = $this->Admin_model->omctimer_chartdata($plaza, $month);
+															$previous_year = date("Y-m-d", strtotime(@$data['chart']['month'] . ' -1 year'));
+															$previous_monthDate = date("Y-m-d", strtotime(date("Y-m-d", strtotime(@$data['chart']['month'])) . "-1 month"));
+															$pre_year_data = $this->Admin_model->get_chart_by(@$data['chart']['toolplaza_id'], $previous_year);
+															$pre_month_data = $this->Admin_model->get_chart_by(@$data['chart']['toolplaza_id'], $previous_monthDate);
 
-		}elseif($para1 == 'edit'){
-			$this->page_data['location'] = $this->db->get_where('google_locations',array('id' => $para2))->result_array();
-			$this->page_data['roads'] = $this->db->get_where('roads',array('status' => 1))->result_array();
-			
-			$this->page_data['page'] = 'Google Locations';
-			$this->load->view('back/googlelocations_edit',$this->page_data);
+															$this->page_data['mtr'] = $this->db->get_where('mtr', array('id' => $data['mtr_id']))->result_array();
+															$month_year = explode('-', $this->page_data['mtr'][0]['for_month']);
+															$start_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['start_date'];
+															$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['end_date'];
+															$sql = "Select * From terrif Where FIND_IN_SET (" . $this->page_data['mtr'][0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
+															$this->page_data['terrif'] = $this->db->query($sql)->result_array();
+															$plazaId = $this->input->post('plaza_id');
+															$month  = $this->input->post('month');
+															$this->page_data['mtrid'] = $data['mtr_id'];
+															$this->page_data['plaza_id'] = $plazaId;
+															$this->page_data['month'] = $month;
 
-		}elseif($para1 == 'update'){
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('name','Location name','required|trim');
-			$this->form_validation->set_rules('type','Location','required|trim');
-			$this->form_validation->set_rules('address','Location address','required|trim');
-			$this->form_validation->set_rules('state','Privience','required|trim');
-			//$this->form_validation->set_rules('chainage','Chainage','required|trim');
-			$this->form_validation->set_rules('lat','Latitude','required|trim');
-			$this->form_validation->set_rules('lang','Longitude','required|trim');
-			$this->form_validation->set_rules('road','Road','required|trim');
-			//$this->load->library('form_validation');
-			//$this->form_validation->set_rules('name','Weighstation name','required|trim');
-			
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('response' => FALSE,'message' => validation_errors())); exit;
-			}else{
-				$post = $this->input->post();
-				$google_id = $para2;
-				$update = $this->Admin_model->update_googlelocations($google_id , $post);
-				if($update){
-					echo json_encode(array('response' => TRUE, 'message' => 'Updated successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url().'admin/googlelocations')); exit;
-				}
-			}
-		}elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('google_locations');
-		}elseif ($para1 == 'tp_publish_set') {
-            $article = $para2;
-            if ($para3 == 'true') {
-                $data['status'] = '1';
-            } else {
-                $data['status'] = '0';
-            }
-            $this->db->where('id', $article);
-            $this->db->update('google_locations', $data);
-			
-           echo $para3;
-        }else{
-        	$this->page_data['page'] = 'Google Locations';
-			$this->load->view('back/google_locations', $this->page_data);
-		}
-	}
-	function getgoogledata($para1 = ''){
-		$div = '';
-		$div .= '<div class="form-group">';
-        if($para1 == 1){
-        	$div .= ' <label for="exampleInputEmail1" style="font-weight: 900;">Toll Plaza</label>
+															$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1, 'omc' => $this->session->userdata('omcid')))->result_array();
+															$this->page_data['chart'] = $data['chart'];
+
+															$this->page_data['revenue'] = $data['revenue'];
+															$this->page_data['pre_month_chart'] = $pre_month_data['chart'];
+															$this->page_data['pre_month_revenue'] = $pre_month_data['revenue'];
+															$this->page_data['pre_year_chart'] = $pre_year_data['chart'];
+															$this->page_data['pre_year_revenue'] = $pre_year_data['revenue'];
+															$this->page_data['page'] = 'Dashboard';
+															// echo "<pre>";
+															// print_r($this->page_data); exit;
+															$this->load->view('back/omctimereload', $this->page_data);
+														}
+														/** Dashboard Timer END */
+
+														///////////////////////////////////////////////////////////////
+														////	/** Notification START  *////////////////////
+														///////////////////////////////////////////////////////////////
+
+														public function notify_counter($para1 = '')
+														{
+															$this->db->where('for_user_type', 3);
+															$this->db->where('for_user_id', $this->session->userdata('adminid'));
+															$this->db->where('user_type', 1);
+															$this->db->where('is_read', 0);
+															$this->db->order_by("id", "desc");
+															$this->db->limit(5);
+															$disapprovedMtrs = $this->db->get('notifications')->result_array();
+															//echo $this->db->last_query(); exit;
+
+															if (!empty($disapprovedMtrs)) {
+																$notifyCounter = 0;
+																foreach ($disapprovedMtrs as $row) {
+																	$notifyCounter++;
+																}
+															}
+															if (!empty($disapprovedMtrs)) {
+																if ($notifyCounter > 3) {
+																	echo "3+";
+																} else {
+																	echo $notifyCounter;
+																}
+															}
+														}
+														public function notify_msg($para1 = '')
+														{
+															// $firstname = 'a';
+															// $lastname = 'b';
+															// $customer_mobile = 'd';
+															// $this->db->select('*')->from('users')
+															// ->group_start()
+															//           ->where('a', $firstname)
+															//           ->where('b', $lastname)
+															//           ->where('c', '1')
+															//           ->or_group_start()
+															//                   ->where('d', $customer_mobile)
+															//                   ->where('e', '1')
+															//           ->group_end()
+															//   ->group_end()
+															// ->get();
+															//    echo $this->db->last_query();
+															$this->db->where('for_user_type', 3);
+															$this->db->where('for_user_id', $this->session->userdata('supervisor_id'));
+															$this->db->or_where('user_type', 1);
+															$this->db->or_where('user_type', 2);
+															$this->db->order_by("id", "desc");
+															$this->db->limit(3);
+															$this->page_data['notifications'] = $this->db->get('notifications')->result();
+
+
+															//echo "<pre>";
+															//print_r($this->page_data['notifications']); exit;
+															//echo $this->db->last_query(); exit;
+															$this->load->view('back/notify_msg', $this->page_data);
+														}
+														public function delete_notification($para1 = '')
+														{
+															$this->db->where('id', $this->input->post('id'));
+															$this->db->delete('notifications');
+															return redirect('admin/notify_msg/');
+														}
+
+														/////////////////////google maps section start here/////////////////////////////////////////
+
+														public function googlelocations($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+																return redirect('admin/login');
+															}
+
+															if ($para1 == 'list') {
+																$this->page_data['googl'] = $this->db->get('google_locations')->result_array();
+
+																$this->load->view('back/googlelocations_list', $this->page_data);
+															} elseif ($para1 == 'add') {
+																$this->page_data['page'] = 'Google Locations';
+																$this->page_data['roads'] = $this->db->get_where('roads', array('status' => 1))->result_array();
+																$this->load->view('back/googlelocations_add', $this->page_data);
+															} elseif ($para1 == 'do_add') {
+																// echo "<pre>";
+																// print_r($_POST); exit;
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('name', 'Location name', 'required|trim');
+																$this->form_validation->set_rules('type', 'Location', 'required|trim');
+																$this->form_validation->set_rules('address', 'Location address', 'required|trim');
+																$this->form_validation->set_rules('state', 'Privience', 'required|trim');
+																//$this->form_validation->set_rules('chainage','Chainage','required|trim');
+																$this->form_validation->set_rules('lat', 'Latitude', 'required|trim');
+																$this->form_validation->set_rules('lang', 'Longitude', 'required|trim');
+																$this->form_validation->set_rules('road', 'Road', 'required|trim');
+
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$post = $this->input->post();
+																	$insert = $this->Admin_model->add_googlelocations($post);
+																	if ($insert) {
+																		echo json_encode(array('response' => TRUE, 'message' => 'Added successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/googlelocations'));
+																		exit;
+																	}
+																}
+															} elseif ($para1 == 'edit') {
+																$this->page_data['location'] = $this->db->get_where('google_locations', array('id' => $para2))->result_array();
+																$this->page_data['roads'] = $this->db->get_where('roads', array('status' => 1))->result_array();
+
+																$this->page_data['page'] = 'Google Locations';
+																$this->load->view('back/googlelocations_edit', $this->page_data);
+															} elseif ($para1 == 'update') {
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('name', 'Location name', 'required|trim');
+																$this->form_validation->set_rules('type', 'Location', 'required|trim');
+																$this->form_validation->set_rules('address', 'Location address', 'required|trim');
+																$this->form_validation->set_rules('state', 'Privience', 'required|trim');
+																//$this->form_validation->set_rules('chainage','Chainage','required|trim');
+																$this->form_validation->set_rules('lat', 'Latitude', 'required|trim');
+																$this->form_validation->set_rules('lang', 'Longitude', 'required|trim');
+																$this->form_validation->set_rules('road', 'Road', 'required|trim');
+																//$this->load->library('form_validation');
+																//$this->form_validation->set_rules('name','Weighstation name','required|trim');
+
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$post = $this->input->post();
+																	$google_id = $para2;
+																	$update = $this->Admin_model->update_googlelocations($google_id, $post);
+																	if ($update) {
+																		echo json_encode(array('response' => TRUE, 'message' => 'Updated successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/googlelocations'));
+																		exit;
+																	}
+																}
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('google_locations');
+															} elseif ($para1 == 'tp_publish_set') {
+																$article = $para2;
+																if ($para3 == 'true') {
+																	$data['status'] = '1';
+																} else {
+																	$data['status'] = '0';
+																}
+																$this->db->where('id', $article);
+																$this->db->update('google_locations', $data);
+
+																echo $para3;
+															} else {
+																$this->page_data['page'] = 'Google Locations';
+																$this->load->view('back/google_locations', $this->page_data);
+															}
+														}
+														function getgoogledata($para1 = '')
+														{
+															$div = '';
+															$div .= '<div class="form-group">';
+															if ($para1 == 1) {
+																$div .= ' <label for="exampleInputEmail1" style="font-weight: 900;">Toll Plaza</label>
                                   <select class="form-control required" name="loc_id" id="loc_id">
                                         <option value="">Choose Plaza</option>';
-		
-			$tollplaza = $this->db->get_where('toolplaza',array('google_map_status' => 1))->result_array();
-			foreach($tollplaza as $row){
-				$div .='<option value="'.$row["id"].'">'.$row["name"].'</option>';
-			}
-		}elseif($para1 == 2){
-			$div .= ' <label for="exampleInputEmail1" style="font-weight: 900;">Weighstation</label>
+
+																$tollplaza = $this->db->get_where('toolplaza', array('google_map_status' => 1))->result_array();
+																foreach ($tollplaza as $row) {
+																	$div .= '<option value="' . $row["id"] . '">' . $row["name"] . '</option>';
+																}
+															} elseif ($para1 == 2) {
+																$div .= ' <label for="exampleInputEmail1" style="font-weight: 900;">Weighstation</label>
                                   <select class="form-control required" name="loc_id" id="loc_id">
                                         <option value="">Choose Weighstation</option>';
-			$weighstation = $this->db->get_where('weighstation',array('gm_status' => 1))->result_array();
-			foreach($weighstation as $row){
-				$div .='<option value="'.$row["id"].'">'.$row["name"].'</option>';
-			}
-			
-		}
-		 $div .= '</select>
+																$weighstation = $this->db->get_where('weighstation', array('gm_status' => 1))->result_array();
+																foreach ($weighstation as $row) {
+																	$div .= '<option value="' . $row["id"] . '">' . $row["name"] . '</option>';
+																}
+															}
+															$div .= '</select>
                </div>';
-               echo $div;
-	}
+															echo $div;
+														}
 
-	public function googleroads($para1 = '', $para2 = '', $para3 = ''){
-		if(!$this->session->userdata('adminid')){
-			return redirect('admin/login');
-		}
-		if($para1 == 'list'){
-			$this->page_data['googl'] = $this->db->get('roads')->result_array();
-			
-			$this->load->view('back/googleroads_list', $this->page_data);
+														public function googleroads($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$this->page_data['googl'] = $this->db->get('roads')->result_array();
 
-			
-		}elseif($para1 == 'add'){
-			$this->page_data['page'] = 'Google Roads';
-			$this->load->view('back/googleroads_add',$this->page_data);
+																$this->load->view('back/googleroads_list', $this->page_data);
+															} elseif ($para1 == 'add') {
+																$this->page_data['page'] = 'Google Roads';
+																$this->load->view('back/googleroads_add', $this->page_data);
+															} elseif ($para1 == 'do_add') {
 
-		}elseif($para1 == 'do_add'){
-			
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('name','Road name','required|trim');
-			$this->form_validation->set_rules('address','Road address','required|trim');
-			$this->form_validation->set_rules('route','Route','required|trim');
-			
-			if(!$this->input->post('road_data')){
-					echo json_encode(array('response' => FALSE,'message' => 'Invalid Request')); exit;
-			
-			}
-			if(!$this->input->post('lat')){
-					echo json_encode(array('response' => FALSE,'message' => 'Invalid Request')); exit;
-			
-			}
-			if(!$this->input->post('lang')){
-					echo json_encode(array('response' => FALSE,'message' => 'Invalid Request')); exit;
-			
-			}
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('response' => FALSE,'message' => validation_errors())); exit;
-			}else{
-				$post = $this->input->post();
-				$insert = $this->Admin_model->add_googleroads($post);
-				if($insert){
-					echo json_encode(array('response' => TRUE, 'message' => 'Added successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url().'admin/googleroads')); exit;
-				}
-			}
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('name', 'Road name', 'required|trim');
+																$this->form_validation->set_rules('address', 'Road address', 'required|trim');
+																$this->form_validation->set_rules('route', 'Route', 'required|trim');
 
-		}elseif($para1 == 'edit'){
-			$this->page_data['road'] = $this->db->get_where('roads',array('id' => $para2))->result_array();
-			$this->page_data['page'] = 'Google Roads';
-			$this->load->view('back/googleroads_edit',$this->page_data);
+																if (!$this->input->post('road_data')) {
+																	echo json_encode(array('response' => FALSE, 'message' => 'Invalid Request'));
+																	exit;
+																}
+																if (!$this->input->post('lat')) {
+																	echo json_encode(array('response' => FALSE, 'message' => 'Invalid Request'));
+																	exit;
+																}
+																if (!$this->input->post('lang')) {
+																	echo json_encode(array('response' => FALSE, 'message' => 'Invalid Request'));
+																	exit;
+																}
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$post = $this->input->post();
+																	$insert = $this->Admin_model->add_googleroads($post);
+																	if ($insert) {
+																		echo json_encode(array('response' => TRUE, 'message' => 'Added successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/googleroads'));
+																		exit;
+																	}
+																}
+															} elseif ($para1 == 'edit') {
+																$this->page_data['road'] = $this->db->get_where('roads', array('id' => $para2))->result_array();
+																$this->page_data['page'] = 'Google Roads';
+																$this->load->view('back/googleroads_edit', $this->page_data);
+															} elseif ($para1 == 'do_update') {
 
-		}elseif($para1 == 'do_update'){
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('name', 'Road name', 'required|trim');
+																$this->form_validation->set_rules('address', 'Road address', 'required|trim');
+																$this->form_validation->set_rules('route', 'Route', 'required|trim');
+																if (!$this->input->post('road_data')) {
+																	echo json_encode(array('response' => FALSE, 'message' => 'Invalid Request'));
+																	exit;
+																}
+																if (!$this->input->post('lat')) {
+																	echo json_encode(array('response' => FALSE, 'message' => 'Invalid Request'));
+																	exit;
+																}
+																if (!$this->input->post('lang')) {
+																	echo json_encode(array('response' => FALSE, 'message' => 'Invalid Request'));
+																	exit;
+																}
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$post = $this->input->post();
+																	$google_id = $para2;
 
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('name','Road name','required|trim');
-			$this->form_validation->set_rules('address','Road address','required|trim');
-			$this->form_validation->set_rules('route','Route','required|trim');
-			if(!$this->input->post('road_data')){
-					echo json_encode(array('response' => FALSE,'message' => 'Invalid Request')); exit;
-			
-			}
-			if(!$this->input->post('lat')){
-					echo json_encode(array('response' => FALSE,'message' => 'Invalid Request')); exit;
-			
-			}
-			if(!$this->input->post('lang')){
-					echo json_encode(array('response' => FALSE,'message' => 'Invalid Request')); exit;
-			
-			}
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('response' => FALSE,'message' => validation_errors())); exit;
-			}else{
-				$post = $this->input->post();
-				$google_id = $para2;
+																	$update = $this->Admin_model->update_googleroads($google_id, $post);
+																	if ($update) {
+																		echo json_encode(array('response' => TRUE, 'message' => 'Updated successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/googleroads'));
+																		exit;
+																	}
+																}
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('roads');
+															} elseif ($para1 == 'tp_publish_set') {
+																$article = $para2;
+																if ($para3 == 'true') {
+																	$data['status'] = '1';
+																} else {
+																	$data['status'] = '0';
+																}
+																$this->db->where('id', $article);
+																$this->db->update('roads', $data);
 
-				$update = $this->Admin_model->update_googleroads($google_id, $post);
-				if($update){
-					echo json_encode(array('response' => TRUE, 'message' => 'Updated successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url().'admin/googleroads')); exit;
-				}
-			}
-		}elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('roads');
-		}elseif ($para1 == 'tp_publish_set') {
-            $article = $para2;
-            if ($para3 == 'true') {
-                $data['status'] = '1';
-            } else {
-                $data['status'] = '0';
-            }
-            $this->db->where('id', $article);
-            $this->db->update('roads', $data);
-			
-           echo $para3;
-        }else{
-        	$this->page_data['page'] = 'Google Roads';
-			$this->load->view('back/google_roads', $this->page_data);
-		}
-		
-	}
+																echo $para3;
+															} else {
+																$this->page_data['page'] = 'Google Roads';
+																$this->load->view('back/google_roads', $this->page_data);
+															}
+														}
 
-	function site_settings($para1 = '' , $para2 = '', $para3 = ''){
-			if(!$this->session->userdata('adminid'))
-			{	
-				return redirect('admin/login');
-			}
-			if($this->session->userdata('role') == 1){
-				return redirect('admin');
-			}
-			$this->load->library('form_validation');
-			if($para1 == 'update_map_key'){
-				$this->form_validation->set_rules('apikey','Api Key','required|trim');
-				if($this->form_validation->run() == FALSE){
-					echo json_encode(array('response' => FALSE , 'message' => validation_errors())); exit;
-				}else{
-					$data = array();
-					$data['value'] = $this->input->post('apikey');
-					$this->db->where('type', 'google_map_api_key');
-					$this->db->update('settings', $data);
-					echo json_encode(array('response' => TRUE , 'message' => 'Updated Successfully', 'is_redirect' => TRUE , 'redirect_url' => base_url().'admin/site_settings'));
-	            }		
-			}else{
-				$this->page_data['user'] = $this->db->get_where('admin',array('id' => $this->session->userdata('adminid')))->result_array();
-				$this->page_data['page'] = 'site settings';
-				$this->load->view('back/site_settings',$this->page_data);
-			}
-		}
+														function site_settings($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
+																return redirect('admin/login');
+															}
+															if ($this->session->userdata('role') == 1) {
+																return redirect('admin');
+															}
+															$this->load->library('form_validation');
+															if ($para1 == 'update_map_key') {
+																$this->form_validation->set_rules('apikey', 'Api Key', 'required|trim');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$data = array();
+																	$data['value'] = $this->input->post('apikey');
+																	$this->db->where('type', 'google_map_api_key');
+																	$this->db->update('settings', $data);
+																	echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/site_settings'));
+																}
+															} else {
+																$this->page_data['user'] = $this->db->get_where('admin', array('id' => $this->session->userdata('adminid')))->result_array();
+																$this->page_data['page'] = 'site settings';
+																$this->load->view('back/site_settings', $this->page_data);
+															}
+														}
 
 
-		/////////////////MAP SECTION STARTS HERE////////
-	public function map($para1 = ''){
-		
-		$this->page_data['page'] = 'map';
-		$this->page_data['roads'] = $this->db->get_where('google_locations',array('status' => 1))->result_array();
-		$this->page_data['locations'] = $this->db->get_where('google_locations',array('status' => 1))->result_array();
-		$this->page_data['roads'] = $this->db->get_where('roads',array('status' => 1))->result_array();
-		$this->load->view('back/mapview', $this->page_data);
-	}
+														/////////////////MAP SECTION STARTS HERE////////
+														public function map($para1 = '')
+														{
 
-	public function getcontents($para1 = ''){
-		$this->page_data['location'] = $this->db->get_where('google_locations',array('id' => $para1))->result_array();
-		$this->page_data['info_data'] = array();
-		if($this->page_data['location'])
-		{
-			if($this->page_data['location'][0]['type'] == 1){
-				$data = $this->db->select('*')->where('toolplaza', $this->page_data['location'][0]['location_id'])->order_by('for_month','desc')->limit(1)->get('mtr')->result_array();
-				if($data){
-					$tp_data = $this->Admin_model->getinfodetails_tp($data);
-				}else{
-					$tp_data = '';
-				}
-				$this->page_data['info_data'] = $tp_data;
-			}elseif($this->page_data['location'][0]['type'] == 2){
-				$this->page_data['info_data'] = array();
-			}
-		}
-		$this->load->view('back/infodata', $this->page_data);
-	}
+															$this->page_data['page'] = 'map';
+															$this->page_data['roads'] = $this->db->get_where('google_locations', array('status' => 1))->result_array();
+															$this->page_data['locations'] = $this->db->get_where('google_locations', array('status' => 1))->result_array();
+															$this->page_data['roads'] = $this->db->get_where('roads', array('status' => 1))->result_array();
+															$this->load->view('back/mapview', $this->page_data);
+														}
 
-	function searchforgoogledata(){
-		$locations = array();
-		if($this->input->post('alltollplaza')){
-			$locations[] = 1;
-		}
+														public function getcontents($para1 = '')
+														{
+															$this->page_data['location'] = $this->db->get_where('google_locations', array('id' => $para1))->result_array();
+															$this->page_data['info_data'] = array();
+															if ($this->page_data['location']) {
+																if ($this->page_data['location'][0]['type'] == 1) {
+																	$data = $this->db->select('*')->where('toolplaza', $this->page_data['location'][0]['location_id'])->order_by('for_month', 'desc')->limit(1)->get('mtr')->result_array();
+																	if ($data) {
+																		$tp_data = $this->Admin_model->getinfodetails_tp($data);
+																	} else {
+																		$tp_data = '';
+																	}
+																	$this->page_data['info_data'] = $tp_data;
+																} elseif ($this->page_data['location'][0]['type'] == 2) {
+																	$this->page_data['info_data'] = array();
+																}
+															}
+															$this->load->view('back/infodata', $this->page_data);
+														}
 
-		if($this->input->post('allweighstation')){
-			$locations[] = 2;
-		}
-		if($this->input->post('cameras')){
-			$locations[] = 3;
-		}
-		if($this->input->post('wis')){
-			$locations[] = 4;
-		}
-		if($this->input->post('vms')){
-			$locations[] = 5;
-		}
-		if($this->input->post('advisory_radio')){
-			$locations[] = 6;
-		}
-		
-		if($this->input->post('erst')){
-			$locations[] = 7;
-		}
-		if($this->input->post('microwavevd')){
-			$locations[] = 8;
-		}
-		
-		if($this->input->post('speedes')){
-			$locations[] = 9;
-			
-		}
-		if($this->input->post('efine')){
-			$locations[] = 10;
-		}
-		if($this->input->post('ofc')){
-			$locations[] = 11;
-			
-		}
-		if($this->input->post('service')){
-			$locations[] = 12;
-			
-		}
-		if($this->input->post('rest')){
-			$locations[] = 13;
-			
-		}
-		
-		if($this->input->post('specific_road')){
-			if($this->input->post('specific_road') == 'all'){
-				$this->page_data['roads'] = $this->db->get_where('roads',array('status' => 1))->result_array();
-				if($locations){
-					$this->db->where('status',1);
-					$this->db->where_in('type', $locations);
-					$this->page_data['locations'] = $this->db->get('google_locations')->result_array();
-		
-				}else{
-					$this->page_data['locations'] = '';
-		
-				}
-			}else{
-				$this->page_data['roads'] = $this->db->get_where('roads',array('status' => 1,'id' => $this->input->post('specific_road')))->result_array();
-				if($locations){
-					$this->db->where('status',1);
-					$this->db->where('road_id', $this->input->post('specific_road'));
-					$this->db->where_in('type', $locations);
-					$this->page_data['locations'] = $this->db->get('google_locations')->result_array();
-		
-				}else{
-					$this->page_data['locations'] = '';
-				}
-				
-			}  
-		}else{
-			$this->page_data['roads'] = '';
-			if($locations){
-				$this->db->where('status',1);
-				$this->db->where_in('type', $locations);
-				$this->page_data['locations'] = $this->db->get('google_locations')->result_array();
-		
-			}else{
-				$this->page_data['locations'] = '';
-		
-			}
-		}
-		
-		if(empty($this->input->post())){
-				$this->page_data['roads'] = $this->db->get_where('roads',array('status' => 1))->result_array();
-				$this->page_data['locations'] = '';
-		}
-		//echo $this->db->last_query(); exit;
-		$this->load->view('back/searchforgoogledata', $this->page_data);
-	
+														function searchforgoogledata()
+														{
+															$locations = array();
+															if ($this->input->post('alltollplaza')) {
+																$locations[] = 1;
+															}
 
-	}
-	public function traffic_counting($para1 = '', $para2 =''){
-		if($para1 == 'list')
-		{
-			$this->db->order_by('id','DESC');
-			$this->page_data['counter']  = $this->db->get('traffic_counter')->result_array();
-			$this->load->view('back/traffic_counter_list', $this->page_data);
-		}
-		elseif($para1 == 'session_start')
-		{
-			$check = $this->db->get_where('traffic_counter', array('id' => $para2))->result_array();
-			$this->page_data['error'] = '';
-			if($check[0]['video_end_date']){
-				$this->page_data['error'] = "You can't reopen a completed session";
-			}
-			$this->page_data['session_data'] = $this->db->get_where('traffic_counter',array('id' => $para2))->result_array();
-			$this->page_data['insert_id'] = $para2;
-			$this->page_data['page_name'] = 'traffic_counting';
-			$this->load->view('front/member/traffic_counter_session', $this->page_data); 
+															if ($this->input->post('allweighstation')) {
+																$locations[] = 2;
+															}
+															if ($this->input->post('cameras')) {
+																$locations[] = 3;
+															}
+															if ($this->input->post('wis')) {
+																$locations[] = 4;
+															}
+															if ($this->input->post('vms')) {
+																$locations[] = 5;
+															}
+															if ($this->input->post('advisory_radio')) {
+																$locations[] = 6;
+															}
 
-		}elseif($para1 == 'view'){
-			$this->page_data['session'] = $this->db->get_where('traffic_counter', array('id' => $para2))->result_array();
-			$this->load->view('back/traffic_counter_details', $this->page_data);
-		}
-		elseif($para1 == 'do_add')
-		{
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('tollplaza',"Toll Plaza",'required');
-			$this->form_validation->set_rules('for_month',"Date",'required');
-			$this->form_validation->set_rules('timey',"Time",'required');
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('response' => FALSE , 'message' => validation_errors())); exit;
-			
-			}else{
-				$datetime = strtotime(str_replace('/', '-', $this->input->post('for_month')).' '.$this->input->post('timey'));
-				$sql = "SELECT * FROM `traffic_counter` WHERE tollplaza = ".$this->input->post('tollplaza')." AND ".$datetime." between video_start_date and video_end_date";
-				$result = $this->db->query($sql)->result_array();
-				
-				if($result){
-					echo json_encode(array('response' => FALSE,'message' => 'Session of this date time already exists')); exit;
-				}
-				$insert_data = array();
-				$insert_data['tollplaza'] = $this->input->post('tollplaza');
-				$insert_data['user_id'] = $this->session->userdata('member_id');
-				$insert_data['user_type'] = 2;
-				$insert_data['video_start_date'] = $datetime;
-				$insert_data['session_start_date'] = time();
-				$this->db->insert('traffic_counter', $insert_data);
-				$insert_id = $this->db->insert_id();
+															if ($this->input->post('erst')) {
+																$locations[] = 7;
+															}
+															if ($this->input->post('microwavevd')) {
+																$locations[] = 8;
+															}
 
-				echo json_encode(array('response' => TRUE, 'message' => "Session started", 'is_redirect' => TRUE, 'redirect_url' => base_url().'member/traffic_counting/session_start/'.$insert_id)); exit;
-			}
-		}else if($para1 == 'traffic_add'){
+															if ($this->input->post('speedes')) {
+																$locations[] = 9;
+															}
+															if ($this->input->post('efine')) {
+																$locations[] = 10;
+															}
+															if ($this->input->post('ofc')) {
+																$locations[] = 11;
+															}
+															if ($this->input->post('service')) {
+																$locations[] = 12;
+															}
+															if ($this->input->post('rest')) {
+																$locations[] = 13;
+															}
 
-			$values = json_decode($this->input->post('result'));
-			$session_id = $this->input->post('session');
-			$data[$values[0]->key] = $values[0]->value;
-			$this->db->where('id', $session_id);
-			$this->db->update('traffic_counter', $data);
-		}elseif($para1 == 'add'){
-			$this->page_data['toolplaza'] = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-			$this->load->view('front/member/counter_add' , $this->page_data);
-		}elseif($para1 == 'update'){
-			$this->page_data['session_id'] = $para2;
-			$this->load->view('front/member/counter_update' , $this->page_data);
-		}elseif($para1 == 'do_update'){
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('end_date',"Video end date",'required');
-			$this->form_validation->set_rules('end_time',"video end time",'required');
-			
-			if($this->form_validation->run() == FALSE){
-				echo json_encode(array('response' => FALSE , 'message' => validation_errors())); exit;
-			
-			}else{
-				$update_data = array();
-				$session_id = $this->input->post('session_id');
-				$video_start_date = $this->db->get_where('traffic_counter' , array('id' => $session_id))->row()->video_start_date;
-				$datetime = strtotime(str_replace('/', '-', $this->input->post('end_date')).' '.$this->input->post('end_time'));
-				if($datetime <= $video_start_date){
-					echo json_encode(array('response' => FALSE, 'message' => 'Invalid date time')); exit;
-				}
-				$update_data['video_end_date'] = $datetime;
-				$update_data['session_end_date'] = time();
-				$this->db->where('id', $session_id);
-				$this->db->update('traffic_counter', $update_data);
+															if ($this->input->post('specific_road')) {
+																if ($this->input->post('specific_road') == 'all') {
+																	$this->page_data['roads'] = $this->db->get_where('roads', array('status' => 1))->result_array();
+																	if ($locations) {
+																		$this->db->where('status', 1);
+																		$this->db->where_in('type', $locations);
+																		$this->page_data['locations'] = $this->db->get('google_locations')->result_array();
+																	} else {
+																		$this->page_data['locations'] = '';
+																	}
+																} else {
+																	$this->page_data['roads'] = $this->db->get_where('roads', array('status' => 1, 'id' => $this->input->post('specific_road')))->result_array();
+																	if ($locations) {
+																		$this->db->where('status', 1);
+																		$this->db->where('road_id', $this->input->post('specific_road'));
+																		$this->db->where_in('type', $locations);
+																		$this->page_data['locations'] = $this->db->get('google_locations')->result_array();
+																	} else {
+																		$this->page_data['locations'] = '';
+																	}
+																}
+															} else {
+																$this->page_data['roads'] = '';
+																if ($locations) {
+																	$this->db->where('status', 1);
+																	$this->db->where_in('type', $locations);
+																	$this->page_data['locations'] = $this->db->get('google_locations')->result_array();
+																} else {
+																	$this->page_data['locations'] = '';
+																}
+															}
 
-				echo json_encode(array('response' => TRUE, 'message' => "Session updated successfully", 'is_redirect' => TRUE, 'redirect_url' => base_url().'member/traffic_counting/')); exit;
-			}
-		}elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('traffic_counter');	
-		}else{
-			
-			$this->page_data['page'] = 'traffic_counting';
-			$this->page_data['tollplaza'] = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-			$this->load->view('back/traffic_counter', $this->page_data);
-		}
-	}
-	public function date_changer(){
-		$count = 0;
-		
-		$dsr_updated = $this->db->order_by('id', 'ASC')->get('dsr_updated')->result_array();
-		
-		/*foreach($lanes as $lane){
+															if (empty($this->input->post())) {
+																$this->page_data['roads'] = $this->db->get_where('roads', array('status' => 1))->result_array();
+																$this->page_data['locations'] = '';
+															}
+															//echo $this->db->last_query(); exit;
+															$this->load->view('back/searchforgoogledata', $this->page_data);
+														}
+														public function traffic_counting($para1 = '', $para2 = '')
+														{
+															if ($para1 == 'list') {
+																$this->db->order_by('id', 'DESC');
+																$this->page_data['counter']  = $this->db->get('traffic_counter')->result_array();
+																$this->load->view('back/traffic_counter_list', $this->page_data);
+															} elseif ($para1 == 'session_start') {
+																$check = $this->db->get_where('traffic_counter', array('id' => $para2))->result_array();
+																$this->page_data['error'] = '';
+																if ($check[0]['video_end_date']) {
+																	$this->page_data['error'] = "You can't reopen a completed session";
+																}
+																$this->page_data['session_data'] = $this->db->get_where('traffic_counter', array('id' => $para2))->result_array();
+																$this->page_data['insert_id'] = $para2;
+																$this->page_data['page_name'] = 'traffic_counting';
+																$this->load->view('front/member/traffic_counter_session', $this->page_data);
+															} elseif ($para1 == 'view') {
+																$this->page_data['session'] = $this->db->get_where('traffic_counter', array('id' => $para2))->result_array();
+																$this->load->view('back/traffic_counter_details', $this->page_data);
+															} elseif ($para1 == 'do_add') {
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('tollplaza', "Toll Plaza", 'required');
+																$this->form_validation->set_rules('for_month', "Date", 'required');
+																$this->form_validation->set_rules('timey', "Time", 'required');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$datetime = strtotime(str_replace('/', '-', $this->input->post('for_month')) . ' ' . $this->input->post('timey'));
+																	$sql = "SELECT * FROM `traffic_counter` WHERE tollplaza = " . $this->input->post('tollplaza') . " AND " . $datetime . " between video_start_date and video_end_date";
+																	$result = $this->db->query($sql)->result_array();
+
+																	if ($result) {
+																		echo json_encode(array('response' => FALSE, 'message' => 'Session of this date time already exists'));
+																		exit;
+																	}
+																	$insert_data = array();
+																	$insert_data['tollplaza'] = $this->input->post('tollplaza');
+																	$insert_data['user_id'] = $this->session->userdata('member_id');
+																	$insert_data['user_type'] = 2;
+																	$insert_data['video_start_date'] = $datetime;
+																	$insert_data['session_start_date'] = time();
+																	$this->db->insert('traffic_counter', $insert_data);
+																	$insert_id = $this->db->insert_id();
+
+																	echo json_encode(array('response' => TRUE, 'message' => "Session started", 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'member/traffic_counting/session_start/' . $insert_id));
+																	exit;
+																}
+															} else if ($para1 == 'traffic_add') {
+
+																$values = json_decode($this->input->post('result'));
+																$session_id = $this->input->post('session');
+																$data[$values[0]->key] = $values[0]->value;
+																$this->db->where('id', $session_id);
+																$this->db->update('traffic_counter', $data);
+															} elseif ($para1 == 'add') {
+																$this->page_data['toolplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+																$this->load->view('front/member/counter_add', $this->page_data);
+															} elseif ($para1 == 'update') {
+																$this->page_data['session_id'] = $para2;
+																$this->load->view('front/member/counter_update', $this->page_data);
+															} elseif ($para1 == 'do_update') {
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('end_date', "Video end date", 'required');
+																$this->form_validation->set_rules('end_time', "video end time", 'required');
+
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$update_data = array();
+																	$session_id = $this->input->post('session_id');
+																	$video_start_date = $this->db->get_where('traffic_counter', array('id' => $session_id))->row()->video_start_date;
+																	$datetime = strtotime(str_replace('/', '-', $this->input->post('end_date')) . ' ' . $this->input->post('end_time'));
+																	if ($datetime <= $video_start_date) {
+																		echo json_encode(array('response' => FALSE, 'message' => 'Invalid date time'));
+																		exit;
+																	}
+																	$update_data['video_end_date'] = $datetime;
+																	$update_data['session_end_date'] = time();
+																	$this->db->where('id', $session_id);
+																	$this->db->update('traffic_counter', $update_data);
+
+																	echo json_encode(array('response' => TRUE, 'message' => "Session updated successfully", 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'member/traffic_counting/'));
+																	exit;
+																}
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('traffic_counter');
+															} else {
+
+																$this->page_data['page'] = 'traffic_counting';
+																$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+																$this->load->view('back/traffic_counter', $this->page_data);
+															}
+														}
+														public function date_changer()
+														{
+															$count = 0;
+
+															$dsr_updated = $this->db->order_by('id', 'ASC')->get('dsr_updated')->result_array();
+
+															/*foreach($lanes as $lane){
 			echo $lane['tollplaza'];echo '<br>';
 		}
 		*/
 
 
-		$i = 0;
-		foreach($dsr_updated as $d){
-			$tool_id[$i]['id'] = $d['toolplaza_id'];
-			$dsr_id = $d['id'];
-			echo '##';
-			$lanes[$i] = $this->db->order_by('id', 'ASC')->get_where('dsr_lane', array('dsr_id' => $d['id'] ))->result_array();
-			$j = 0;
-			foreach($lanes[$i] as $lane){
-				$data['toolplaza_id'] = $tool_id[$i]['id'];
-				echo $d['id'].' '.$lane['lane_id'].'<br>';
-				$this->db->where('dsr_id', $lane['dsr_id']);
-				$this->db->update('dsr_lane', $data);
-				$count++;
-				echo $lane['id']; echo ' '; echo $count;
-				$j++;
-			}
-			
-			$i++;
-		}/*?> <pre><?php echo print_r($lanes);*/
-	}
+															$i = 0;
+															foreach ($dsr_updated as $d) {
+																$tool_id[$i]['id'] = $d['toolplaza_id'];
+																$dsr_id = $d['id'];
+																echo '##';
+																$lanes[$i] = $this->db->order_by('id', 'ASC')->get_where('dsr_lane', array('dsr_id' => $d['id']))->result_array();
+																$j = 0;
+																foreach ($lanes[$i] as $lane) {
+																	$data['toolplaza_id'] = $tool_id[$i]['id'];
+																	echo $d['id'] . ' ' . $lane['lane_id'] . '<br>';
+																	$this->db->where('dsr_id', $lane['dsr_id']);
+																	$this->db->update('dsr_lane', $data);
+																	$count++;
+																	echo $lane['id'];
+																	echo ' ';
+																	echo $count;
+																	$j++;
+																}
 
-	///////////////////////toll plaza Live data///////////////////////
-	public function toll_plaza_report($para1 = '' , $para2 = '', $para3 =''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+																$i++;
+															}/*?> <pre><?php echo print_r($lanes);*/
+														}
 
-		}
-		
-        	$this->page_data['page'] = 'weighstation daily report';
-        	$this->page_data['weighstation'] = $this->db->get_where('weighstation',array('status' => 1))->result_array();
+														///////////////////////toll plaza Live data///////////////////////
+														public function toll_plaza_report($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
 
-		    $sql = 'SELECT toolplaza.id , toolplaza.name,
+																return redirect('admin/login');
+															}
+
+															$this->page_data['page'] = 'weighstation daily report';
+															$this->page_data['weighstation'] = $this->db->get_where('weighstation', array('status' => 1))->result_array();
+
+															$sql = 'SELECT toolplaza.id , toolplaza.name,
 		    transactions.tollplaza_id,
 		    transactions.date,
 		    COUNT(transactions.id) AS total_vehicles,
@@ -4239,21 +4256,18 @@ class Omc extends CI_Controller
 			GROUP BY
 		    toolplaza.id';
 
-			$query= $this->db->query($sql);
-			
-			$this->page_data['record'] = $query->result_array(); 
-			//echo "<pre>";
-			//print_r($this->page_data['record']); exit;
-			$this->load->view('back/tollplaza_data', $this->page_data);
+															$query = $this->db->query($sql);
 
-		
-		
-		
-	}
+															$this->page_data['record'] = $query->result_array();
+															//echo "<pre>";
+															//print_r($this->page_data['record']); exit;
+															$this->load->view('back/tollplaza_data', $this->page_data);
+														}
 
 
-	function get_tollplaza_data(){
-		$sql = 'SELECT toolplaza.id , toolplaza.name,
+														function get_tollplaza_data()
+														{
+															$sql = 'SELECT toolplaza.id , toolplaza.name,
 		    transactions.tollplaza_id,
 		    DATE_FORMAT(transactions.date, " %M %d, %Y") as date,
 		    
@@ -4286,96 +4300,87 @@ class Omc extends CI_Controller
 			WHERE transactions.date = (SELECT MAX(date) FROM transactions WHERE tollplaza_id = toolplaza.id)
 			GROUP BY
 		    toolplaza.id';
-        	     $query= $this->db->query($sql);
-    		 
-    		    echo json_encode($query->result_array()); 
+															$query = $this->db->query($sql);
 
-	}
+															echo json_encode($query->result_array());
+														}
 
 
-	///////////////Tollplaza Lanes///////////////////
+														///////////////Tollplaza Lanes///////////////////
 
-	public function tollplaza_lanes($para1 = '' , $para2 = '', $para3 =''){
-		if(!$this->session->userdata('adminid')){
-			
-			return redirect('admin/login');
+														public function tollplaza_lanes($para1 = '', $para2 = '', $para3 = '')
+														{
+															if (!$this->session->userdata('adminid')) {
 
-		}
-		if($para1 == 'list'){
-			$this->page_data['lanes'] = $this->db->get('tollplaza_lanes')->result_array();
-			$this->load->view('back/tollplaza_lanes_list', $this->page_data);
-			
-		}elseif($para1 == 'add'){
-			$this->page_data['tollplaza'] = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-			$this->load->view('back/tollplaza_lanes_add',$this->page_data);
-		}elseif($para1 == 'do_add'){
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('tollplaza','Tollplaza','required|trim');
-			$this->form_validation->set_rules('name', 'Lane', 'required|trim');
-			$this->form_validation->set_rules('type', 'Lane Type', 'required|trim');
-			$this->form_validation->set_rules('ip_address', 'Lane IP Address', 'required|trim');
-			if($this->form_validation->run() == FALSE){
-			 		echo json_encode(array('respose' => FALSE , 'message' => validation_errors()));exit;
-		
-			}else{
-				$insert_data = array();
-				$insert_data['toll_plaza'] = $this->input->post('tollplaza');
-				$insert_data['name'] = $this->input->post('name');
-				$insert_data['type'] = $this->input->post('type');
-				$insert_data['ipaddress'] = $this->input->post('ip_address');
-				$insert_data['date'] = time();
-				$this->db->insert('tollplaza_lanes',$insert_data);
-				echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/tollplaza_lanes')); exit;
-		
-
-			}
-		}elseif($para1 == 'edit'){
-			$this->page_data['lane'] = $this->db->get_where('tollplaza_lanes',array('id' => $para2))->result_array();
-			$this->page_data['tollplaza'] = $this->db->get_where('toolplaza',array('status' => 1))->result_array();
-			$this->load->view('back/tollplaza_lanes_edit',$this->page_data);
-		
-		}elseif($para1 == 'do_update'){
-			$this->load->library('form_validation');
-			$this->form_validation->set_rules('tollplaza','Tollplaza','required|trim');
-			$this->form_validation->set_rules('name', 'Lane', 'required|trim');
-			$this->form_validation->set_rules('type', 'Lane Type', 'required|trim');
-			$this->form_validation->set_rules('ip_address', 'Lane IP Address', 'required|trim');
-			if($this->form_validation->run() == FALSE){
-			 		echo json_encode(array('respose' => FALSE , 'message' => validation_errors()));exit;
-		
-			}else{
-				$insert_data = array();
-				$insert_data['toll_plaza'] = $this->input->post('tollplaza');
-				$insert_data['name'] = $this->input->post('name');
-				$insert_data['type'] = $this->input->post('type');
-				$insert_data['ipaddress'] = $this->input->post('ip_address');
-				$insert_data['date'] = time();
-				$this->db->where('id',$para2);
-				$this->db->update('tollplaza_lanes',$insert_data);
-				echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/tollplaza_lanes')); exit;
-		
-
-			}
-
-		}elseif($para1 == 'delete'){
-			$this->db->where('id', $para2);
-			$this->db->delete('tollplaza_lanes');
-		}elseif ($para1 == 'tp_publish_set') {
-            $article = $para2;
-            if ($para3 == 'true') {
-                $data['status'] = '1';
-            } else {
-                $data['status'] = '0';
-            }
-            $this->db->where('id', $article);
-            $this->db->update('tollplaza_lanes', $data);
-           echo $para3;
-        }else{
-        	$this->page_data['page'] = 'Tollplaza_lanes';
-			$this->load->view('back/tollplaza_lanes', $this->page_data);
-		}
-		
-		
-	}
-
-}
+																return redirect('admin/login');
+															}
+															if ($para1 == 'list') {
+																$this->page_data['lanes'] = $this->db->get('tollplaza_lanes')->result_array();
+																$this->load->view('back/tollplaza_lanes_list', $this->page_data);
+															} elseif ($para1 == 'add') {
+																$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+																$this->load->view('back/tollplaza_lanes_add', $this->page_data);
+															} elseif ($para1 == 'do_add') {
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('tollplaza', 'Tollplaza', 'required|trim');
+																$this->form_validation->set_rules('name', 'Lane', 'required|trim');
+																$this->form_validation->set_rules('type', 'Lane Type', 'required|trim');
+																$this->form_validation->set_rules('ip_address', 'Lane IP Address', 'required|trim');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$insert_data = array();
+																	$insert_data['toll_plaza'] = $this->input->post('tollplaza');
+																	$insert_data['name'] = $this->input->post('name');
+																	$insert_data['type'] = $this->input->post('type');
+																	$insert_data['ipaddress'] = $this->input->post('ip_address');
+																	$insert_data['date'] = time();
+																	$this->db->insert('tollplaza_lanes', $insert_data);
+																	echo json_encode(array('response' => TRUE, 'message' => 'Added Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/tollplaza_lanes'));
+																	exit;
+																}
+															} elseif ($para1 == 'edit') {
+																$this->page_data['lane'] = $this->db->get_where('tollplaza_lanes', array('id' => $para2))->result_array();
+																$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+																$this->load->view('back/tollplaza_lanes_edit', $this->page_data);
+															} elseif ($para1 == 'do_update') {
+																$this->load->library('form_validation');
+																$this->form_validation->set_rules('tollplaza', 'Tollplaza', 'required|trim');
+																$this->form_validation->set_rules('name', 'Lane', 'required|trim');
+																$this->form_validation->set_rules('type', 'Lane Type', 'required|trim');
+																$this->form_validation->set_rules('ip_address', 'Lane IP Address', 'required|trim');
+																if ($this->form_validation->run() == FALSE) {
+																	echo json_encode(array('respose' => FALSE, 'message' => validation_errors()));
+																	exit;
+																} else {
+																	$insert_data = array();
+																	$insert_data['toll_plaza'] = $this->input->post('tollplaza');
+																	$insert_data['name'] = $this->input->post('name');
+																	$insert_data['type'] = $this->input->post('type');
+																	$insert_data['ipaddress'] = $this->input->post('ip_address');
+																	$insert_data['date'] = time();
+																	$this->db->where('id', $para2);
+																	$this->db->update('tollplaza_lanes', $insert_data);
+																	echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/tollplaza_lanes'));
+																	exit;
+																}
+															} elseif ($para1 == 'delete') {
+																$this->db->where('id', $para2);
+																$this->db->delete('tollplaza_lanes');
+															} elseif ($para1 == 'tp_publish_set') {
+																$article = $para2;
+																if ($para3 == 'true') {
+																	$data['status'] = '1';
+																} else {
+																	$data['status'] = '0';
+																}
+																$this->db->where('id', $article);
+																$this->db->update('tollplaza_lanes', $data);
+																echo $para3;
+															} else {
+																$this->page_data['page'] = 'Tollplaza_lanes';
+																$this->load->view('back/tollplaza_lanes', $this->page_data);
+															}
+														}
+													}
