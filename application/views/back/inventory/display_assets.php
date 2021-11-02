@@ -115,63 +115,63 @@
                       </a>
                       </td>       
                       <td>
-                         <?php 
+                        <?php 
                             if($asset['action_status']=="0")
-                             {
-                               echo "Brand New";
-                             }
-                             elseif($asset['action_status']=="1")
-                             {
-                               echo "Checked Out";
-                             }
-                             elseif($asset['action_status']=="2")
-                             {
-                               echo "Checked In";
-                             }
-                             elseif($asset['action_status']=="3")
-                             {
-                               echo "Installed";
-                             } 
-                             elseif($asset['action_status']=="4")
-                             {
-                               echo "Repairing Mode";
-                             }
-                             elseif($asset['action_status']=="5")
-                             {
-                               echo "Repaired";
-                             } 
-                             elseif($asset['action_status']=="6")
-                             {
-                               echo "Retired";
-                             }
-                             elseif($asset['action_status']=="9")
-                             {
-                               echo "Re Installed";
-                             }
-                             elseif($asset['action_status']=="10")
-                             {
-                               echo "Whole Equipment Faulty";
-                             } 
-                             elseif($asset['action_status']=="11")
-                             {
-                               echo $faulty_comp_name." Faulty";
-                             }
-                             elseif($asset['action_status']=="12")
-                             {
-                               echo $faulty_comp_name." Replaced";
-                             }
-                             elseif($asset['action_status']=="13")
-                             {
-                               echo $faulty_comp_name." Repairing Mode";
-                             }
-                             elseif($asset['action_status']=="14")
-                             {
-                               echo $faulty_comp_name." Reinstalled";
-                             }
-                             elseif($asset['action_status']=="15")
-                             {
-                               echo $faulty_comp_name." Retired";
-                             }                                    
+                            {
+                              echo "Brand New";
+                            }
+                            elseif($asset['action_status']=="1")
+                            {
+                              echo "Checked Out";
+                            }
+                            elseif($asset['action_status']=="2")
+                            {
+                              echo "Checked In";
+                            }
+                            elseif($asset['action_status']=="3")
+                            {
+                              echo "Installed";
+                            } 
+                            elseif($asset['action_status']=="4")
+                            {
+                              echo "Repairing Mode";
+                            }
+                            elseif($asset['action_status']=="5")
+                            {
+                              echo "Repaired";
+                            } 
+                            elseif($asset['action_status']=="6")
+                            {
+                              echo "Retired";
+                            }
+                            elseif($asset['action_status']=="9")
+                            {
+                              echo "Re Installed";
+                            }
+                            elseif($asset['action_status']=="10")
+                            {
+                              echo "Whole Equipment Faulty";
+                            } 
+                            elseif($asset['action_status']=="11")
+                            {
+                              echo $faulty_comp_name." Faulty";
+                            }
+                            elseif($asset['action_status']=="12")
+                            {
+                              echo $faulty_comp_name." Replaced";
+                            }
+                            elseif($asset['action_status']=="13")
+                            {
+                              echo $faulty_comp_name." Repairing Mode";
+                            }
+                            elseif($asset['action_status']=="14")
+                            {
+                              echo $faulty_comp_name." Reinstalled";
+                            }
+                            elseif($asset['action_status']=="15")
+                            {
+                              echo $faulty_comp_name." Retired";
+                            }                                    
                             ?>
                       </td>
                       <td>
@@ -182,32 +182,29 @@
                         </td>
                       <!-- <td>
                       <?php if($asset['action_status']==1){?>
-                         <?php if($asset['checkout_user_type']=="1"){ 
-                               $checkout_to = $this->db->get_where('admin',array('id' => $asset['checkout_to']))->result_array(); 
-                               echo $checkout_to[0]['fname']." ".$checkout_to[0]['lname']; 
+                        <?php if($asset['checkout_user_type']=="1"){ 
+                              $checkout_to = $this->db->get_where('admin',array('id' => $asset['checkout_to']))->result_array(); 
+                              echo $checkout_to[0]['fname']." ".$checkout_to[0]['lname']; 
                               } ?>
 
-                         <?php if($asset['checkout_user_type']=="2"){ 
-                               $checkout_to = $this->db->get_where('member',array('id' => $asset['checkout_to']))->result_array();
-                               echo $checkout_to[0]['fname']." ".$checkout_to[0]['lname']; 
-                               } ?>
+                        <?php if($asset['checkout_user_type']=="2"){ 
+                              $checkout_to = $this->db->get_where('member',array('id' => $asset['checkout_to']))->result_array();
+                              echo $checkout_to[0]['fname']." ".$checkout_to[0]['lname']; 
+                              } ?>
 
-                         <?php if($asset['checkout_user_type']=="3"){ 
-                               $checkout_to = $this->db->get_where('tpsupervisor',array('id' => $asset['checkout_to']))->result_array(); 
+                        <?php if($asset['checkout_user_type']=="3"){ 
+                              $checkout_to = $this->db->get_where('tpsupervisor',array('id' => $asset['checkout_to']))->result_array(); 
                                //echo "<pre>"; print_r($checkout_to);// exit;
-                                 echo $checkout_to[0]['fname']." ".$checkout_to[0]['lname'];
-                               } ?>
-                       <?php } ?>
+                                echo $checkout_to[0]['fname']." ".$checkout_to[0]['lname'];
+                              } ?>
+                      <?php } ?>
                       </td> -->
                       </tr>
-                     
-                      
-
                               <?PHP
                               $id++;
-                             } 
-                             ?>
-                   <!-- <tbody class="hidebody" style="display:none;"></tbody> -->
+                            } 
+                            ?>
+                  <!-- <tbody class="hidebody" style="display:none;"></tbody> -->
                               <?php if(count($items)==1){?>                
                   <tr role="row" class="odd" id="mainrow<?php echo $counter ?>" >
                       <td class="sorting_1">
@@ -217,29 +214,29 @@
                       <td>
                       <a href="#" onclick="show_asset('<?php echo base_url().'inventory/selected_asset/list/'.$asset['id'];?>','display_selected_asset');">
                       <?php 
-                       $assetName = $this->db->get_where('items',array('id'=>$asset['name']))->result_array();
-                       echo $assetName[0]['name'];  
+                      $assetName = $this->db->get_where('items',array('id'=>$asset['name']))->result_array();
+                      echo $assetName[0]['name'];  
                       ?>
                       </a>
                       </td>       
                       <td>
-                         <?php 
+                        <?php 
                             if($asset['action_status']=="0")
-                             {
-                               echo "Brand New";
-                             }
-                             elseif($asset['action_status']=="1")
-                             {
-                               echo "Checked Out";
-                             }
-                             elseif($asset['action_status']=="2")
-                             {
-                               echo "Checked In";
-                             }
-                             elseif($asset['action_status']=="3")
-                             {
-                               echo "Installed";
-                             } 
+                            {
+                              echo "Brand New";
+                            }
+                            elseif($asset['action_status']=="1")
+                            {
+                              echo "Checked Out";
+                            }
+                            elseif($asset['action_status']=="2")
+                            {
+                              echo "Checked In";
+                            }
+                            elseif($asset['action_status']=="3")
+                            {
+                              echo "Installed";
+                            } 
                              elseif($asset['action_status']=="4")
                              {
                                echo "Repairing Mode";
@@ -641,7 +638,7 @@ if( filter_by == 2)
   function expandCollapse(assetName,id){
     var loading_set = '<div class="col-md-2"><div class="stat"><div class="stat-icon" style="color:#fa8564"><i class="fa fa-refresh fa-spin"></i></div></div></div>';
     var list = $('.hidden-row');
-     console.log(id);
+    console.log(id);
     assetName.classList.remove("fa-caret-square-down");
     assetName.classList.add("fa-caret-square-up");
     var tr = assetName.closest('tr');
@@ -654,15 +651,15 @@ if( filter_by == 2)
     // console.log(document.getElementsByClassName('test'));
     var dynamic_rows = document.getElementById('trow'+tr.id)
     // console.log(dynamic_rows);
- 
+
       // console.log("yasir") ;
-             $.ajax({ 
+            $.ajax({ 
               url: "<?php echo base_url() ?>inventory/expand/"+inputValue,
               cache       : false,
               contentType : false,
               processData : false,
               beforeSend: function() {
-               
+              
               list.html(loading_set);
               },
               success: function(data) {

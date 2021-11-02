@@ -12,6 +12,7 @@
                     <tbody>
                        <?php
                         $counter = 0;
+                        //echo '<pre>'; echo print_r($dtr);exit;
                        foreach($dtr as $row){
                         $counter++; 
                         $toolplaza_name = $this->db->get_where('toolplaza',array('id' =>$row['toolplaza']))->row()->name;
@@ -26,6 +27,7 @@
                           $this->db->from('tpsupervisor');
                           $this->db->where('id', $row['user_id']);
                           $upload_name = $this->db->get()->result_array();
+                          //echo print_r($row);exit;
                           echo $upload_name[0]['fname'].' '.$upload_name[0]['lname']."&nbsp;(Supervisor)";
                         }else{
                           $this->db->select('fname, lname');

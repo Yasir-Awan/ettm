@@ -1010,6 +1010,7 @@ public function suppliers($para1 = '' , $para2 = '', $para3 =''){
 			'contact' => $this->input->post('contact'),
 			'address' => $this->input->post('address_[description]')
 			);
+			// echo "<pre>"; print_r($data); exit;
 		$this->db->insert('suppliers',$data);
 		echo json_encode(array('response' => true, 'message' =>'Supplier Added Successfully','is_redirect' => True,'redirect_url' => base_url().'inventory/first_page')); exit;
 	 } 
@@ -1317,6 +1318,7 @@ public function manufacturers($para1 = '' , $para2 = '', $para3 =''){
 			{
 				$this->page_data['selected_installed'] = $this->db->select('*')->where('id', $para2)->order_by('id','desc')->limit(1)->get('installed_inventory')->result_array();
 				$this->page_data['selected_installed_transaction'] = $this->db->select('*')->where('installed_id', $para2)->order_by('id','desc')->limit(1)->get('asset_transaction')->result_array();
+				
 				$this->page_data['selected_assets'] = $this->db->get_where('assets',array('id' => $this->page_data['selected_installed'][0]['asset_id']))->result_array();		
 				$this->page_data['install_transactions'] = $this->db->select('*')->where('installed_id', $para2)->order_by('id','desc')->get('asset_transaction')->result_array();
 				$this->load->view('back/inventory/display_selected_installs',$this->page_data);	
@@ -1711,6 +1713,7 @@ public function add_asset_components($para1='',$para2='',$para3='')
 	  $this->form_validation->set_rules('warranty_type',' Warranty type','required|trim');
 	  if($this->form_validation->run() == TRUE)
 	  {
+		//   echo "<pre>"; print_r($_POST); exit;
 		  if($this->session->userdata('adminid'))
 		  {
 			 $eSerialCounter = 0;
@@ -3218,8 +3221,8 @@ public function add_asset_components($para1='',$para2='',$para3='')
 
 							$this->db->insert('faulty_equipment_list',$faulty_data);
 							$qur = $this->db->last_query();  
-							echo $qur;
-							exit;
+							// echo $qur;
+							// exit;
 
 
 						$data = array(

@@ -29,6 +29,9 @@
                                                 <div class="weighdate col-md-4">
                                                     <input type="text" id="day" name="day" class="form-control" placeholder="Select Date" >
                                                 </div>
+
+                                                
+                                            
                                         </div>
                                         </form>
                                     </div>
@@ -76,7 +79,8 @@
                                                     <td><?php echo round($row['exces_weight'],2);?></td>
                                                     <td><?php echo $row['percent_overload'];?>&nbsp; %</td>
                                                     <td><?php echo $row['fine'];?></td>
-                                                    <td><?php if($row['status'] == 2){echo "Overload";}else{echo "Ok";}?></td>    
+                                                    <td><?php if($row['status'] == 2){echo "Overload";}else{echo "Ok";}?></td>
+                                                    
                                                 </tr> 
                                                 <?php    }
                                                 }?>

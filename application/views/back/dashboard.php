@@ -1,4 +1,3 @@
-
 <?php include('includes/header.php'); ?>
 
 <?php include('dashboard/style.php'); ?>
@@ -15,6 +14,7 @@
         <!-- Traffic summary table -->
         <?php include('dashboard/traffic_summary.php'); ?>
         <!-- Traffic summary Table END -->
+
         <?php include('dashboard/charts.php'); ?>
       </div>
       <?php if($page == "Dashboard"){?>

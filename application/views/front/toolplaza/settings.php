@@ -93,7 +93,7 @@ nav > div a.nav-item.nav-link:focus
                                 <div class="col-md-8 pr-">
                                   <div class="form-group">
                                     <label>Contact</label>
-                                    <input type="text" name="contact" class="form-control required" placeholder="Enter Contact Number" value="<?php echo $user[0]['contact']?>">
+                                    <input type="tel" name="contact" class="form-control required" placeholder="03001234567" pattern="[0-9]{11}" required value="<?php echo $user[0]['contact']?>">
                                   </div>
                                 </div>
                                 <div class="col-md-3"></div>

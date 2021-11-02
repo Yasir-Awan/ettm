@@ -242,6 +242,8 @@ class dsr_model extends MY_Model
 	}
 	//function to load the data from database especially for view and edit modules 
 	public function dsr_data($id, $tool, $edit,$para2){
+		// echo '<pre>';
+		// echo print_r($edit); exit;
 		if(isset($edit)){
 			$dsr_inventory = $edit['dsr_inventory'];
 			$dsr_bound = $edit['dsr_bound'];
@@ -502,6 +504,7 @@ class dsr_model extends MY_Model
 		}
 		if($page == 'R'){
 			$edit = $this->dsr_read($id, $tool, $page, $para1);
+			/*?><pre> <?php echo print_r($edit);exit;*/
 			$edit['dsr_heading'][0]['dsr_date'] =  date( 'jS F Y',strtotime($edit['dsr_heading'][0]['dsr_date']));
 			if(isset($edit['dsr_attendance'])){
 				$dsr_a = 0;
@@ -515,7 +518,7 @@ class dsr_model extends MY_Model
 					$dsr_a++;
 				}
 			}
-			/*?><pre> <?php echo print_r($edit);exit;*/
+			
 		}
 		if($page == 'U'){
 			//PU stands for data accumulation before taking to the edit page.
@@ -843,6 +846,8 @@ class dsr_model extends MY_Model
 	public function dsr_read($id, $tool, $page, $para1){
 		$read['dsr_bound'] = db()->get('dsr_bound')->result_array();
 		$read['dsr_heading'] = db()->get_where('view_dsr_heading', array('id' => $para1))->result_array();
+		// echo '<pre>';
+		// echo print_r($para1); exit;
 		$read['dsr_inventory'] = db()->get_where('view_dsr_inventory', array('dsr_id' => $para1))->result_array();
 
 		$read['tp_lanes'] = db()->get('tp_lanes')->result_array();

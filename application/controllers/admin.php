@@ -26,9 +26,7 @@ class Admin extends CI_Controller
 			return redirect('NHMP_dashboard/index');
 		}
 		$data = $this->Admin_model->chartdata();
-		// echo "<pre>";
-		// print_r($data);
-		// exit;
+
 		// $this->load->model('General');
 		// $this->General->notifications();
 		$previous_year = date("Y-m-d", strtotime(@$data['chart']['month'] . ' -1 year'));
@@ -49,14 +47,8 @@ class Admin extends CI_Controller
 		$this->page_data['plaza_id'] = $data['chart']['toolplaza_id'];
 		$this->page_data['month'] = $data['chart']['month'];
 
-		if ($this->session->userdata('adminid') == 28) {
-			$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1, 'id' => 10))->result_array();
-		}
-		if ($this->session->userdata('adminid') == 29) {
-			$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1, 'id' => 11))->result_array();
-		} else {
-			$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
-		}
+
+		$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
 		$this->page_data['chart'] = $data['chart'];
 
 		$this->page_data['revenue'] = $data['revenue'];
@@ -72,9 +64,10 @@ class Admin extends CI_Controller
 	Function name: dasboard Parameter Name $id, $tool
 	Function: Its the main function that displays dashboardST
 	Date Creation: Late
-	Optimized Date: 5/10/2020*/
+	Optimized Date: 11/6/2021*/
 	public function dashboard()
 	{
+		$starttime = microtime(true);
 		date_default_timezone_set("Asia/Karachi");
 		$this->load->model('dashboardst');
 		if (!$this->session->userdata('adminid')) {
@@ -93,16 +86,19 @@ class Admin extends CI_Controller
 		$this->dash_dtr($dtrid, $tool);
 		///DTR Area End
 		$this->page_data['id'] = $id;
-
+		unset($id, $tool, $table, $where, $dtrid);
 		/*?><pre> <?php echo print_r($this->page_data);exit;*/
 		$this->page_data['page'] = 'Dashboard ST';
+		$endtime = microtime(true);
+		$executiontime = $endtime - $starttime;
+
 		$this->load->view('back/Ddashboard', $this->page_data);
 	}
 	/*Author: Numaan 
 	Function name: dasboard_dsr Parameter Name $id, $tool
 	Function: It deals with all the ajax calls done from DashbaordST
 	Date Creation: Late
-	Optimized Date: 5/10/2020*/
+	Optimized Date: 11/6/2021*/
 	public function dashboard_dsr()
 	{
 		date_default_timezone_set("Asia/Karachi");
@@ -119,6 +115,7 @@ class Admin extends CI_Controller
 			///DSR Area Closed
 			$this->page_data['id'] = $id;
 			$this->page_data['page'] = 'Dashboard ST';
+			unset($id, $table, $where, $tool);
 			$this->load->view("back/includes/dashboarddtrdsr/dsr", $this->page_data);
 		} elseif ($id == "today-dtr" || $id == "yesterday-dtr" || $id == "current-month-dtr" || $id == "current-quarter-dtr" || $id == "current-semiannual-dtr") {
 			///DtR Area Start
@@ -127,6 +124,7 @@ class Admin extends CI_Controller
 			/*?> <?php echo print_r($this->page_data);exit;*/
 			$this->page_data['id'] = $id;
 			$this->page_data['page'] = 'Dashboard ST';
+			unset($id, $table, $where, $tool);
 			$this->load->view("back/includes/dashboarddtrdsr/dtr", $this->page_data);
 		}
 	}
@@ -252,7 +250,7 @@ class Admin extends CI_Controller
 	Function name: dash_dsr Parameter Name $id, $tool
 	Function: To get and display data for DSR portion in Dashboard ST
 	Date Creation: 5/7/2020
-	Optimized date : 5/10/2020*/
+	Optimized date : 11/6/2021*/
 	public function dash_dsr($id, $tool)
 	{
 		date_default_timezone_set("Asia/Karachi");
@@ -326,12 +324,13 @@ class Admin extends CI_Controller
 			$t++;
 		}
 		$this->page_data['dsr'] = $dsr;
+		unset($id, $tool, $t, $toll, $k, $dsr, $toolplaza_st);
 	}
 	/*Author: Numaan 
 	Function name: dash_dtr Parameter Name $id, $tool
 	Function: To get and display data for DSR portion in Dashboard ST
 	Date Creation: 5/7/2020
-	Optimized date : 5/10/2020*/
+	Optimized date : 11/6/2021*/
 	public function dash_dtr($id, $tool)
 	{
 		date_default_timezone_set("Asia/Karachi");
@@ -379,13 +378,17 @@ class Admin extends CI_Controller
 
 		/*?><pre> <?php echo print_r($this->page_data['tool']);exit;*/
 		$this->page_data['dtr'] = $dtr;
+		unset($id, $tool, $dtr, $toll, $toolplaza_st, $t, $k);
 	}
 	/*Author: Numaan 
 	Function name: dash_dsr_extend
 	Function: To display dates of rejected and not uploaded dsr
-	Date Creation: 5/12/2020*/
+	Date Creation: 5/12/2021
+	Optimization: Unset All ununsed variables
+	Date Optimization 11/6/2021*/
 	public function dash_dsr_extend()
 	{
+		$starttime = microtime(true);
 		$this->load->model("dashboardst");
 
 		$id = $this->input->post("id");
@@ -403,6 +406,8 @@ class Admin extends CI_Controller
 		Date added: 5/21/2020*/
 		$this->page_data['dates'] = $this->dashboard_st_dates($id, $data);
 		$this->page_data['toolplaza'] = $data['toolplaza'];
+		unset($id, $post, $toll, $dsr, $data);
+
 		if (strpos($data['htmlid'], 'dtr')) {
 			$this->load->view("back/includes/dashboarddtrdsr/dtrpanel/dtr_extended", $this->page_data);
 		} else {
@@ -427,6 +432,7 @@ class Admin extends CI_Controller
 				$t++;
 			}
 		}
+		unset($toll, $t, $tool);
 		$this->page_data['page'] = "Duplicate Dates";
 		$this->load->view('back/includes/dashboarddtrdsr/duplicates', $this->page_data);
 	}
@@ -1009,13 +1015,13 @@ class Admin extends CI_Controller
 			$i++;
 		}*/
 														/*$data['file'] = file_get_contents('C:\Mandra\0000000294_TSaveBatchDBMessage.txt');
-		if(sizeof($data['file']) > 1){
-		foreach($data['file'] as $file){
-		$data['exp'] = explode('C:\Mandra\0000000294_TSaveBatchDBMessage.txt',$file);
-		}
-		}else{
-	$data['exp'] = explode('C:\Mandra\0000000294_TSaveBatchDBMessage.txt',$data['file']);
-	}	*/
+    	if(sizeof($data['file']) > 1){
+    	foreach($data['file'] as $file){
+    	$data['exp'] = explode('C:\Mandra\0000000294_TSaveBatchDBMessage.txt',$file);
+    	}
+    	}else{
+     $data['exp'] = explode('C:\Mandra\0000000294_TSaveBatchDBMessage.txt',$data['file']);
+    	}	*/
 
 														?>
 		<pre><?php echo print_r($data[$k]['file']); ?></pre><?php exit;
@@ -1050,7 +1056,7 @@ class Admin extends CI_Controller
 																	$this->session->set_userdata('role', $admin_info[0]['role']);
 																	$this->session->set_userdata('site', $admin_info[0]['site']);
 																	// echo "<pre>"; print_r($this->session->userdata('site')); exit;
-																	if ($this->session->userdata('role') == 3 || $this->session->userdata('role') == 5) {
+																	if ($this->session->userdata('role') == 3 || $this->session->userdata('role') == 5 || $this->session->userdata('role') == 14) {
 																		echo json_encode(array('response' => TRUE, 'message' => 'Successfull Login', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'inventory/first_page'));
 																	}
 																	if ($this->session->userdata('role') == 1 || $this->session->userdata('role') == 2 || $this->session->userdata('role') == 4) {
@@ -1142,7 +1148,6 @@ class Admin extends CI_Controller
 														}
 														public function searchforchart($para1 = '')
 														{
-
 															$tollplaza = $this->input->post('tollplaza');
 															$month  = $this->input->post('formonth');
 															$data = $this->Admin_model->get_chartdata($tollplaza, $month);
@@ -1152,26 +1157,22 @@ class Admin extends CI_Controller
 															$pre_year_data = $this->Admin_model->get_chart_by(@$data['chart']['toolplaza_id'], $previous_year);
 
 															$pre_month_data = $this->Admin_model->get_chart_by(@$data['chart']['toolplaza_id'], $previous_monthDate);
-
 															$this->page_data['mtr'] = $this->db->get_where('mtr', array('id' => $data['mtr_id']))->result_array();
 															$month_year = explode('-', $this->page_data['mtr'][0]['for_month']);
 															$start_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['start_date'];
 															$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['end_date'];
 															$sql = "Select * From terrif Where FIND_IN_SET (" . $this->page_data['mtr'][0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
 															$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
-
 															$this->page_data['mtrid'] = $data['mtr_id'];
 															$this->page_data['page'] = 'Dashboard';
 															$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
 															$this->page_data['chart'] = $data['chart'];
-
 															$this->page_data['revenue'] = $data['revenue'];
 															$this->page_data['custom'] = 'custom_search';
 															$this->page_data['pre_month_chart'] = $pre_month_data['chart'];
 															$this->page_data['pre_month_revenue'] = $pre_month_data['revenue'];
 															$this->page_data['pre_year_chart'] = $pre_year_data['chart'];
 															$this->page_data['pre_year_revenue'] = $pre_year_data['revenue'];
-
 															$this->load->view('back/customize_chart_search', $this->page_data);
 														}
 														public function check_dtrtollplaza_dates($tollplaza = '')
@@ -1869,6 +1870,7 @@ class Admin extends CI_Controller
 																$where = 'id';
 																$table = 'dsr';
 																$this->dsr_model->update_dsr($where, $para2, $table, $data);
+																$this->createNotification($para2, 'DSR', 'Approve');
 															} elseif ($para1 == 'disapprove') {
 																$edit['id'] = $para2;
 																$this->load->view('back/dsr_disapprove', $edit);
@@ -1888,6 +1890,7 @@ class Admin extends CI_Controller
 																			$where = 'id';
 																			$table = 'dsr';
 																			$this->dsr_model->update_dsr($where, $para2, $table, $data);
+																			$this->createNotification($para2, 'DSR', 'Disapprove');
 																			echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/dsr'));
 																			exit;
 																		}
@@ -1940,6 +1943,8 @@ class Admin extends CI_Controller
 																$page = 'R'; //CRUD Read 
 																//Some data is loaded to run data into dsr variable like Staff, north, south from dsr_lane, and dsr staff tables
 																$edit['read'] = $this->dsr_model->sitereport_data_preload($id, $tool, $page, $para1);
+																// echo '<pre>';
+																// echo print_r($edit); exit;
 																//data is loaded into dsr variable where new layout data is converted to old layout data so that it can be merged easily with older work 
 																$edit = $this->dsr_model->dsr_data($id, $tool, $edit['read'], $para1);
 															}
@@ -2020,13 +2025,13 @@ class Admin extends CI_Controller
 														public function dsr_features($para1 = '', $para2 = '', $para3 = '')
 														{
 															if (!$this->session->userdata('adminid')) {
-
 																return redirect('admin/login');
 															} else {
 																$this->load->model('features');
 																$this->load->model('dsr_model');
 																if ($para1 == 'list') {
 																	$this->page_data['features'] = $this->db->get('dsr_features')->result_array();
+																	//echo "<pre>"; print_r($this->page_data); exit;
 																	$this->load->view('back/dsr/features_list', $this->page_data);
 																} elseif ($para1 == 'delete') {
 																	$this->db->where('id', $para2);
@@ -3372,6 +3377,7 @@ class Admin extends CI_Controller
 																// $this->db->delete('alerts');
 																$this->db->where('id', $para2);
 																$this->db->update('mtr', $data);
+																$this->createNotification($para2, 'MTR', 'Approve');
 															} elseif ($para1 == 'delete') {
 																$this->db->where('id', $para2);
 																$record = $this->db->get('mtr');
@@ -3412,25 +3418,7 @@ class Admin extends CI_Controller
 																			$data['reason'] = $this->input->post('dissapprove_reason');
 																			$this->db->where('id', $para2);
 																			$this->db->update('mtr', $data);
-																			/**Notifications Start */
-
-
-																			$notificatoin_msg = 'Your  ' . date("F, Y", strtotime($check[0]['for_month'])) . ' mtr disapproved.';
-																			$mtrMonth = explode('-', $check[0]['for_month']);
-																			$mtr_month = $mtrMonth[0] . '-' . $mtrMonth[1] . '-' . $mtrMonth[2];
-
-																			$data11 = array(
-																				'user_type' => 3,
-																				'user_id' => $this->session->userdata('adminid'),
-																				'for_user_id' => $check[0]['user_id'],
-																				'for_user_type' => $check[0]['upload_type'],
-																				'alert_type'  => 2,
-																				'ref_id' 	=> $para2,
-																				'date' => date("Y-m-d H:i:s"),
-																				'is_read' => 0,
-																				'notification_msg' => $notificatoin_msg
-																			);
-																			$this->db->insert('notifications', $data11);
+																			$this->createNotification($para2, 'MTR', 'Disapprove');
 
 																			echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/mtr'));
 																			exit;
@@ -3519,21 +3507,7 @@ class Admin extends CI_Controller
 															//$pdf->Output(SERVER_RELATIVE_PATH . '/uploads/invoices/invoice' . $invoice_name . '.pdf', 'F');
 
 														}
-														public function specific_mtr($para1 = '', $para2 = '')
-														{
-															if ($para1 == 'list') {
-																$this->page_data['mtr'] = $this->db->get_where('mtr', array('id' => $para2))->result_array();
-																// $this->db->where('alert_type',2);
-																// $this->db->where('ref_id',$para2);
-																// $this->db->update('notifications',array('is_read' => 1))->result_array();	
-																$this->load->view('back/mtr_list', $this->page_data);
-															} else {
 
-																$this->page_data['page'] = 'specific_mtr';
-																$this->page_data['mtr_id'] = $para1;
-																$this->load->view('back/specific_mtr', $this->page_data);
-															}
-														}
 														public function view_supporting($para1 = '')
 														{
 															if (!$this->session->userdata('adminid')) {
@@ -3547,7 +3521,29 @@ class Admin extends CI_Controller
 														///////////////////////////////////////////////////////////////
 														////	/** DTR START  *////////////////////
 														///////////////////////////////////////////////////////////////
-
+														public function dtr_limit($count, $para2)
+														{
+															if ($count) {
+																$feat['show'] = $count + 200;
+																$feat['less'] = $count - 200;
+																$user_id = $para2;
+																$toll = NULL;
+																$limit = $count;
+																$Dtrs = $this->load->model('dtrModel');
+																$Dtrs = new dtrModel();
+																$Dtrs = $Dtrs->getLimitedList($user_id, $toll, $limit);
+																return array('dtr' => $Dtrs, 'feat' => $feat);
+															} else {
+																$feat['show'] = 400;
+																$user_id = $para2;
+																$toll = NULL;
+																$limit = 200;
+																$Dtrs = $this->load->model('dtrModel');
+																$Dtrs = new dtrModel();
+																$Dtrs = $Dtrs->getLimitedList($user_id, $toll, $limit);
+																return array('dtr' => $Dtrs, 'feat' => $feat);
+															}
+														}
 														public function dtr($para1 = '', $para2 = '', $para3 = '')
 														{
 															//date_default_timezone_set("Asia/Karachi");
@@ -3558,17 +3554,26 @@ class Admin extends CI_Controller
 
 															date_default_timezone_set("Asia/Karachi");
 															if ($para1 == 'list') {
-																$this->db->order_by('id', 'DESC');
-																$this->page_data['dtr']  = $this->db->get('dtr')->result_array();
-																/*?> <pre> <?php echo print_r(date('F j, Y, g:i a',$this->page_data['dtr'][0]['adddate'])); exit; ?> </pre> <?php */
-																/*?> <pre><?php echo print_r($this->page_data); exit; */
+																$count = $this->input->post('count');
+
+																$Dtrs = $this->dtr_limit($count, $para2);
+																// echo '<pre>';
+																// echo print_r($Dtrs['dtr']); exit;
+																$this->page_data['dtr'] = $Dtrs;
+																unset($Dtrs);
 																$this->load->view('back/dtr_list', $this->page_data);
 															} elseif ($para1 == 'by_tollplaza') {
+																$Dtrs = $this->load->model('dtrModel');
+																$Dtrs = new dtrModel();
 																if ($para2 != '') {
-																	$this->db->where('toolplaza', $para2);
+																	$Dtrs = $Dtrs->getByTollplaza($para2);
+																} else {
+																	$Dtrs = $Dtrs->getAll();
 																}
-																$this->db->order_by('id', 'DESC');
-																$this->page_data['dtr']  = $this->db->get('dtr')->result_array();
+																// echo '<pre>';
+																// echo print_r($Dtrs);exit;		
+																$this->page_data['dtr']['dtr'] = $Dtrs;
+																unset($Dtrs);
 																$this->load->view('back/dtr_list', $this->page_data);
 															} elseif ($para1 == 'approve') {
 
@@ -3580,6 +3585,7 @@ class Admin extends CI_Controller
 																// $this->db->delete('alerts');
 																$this->db->where('id', $para2);
 																$this->db->update('dtr', $data);
+																$this->createNotification($para2, 'DTR', 'Approve');
 															} elseif ($para1 == 'delete') {
 																$this->db->where('id', $para2);
 																$record = $this->db->get('dtr');
@@ -3625,27 +3631,10 @@ class Admin extends CI_Controller
 																			$this->db->limit(1);
 																			$this->db->where('id', $para2);
 																			$this->db->update('dtr', $data);
-																			/**Notifications Start 
-    
-    
-					  $notificatoin_msg = 'Your  '. date("F, Y",strtotime($check[0]['for_date'])) .' dtr disapproved.';
-                      $mtrMonth = explode('-', $check[0]['for_date']);
-                      $mtr_date = $mtrdate[0].'-'.$mtrdate[1].'-'.$mtrdate[2];
-                      
-                      $data11 = array(
-					 'user_type' => 3,
-	   				 'user_id' => $this->session->userdata('adminid'),
-					 'for_user_id' => $check[0]['user_id'],
-					 'for_user_type' => $check[0]['upload_type'],
-					 'alert_type'  => 2,
-					 'ref_id' 	=> $para2,
-					 'date' => date("Y-m-d H:i:s"),
-					 'is_read' => 0,
-					 'notification_msg' => $notificatoin_msg                
-					  );
-                     $this->db->insert('notifications', $data11);             
+																			$this->createNotification($para2, 'DTR', 'Disapprove');
 
-						echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully' , 'is_redirect' =>TRUE , 'redirect_url' => base_url().'admin/dtr')); exit;*/
+																			echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/dtr'));
+																			exit;
 																		}
 																	} else {
 																		echo json_encode(array('response' => TRUE, 'message' => 'Disapproved Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/dtr'));
@@ -3658,7 +3647,10 @@ class Admin extends CI_Controller
 																/**Notifications END */
 															} else {
 																$this->page_data['page'] = 'dtr';
-																$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+																$Toolplaza = $this->load->model('toolplazaModel');
+																$Toolplaza = new toolplazaModel();
+																$Toolplaza = $Toolplaza->getAll();
+																$this->page_data['tollplaza'] = $Toolplaza;
 																$this->load->view('back/dtr', $this->page_data);
 															}
 														}
@@ -3669,6 +3661,175 @@ class Admin extends CI_Controller
 															$sql = "Select * From terrif Where FIND_IN_SET (" . $this->page_data['dtr'][0]['toolplaza'] . " ,toolplaza)  AND (start_date <= '" . $date . "' AND end_date >= '" . $date . "')";
 															$this->page_data['terrif'] =  $this->db->query($sql)->result_array();
 															$this->load->view('back/dtr_invoice', $this->page_data);
+														}
+
+
+														public function traffic_report_custom($para1 = '', $para2 = '')
+														{
+
+															switch ($para1) {
+																case 'get_dates':
+																	$dates = $this->Admin_model->get_tollplaza_dates_dtr($para2);
+																	echo json_encode($dates);
+																	break;
+																case 'search_data':
+																	$start_date = str_replace('/', '-', $this->input->post('day'));
+																	$end_date = str_replace('/', '-', $this->input->post('day_end'));
+																	if ($start_date > $end_date) {
+																		echo '<h4 class="text-danger">Invalid date</h4>';
+																		exit;
+																	}
+																	$tollplaza = $this->input->post('toll_plaza');
+																	$search_data = $this->Admin_model->get_custom_report_data($tollplaza, $start_date, $end_date);
+																	if ($search_data) {
+																		$this->page_data['data'] = $search_data;
+																	} else {
+																		echo '<h4 class="text-danger">Invalid request</h4>';
+																		exit;
+																	}
+
+
+																	$this->load->view('back/traffic_report_custom', $this->page_data);
+																	break;
+																default:
+																	$this->page_data['page'] = 'custom traffic';
+																	$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+																	$this->load->view('back/custom_traffic', $this->page_data);
+
+																	break;
+															}
+														}
+
+														public function traffic_report_custom_pdf($plaza = '', $start_date = '', $end_date = '')
+														{
+															if (empty($plaza) || empty($start_date) || empty($end_date)) {
+																return redirect('admin/traffic_report_custom');
+															}
+															if ($start_date > $end_date) {
+																return redirect('admin/traffic_report_custom');
+															}
+															$search_data = $this->Admin_model->get_custom_report_data($plaza, $start_date, $end_date);
+															$this->page_data['data'] = $search_data;
+
+															$pdfdata = $this->load->view('front/toolplaza/traffic_report_custom_pdf', $this->page_data, TRUE);
+
+															$this->load->library("Pdf");
+															$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+															$pdf->SetCreator(PDF_CREATOR);
+															$pdf->SetAuthor('NHA DTR');
+															$pdf->SetTitle('NHA Daily Traffic Report');
+															$pdf->SetSubject('DTR');
+															$pdf->SetKeywords('DTR, PDF');
+
+															$pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+															$pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+
+															// set default monospaced font
+															$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+
+															// set margins
+															$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+															$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+															$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+															$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+															$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+															if (@file_exists(dirname(__FILE__) . '/lang/eng.php')) {
+																require_once(dirname(__FILE__) . '/lang/eng.php');
+																$pdf->setLanguageArray($l);
+															}
+															$pdf->setFontSubsetting(true);
+															$pdf->SetFont('dejavusans', '', 16, '', true);
+															$pdf->AddPage('L', 'A2');
+
+															$pdf->setTextShadow(array('enabled' => true, 'depth_w' => 0.2, 'depth_h' => 0.2, 'color' => array(196, 196, 196), 'opacity' => 1, 'blend_mode' => 'Normal'));
+															$pdf->writeHTMLCell(0, 0, '', '', $pdfdata, 0, 1, 0, true, '', true);
+															$pdf->Output('dtr.pdf', 'I');
+															//$pdf->Output(SERVER_RELATIVE_PATH . '/uploads/invoices/invoice' . $invoice_name . '.pdf', 'F');
+
+														}
+
+														public function traffic_summary_custom($para1 = '', $para2 = '')
+														{
+
+															switch ($para1) {
+																case 'get_dates':
+																	$dates = $this->Admin_model->get_tollplaza_dates_dtr($para2);
+																	echo json_encode($dates);
+																	break;
+																case 'search_data':
+																	$start_date = str_replace('/', '-', $this->input->post('day'));
+																	$end_date = str_replace('/', '-', $this->input->post('day_end'));
+																	if ($start_date > $end_date) {
+																		echo '<h4 class="text-danger">Invalid date</h4>';
+																		exit;
+																	}
+																	$tollplaza = $this->input->post('toll_plaza');
+																	$search_data = $this->Admin_model->get_custom_report_data($tollplaza, $start_date, $end_date);
+																	if ($search_data) {
+																		$this->page_data['data'] = $search_data;
+																	} else {
+																		echo '<h4 class="text-danger">Invalid request</h4>';
+																		exit;
+																	}
+
+
+																	$this->load->view('back/traffic_summary_custom', $this->page_data);
+																	break;
+																default:
+																	$this->page_data['page'] = 'custom traffic summary';
+																	$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+																	$this->load->view('back/custom_traffic_summary', $this->page_data);
+
+																	break;
+															}
+														}
+
+														public function traffic_summary_custom_pdf($plaza = '', $start_date = '', $end_date = '')
+														{
+															if (empty($plaza) || empty($start_date) || empty($end_date)) {
+																return redirect('admin/traffic_summary_custom');
+															}
+															if ($start_date > $end_date) {
+																return redirect('admin/traffic_summary_custom');
+															}
+															$search_data = $this->Admin_model->get_custom_report_data($plaza, $start_date, $end_date);
+															$this->page_data['data'] = $search_data;
+
+															$pdfdata = $this->load->view('back/traffic_summary_custom_pdf', $this->page_data, TRUE);
+
+															$this->load->library("Pdf");
+															$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+															$pdf->SetCreator(PDF_CREATOR);
+															$pdf->SetAuthor('NHA DTR');
+															$pdf->SetTitle('NHA Daily Traffic Report');
+															$pdf->SetSubject('DTR');
+															$pdf->SetKeywords('DTR, PDF');
+
+															$pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+															$pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+
+															// set default monospaced font
+															$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+
+															// set margins
+															$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+															$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+															$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+															$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+															$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+															if (@file_exists(dirname(__FILE__) . '/lang/eng.php')) {
+																require_once(dirname(__FILE__) . '/lang/eng.php');
+																$pdf->setLanguageArray($l);
+															}
+															$pdf->setFontSubsetting(true);
+															$pdf->SetFont('dejavusans', '', 16, '', true);
+															$pdf->AddPage('L', 'A2');
+
+															$pdf->setTextShadow(array('enabled' => true, 'depth_w' => 0.2, 'depth_h' => 0.2, 'color' => array(196, 196, 196), 'opacity' => 1, 'blend_mode' => 'Normal'));
+															$pdf->writeHTMLCell(0, 0, '', '', $pdfdata, 0, 1, 0, true, '', true);
+															$pdf->Output('dtr.pdf', 'I');
+															//$pdf->Output(SERVER_RELATIVE_PATH . '/uploads/invoices/invoice' . $invoice_name . '.pdf', 'F');
+
 														}
 														public function dtr_generate_pdf($para1 = '')
 														{
@@ -5352,10 +5513,8 @@ class Admin extends CI_Controller
 
 														public function dashboard_timer($para1 = '')
 														{
-
 															$plaza = $this->input->post('plaza_id');
 															$month = $this->input->post('month');
-
 															$data = $this->Admin_model->timer_chartdata($plaza, $month);
 															$previous_year = date("Y-m-d", strtotime(@$data['chart']['month'] . ' -1 year'));
 															$previous_monthDate = date("Y-m-d", strtotime(date("Y-m-d", strtotime(@$data['chart']['month'])) . "-1 month"));
@@ -5368,10 +5527,10 @@ class Admin extends CI_Controller
 															$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $this->page_data['mtr'][0]['end_date'];
 															$sql = "Select * From terrif Where FIND_IN_SET (" . $this->page_data['mtr'][0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
 															$this->page_data['terrif'] = $this->db->query($sql)->result_array();
-
+															$plazaId = $this->input->post('plaza_id');
 															$month  = $this->input->post('month');
 															$this->page_data['mtrid'] = $data['mtr_id'];
-															$this->page_data['plaza_id'] = $plaza;
+															$this->page_data['plaza_id'] = $plazaId;
 															$this->page_data['month'] = $month;
 
 															$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
@@ -5395,54 +5554,16 @@ class Admin extends CI_Controller
 
 														public function notify_counter($para1 = '')
 														{
-															$this->db->where('for_user_type', 3);
-															$this->db->where('for_user_id', $this->session->userdata('adminid'));
-															$this->db->where('user_type', 1);
-															$this->db->where('is_read', 0);
-															$this->db->order_by("id", "desc");
-															$this->db->limit(5);
-															$disapprovedMtrs = $this->db->get('notifications')->result_array();
-															//echo $this->db->last_query(); exit;
-
-															if (!empty($disapprovedMtrs)) {
-																$notifyCounter = 0;
-																foreach ($disapprovedMtrs as $row) {
-																	$notifyCounter++;
-																}
-															}
-															if (!empty($disapprovedMtrs)) {
-																if ($notifyCounter > 3) {
-																	echo "3+";
-																} else {
-																	echo $notifyCounter;
-																}
-															}
+															$this->load->model('notifications');
+															$Notifications = new notifications();
+															$count = $Notifications->adminCountUnread($this->session->userdata('adminid'));
+															echo $count;
 														}
 														public function notify_msg($para1 = '')
 														{
-															// $firstname = 'a';
-															// $lastname = 'b';
-															// $customer_mobile = 'd';
-															// $this->db->select('*')->from('users')
-															// ->group_start()
-															//           ->where('a', $firstname)
-															//           ->where('b', $lastname)
-															//           ->where('c', '1')
-															//           ->or_group_start()
-															//                   ->where('d', $customer_mobile)
-															//                   ->where('e', '1')
-															//           ->group_end()
-															//   ->group_end()
-															// ->get();
-															//    echo $this->db->last_query();
-															$this->db->where('for_user_type', 3);
-															$this->db->where('for_user_id', $this->session->userdata('supervisor_id'));
-															$this->db->or_where('user_type', 1);
-															$this->db->or_where('user_type', 2);
-															$this->db->order_by("id", "desc");
-															$this->db->limit(3);
-															$this->page_data['notifications'] = $this->db->get('notifications')->result();
-
+															$this->load->model('notifications');
+															$Notifications = new notifications();
+															$this->page_data['notifications'] = $Notifications->adminRead($this->session->userdata('adminid'));
 
 															//echo "<pre>";
 															//print_r($this->page_data['notifications']); exit;
@@ -5454,6 +5575,58 @@ class Admin extends CI_Controller
 															$this->db->where('id', $this->input->post('id'));
 															$this->db->delete('notifications');
 															return redirect('admin/notify_msg/');
+														}
+														public function specific_notification($para1 = '', $para2 = '')
+														{
+															if ($para1 == 'list') {
+																//echo print_r($para2);
+																$this->load->model('notifications');
+																$notification = new notifications();
+																$notification->loadEntity($para2);
+																$view = $notification->getLookupTable();
+																switch ($notification->getAlertType()) {
+																	case 2:
+																		$this->page_data[$notification->getLookupTable()] = $notification->loadEntity($para2);
+																		$this->page_data['name'] = 'Monthly Traffic Report';
+																		break;
+																	case 3:
+																		$this->load->model('dtrModel');
+																		$dtr = new dtrModel();
+																		$dtr = $dtr->find($notification->getRefID());
+																		$this->page_data[$notification->getLookupTable()] = $dtr;
+																		//echo '<pre>';echo print_r($dtr);exit;
+																		$this->page_data['name'] = 'Daily Traffic Report';
+																		break;
+																	case 4:
+																		$this->page_data[$notification->getLookupTable()][$notification->getLookupTable()] = $notification->loadEntity($para2);
+																		$this->page_data['name'] = 'Daily Site Report';
+																		break;
+																	default:
+																		$this->page_data[$notification->getLookupTable()] = $notification->loadEntity($para2);
+																		break;
+																}
+																$this->load->view('back/' . $view . '_list', $this->page_data);
+															} else {
+
+																$this->page_data['page'] = 'specific_notification';
+																$this->page_data['not_id'] = $para1;
+																$this->load->view('back/specific_notification', $this->page_data);
+															}
+														}
+														public function createNotification($para2, $name, $function)
+														{
+															//$name is used for name of module ie, Inventory, MTR, DTR, DSR
+															//$function is used for type of action ie Create, Update
+															//$date is used for the date at which the action on module took place ie, $check[0]['for_month'] for MTR, $data['for_date'] of DTR,  $datecreated for DSR
+															/** some changes by Numaan for notifications START*/
+															$user_id =  $this->session->userdata('adminid');
+															$modelNot = $this->load->model('notifications');
+															$notification = new notifications();
+															$notification->setName($name);
+															//echo $notification->getLookupTable(); exit;						
+															$notification = $notification->admin($para2, $user_id, $function);
+															unset($notification, $date, $function, $modelNot);
+															/** some changes by Numaan for notifications END*/
 														}
 
 														/////////////////////google maps section start here/////////////////////////////////////////

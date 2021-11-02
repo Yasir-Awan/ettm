@@ -14,7 +14,7 @@
                           <!-- <a class="dropdown-item submit" href="#"  value="Checkout" data-toggle="modal" data-target="#assets_checkout" onclick="ajax_html_cust('<?php echo base_url()?>inventory/action_on_asset/checkout/','checkout_asset_contents');"> Checkout</a>
                            <a class="dropdown-item far fa-arrow-circle-down-alt submit"  value="Checkin" href="#" data-toggle="modal" data-target="#assets_checkin" onclick="ajax_html_cust('<?php echo base_url()?>inventory/action_on_asset/checkin/','checkin_asset_contents');">Checkin</a> -->
                            <!-- <a class="dropdown-item submit" href="#"  value="Checkout" data-toggle="modal" data-target="#assets_install" onclick="ajax_html_cust('<?php echo base_url()?>inventory/action_on_asset/install/','install_asset_contents');"> Install</a> -->
-                           <a class="dropdown-item submit" href="#"  ><input placeholder="quantity" type="number" name="cl_qty" id="cl_qty" style="width:82%; margin-left:-11%; border:unset;" max="15" min="1" > <span class="btn btn-primary btn-xs clickmethen" data-toggle="modal" data-target="#clone">Clone</span></a>
+                           <!-- <a class="dropdown-item submit" href="#"  ><input placeholder="quantity" type="number" name="cl_qty" id="cl_qty" style="width:82%; margin-left:-11%; border:unset;" max="15" min="1" > <span class="btn btn-primary btn-xs clickmethen" data-toggle="modal" data-target="#clone">Clone</span></a> -->
                            <!-- <a class="dropdown-item submit" href="#" id="clon" value="Clone" data-toggle="modal" data-target="#c_qty" >Clone </a> -->
                            <a class="dropdown-item submit" href="#"  value="Faulty" data-toggle="modal" data-target="#assets_faulty" onclick="ajax_html_cust('<?php echo base_url()?>inventory/action_on_asset/faulty/','start_faulty_assets');">Faulty</a>
                            <a class="dropdown-item submit" href="#"  value="Repair" data-toggle="modal" data-target="#assets_repair" onclick="ajax_html_cust('<?php echo base_url()?>inventory/action_on_asset/start_repair/','start_repair_assets');">Repair</a>
@@ -62,17 +62,6 @@
                       <th class="sorting" tabindex="0" aria-controls="installed_items_table" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: auto;">Location</th>
                     </tr>
                   </thead>
-                  <!-- <tfoot>
-                    <tr>
-                       <th rowspan="1" colspan="1">Sr #</th>
-                       <th rowspan="1" colspan="1">Name</th>
-                       <th rowspan="1" colspan="1">Category</th>
-                       <th rowspan="1" colspan="1">Serial No</th>
-                       <th rowspan="1" colspan="1">Status</th>
-                       <th rowspan="1" colspan="1">Site</th>
-                       <th rowspan="1" colspan="1">location</th>
-                    </tr>
-                  </tfoot> -->
                   <tbody>
                   <?php
                      $counter = 0;

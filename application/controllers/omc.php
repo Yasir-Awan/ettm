@@ -21,7 +21,7 @@ class Omc extends CI_Controller
 			return redirect('omc/login');
 		}
 		$data = $this->Admin_model->dtr_chartdata();
-
+		// echo "<pre>"; print_r($data); exit;
 		$datadtr = $this->db->select('*')->order_by('id', 'desc')->limit(1)->get('dtr')->result_array();
 		$date_latest = date('n', strtotime($datadtr[0]['for_date']));
 		$dtr_month_min = $this->db->where('MONTH(for_date)', $date_latest)->where('toolplaza', $datadtr[0]['toolplaza'])->order_by('for_date', 'asc')->get('dtr')->result_array();
@@ -31,16 +31,20 @@ class Omc extends CI_Controller
 		$start_date = $dtr_month_min[0]['for_date'];
 		$end_date = $dtr_month[0]['for_date'];
 
+		$myDate = explode('/',$data['end_date']);
+		$myDate2 = implode("-",$myDate);
+
+
 		$sql = "Select * From terrif Where FIND_IN_SET (" . $dtr_month_min[0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
 		$tarrif =  $this->db->query($sql)->result_array();
 		$this->page_data['dtr_month'] = $data['chart']['month'];
 		$this->page_data['plaza_id'] = $data['chart']['toolplaza_id'];
-		$this->page_data['month'] = $data['chart']['month'];
+		$this->page_data['month'] = $myDate2;
 
 		$this->page_data['dtr'] = $dtr_month_min;
 		$this->page_data['dtrid'] = $data['dtr_id'];
 		$this->page_data['exempt'] = $this->db->get_where('dtr_exempt', array('dtr_id' => $this->page_data['dtrid']))->result_array();
-		$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1))->result_array();
+		$this->page_data['tollplaza'] = $this->db->get_where('toolplaza', array('status' => 1, 'omc' => 1))->result_array();
 		$this->page_data['chart'] = $data['chart'];
 		$this->page_data['revenue'] = $data['revenue'];
 		/*?> <pre> <?php echo print_r($this->page_data); exit; ?> </pre> <?php*/

@@ -8,6 +8,7 @@
                     <div class="col-12 mt-5">
                         <div class="card">
                             <div class="card-body">
+                        
                                 <div class="row">
                                     <div class="col-md-4">
                                         <h4 class="header-title">Weighstation Daily Reports</h4>
@@ -28,6 +29,9 @@
                                                 <div class="weighdate col-md-4">
                                                     <input type="text" id="day" name="day" class="form-control" placeholder="Select Date" >
                                                 </div>
+
+                                                
+                                            
                                         </div>
                                         </form>
                                     </div>
@@ -59,7 +63,11 @@
                                             </thead>
                                             <tbody>
                                                 <?php if($weighstation){
+                                                  
                                                     foreach($weighstation as $row){
+
+                                                          
+
                                                 ?>
                                                  <tr>
                                                     <td><?php echo date('d-m-Y',strtotime($row['date']));?></td>
@@ -71,7 +79,8 @@
                                                     <td><?php echo round($row['exces_weight'],2);?></td>
                                                     <td><?php echo $row['percent_overload'];?>&nbsp; %</td>
                                                     <td><?php echo $row['fine'];?></td>
-                                                    <td><?php if($row['status'] == 2){echo "Overload";}else{echo "Ok";}?></td>      
+                                                    <td><?php if($row['status'] == 2){echo "Overload";}else{echo "Ok";}?></td>
+                                                    
                                                 </tr> 
                                                 <?php    }
                                                 }?>

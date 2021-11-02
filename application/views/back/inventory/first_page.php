@@ -13,7 +13,7 @@
                                         <a class="tab nav-link" id="installed_items" data-toggle="tab" href="#installed" role="tab" aria-controls="installs" aria-selected="false" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/installed/','displaying_installed');">Installed Equipment</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="tab nav-link" id="installed_subitem" data-toggle="tab" href="#installed_subitems" role="tab" aria-controls="subitem_installs" aria-selected="false" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/installed_subitems/','displaying_installed_subitems');">Installed Cmponent</a>
+                                        <a class="tab nav-link" id="installed_subitem" data-toggle="tab" href="#installed_subitems" role="tab" aria-controls="subitem_installs" aria-selected="false" onclick="ajax_html('<?php echo base_url()?>inventory/tabs/installed_subitems/','displaying_installed_subitems');">Installed Component</a>
                                     </li>
 
                                     <li class="nav-item">

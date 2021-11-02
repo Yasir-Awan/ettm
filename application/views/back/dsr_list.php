@@ -112,7 +112,7 @@
     </table>
     <script>
     $(document).ready(function(){
-
+        //$.fn.dataTable.luxon( 'F j, Y g:i a' );
         $('#dataTable3').DataTable();
     })
     </script>

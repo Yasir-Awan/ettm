@@ -207,7 +207,7 @@
               <p>Dashboard</p>
             </a>
           </li>
-          
+          <?php $tpsupervisor = $this->db->get_where('tpsupervisor',array('id' => $this->session->userdata('supervisor_id')))->result_array();?>
           <?php if($tpsupervisor[0]['role'] == 0 || $tpsupervisor[0]['role'] == 1 || $tpsupervisor[0]['role'] == 2 || $tpsupervisor[0]['role'] == 4){ ?>
           <li <?php if($page_name == 'traffic_conter'){?>class="active"<?php } ?>>
             <a href="<?php echo base_url()?>toolplaza/traffic_counting">
@@ -228,7 +228,7 @@
               <p>Faulty Equipment List</p>
             </a>
           </li> -->
-          <?php $tpsupervisor = $this->db->get_where('tpsupervisor',array('id' => $this->session->userdata('supervisor_id')))->result_array();?>
+
           <?php if($tpsupervisor[0]['role'] == 0 || $tpsupervisor[0]['role'] == 1 || $tpsupervisor[0]['role'] == 2 || $tpsupervisor[0]['role'] == 4){ ?>
           <li <?php if($page_name == 'mtr'){?>class="active"<?php } ?>>
             <a href="<?php echo base_url()?>toolplaza/mtr">

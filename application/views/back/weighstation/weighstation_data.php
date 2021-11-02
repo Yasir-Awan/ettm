@@ -114,7 +114,8 @@ background: linear-gradient(to bottom, #7e801b 0%, #d1d42c 100%);
                             <div class="income-dashone-total income-monthly shadow-reset nt-mg-b-30">
                                     <div class="income-title">
                                         <div class="main-income-head">
-                                            <h2>Total Weighed<i class="fa fa-truck pull-right" style="font-size: 30px;" aria-hidden="true"></i></h2>                    
+                                            <h2>Total Weighed<i class="fa fa-truck pull-right" style="font-size: 30px;" aria-hidden="true"></i></h2>
+                                            
                                         </div>
                                     </div>
                                     <div class="income-dashone-pro">
@@ -161,7 +162,7 @@ background: linear-gradient(to bottom, #7e801b 0%, #d1d42c 100%);
                                         <div class="clear"></div>
                                     </div>
                              </div>
-
+                       
                           </td>
                           <td style="width: 25%;padding: 0.25rem;">
                               <div class="income-dashone-total overload-percent shadow-reset nt-mg-b-30">
@@ -189,9 +190,11 @@ background: linear-gradient(to bottom, #7e801b 0%, #d1d42c 100%);
                         </div>
                           
                     </td>
+                      
                       </tr>
                       <tr>
                         <td style="width: 25%;padding: 0.25rem;">
+                            
                                <div class="income-dashone-total user-monthly shadow-reset nt-mg-b-30">
                                 <div class="income-title">
                                     <div class="main-income-head">
@@ -380,6 +383,8 @@ background: linear-gradient(to bottom, #7e801b 0%, #d1d42c 100%);
                                                   $counter = 0;
                                                     foreach($record as $row){
                                                         $counter ++;
+                                                          
+
                                                 ?>
                                                  <tr>
                                                     <td><?php echo $counter;?></td>
@@ -393,8 +398,7 @@ background: linear-gradient(to bottom, #7e801b 0%, #d1d42c 100%);
                                                     <td><a href="<?php echo base_url().'admin/weighstation_daily_report/by_weighstation/'.$row['id'];?>" class="btn-xs btn-success fa fa-calendar">&nbsp;Daily</a>&nbsp; <a href="<?php echo base_url().'admin/weighstation_monthly_report/by_weighstation/'.$row['id'];?>" class="btn-xs btn-info fa fa-calendar">&nbsp; Monthly</a></td>
                                                     
                                                 </tr> 
-                                                <?php   
-                                                     }
+                                                <?php    }
                                                 }?>
                                                
                                             </tbody>

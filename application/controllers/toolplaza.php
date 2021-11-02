@@ -21,7 +21,9 @@ class Toolplaza extends CI_Controller{
 	///////////////////////////////////////////////////////////////
 	////	/** Dashboard START  *////////////////////
 	///////////////////////////////////////////////////////////////
-
+	public function info(){
+		phpinfo();
+	}
 	public function index(){
 		$data = $this->Tollplaza_model->chartdata();
 
@@ -179,23 +181,7 @@ class Toolplaza extends CI_Controller{
 	////	/** MTR START  *////////////////////
 	///////////////////////////////////////////////////////////////
 	
-	public function specific_mtr($para1 = '', $para2 = '' ){
-		if($para1 == 'list')
-		{
-			$this->page_data['mtr'] = $this->db->get_where('mtr',array('id' => $para2))->result_array();
-		    // $this->db->where('alert_type',2);
-			// $this->db->where('ref_id',$para2);
-			// $this->db->update('notifications',array('is_read' => 1))->result_array();	
-			$this->load->view('front/toolplaza/mtr_list', $this->page_data);
-		}
-		else
-		{
-			
-			$this->page_data['page_name'] = 'specific_mtr';
-			$this->page_data['mtr_id'] = $para1;			
-			$this->load->view('front/toolplaza/specific_mtr', $this->page_data);	
-		}
-	}
+
 	public function mtr($para1 = '' , $para2 = '', $para3 = ''){
 		if($para1 == 'list'){
 			$this->db->order_by('id','DESC');
@@ -392,6 +378,7 @@ class Toolplaza extends CI_Controller{
 				}
 				$this->db->insert('mtr', $data);
 				$insert_id = $this->db->insert_id();
+				//$this->createNotification($insert_id, 'MTR', 'Create');
 				if($this->input->post('add_exempt') == 1){
 						$post_exempt = array();
 						$post_exempt['description'] = $this->input->post('excempt_desc');
@@ -621,25 +608,7 @@ class Toolplaza extends CI_Controller{
 						if (empty($data['start_date']) || empty($data['end_date'])) {
    								echo json_encode(array('response' => FALSE , 'message' => "An Error Occoured Please Refresh Your Page And try Again")); exit;
 						}
-						/** some changes by yasir for notifications START*/
-						$this->db->where('id',$this->session->userdata('supervisor_id'));
-						$supervisor = $this->db->get('tpsupervisor')->result_array();
-						$tollplaza =$this->db->get_where('toolplaza',array('id'=>$supervisor[0]['tollplaza'],'status'=>1))->result_array();
-						$notificatoin_msg =  $tollplaza[0]['name']." ". date("F, Y",strtotime($check[0]['for_month'])) .' mtr Updated.';
-							$data11 = array(
-							'user_id' => $this->session->userdata('supervisor_id'),
-							'user_type' => 1,
-							'for_user_id' =>  1,
-							'for_user_type' => 3,
-							'ref_id' 	=> $para2,
-							'alert_type'  => 2,
-							'date' => date("Y-m-d H:i:s"),
-							'is_read' => 0,
-							'notification_msg' => $notificatoin_msg                
-							 );
-
-							$this->db->insert('notifications', $data11); 
-					/** some changes by yasir for notifications END*/
+						$this->createNotification($para2,'MTR','Update');
 						$this->db->where('id', $para2);
 						$this->db->update('mtr', $data);
 						
@@ -1068,6 +1037,7 @@ class Toolplaza extends CI_Controller{
 					}*/
 					$this->db->insert('dtr', $data);
 					$insert_id = $this->db->insert_id();
+					//$this->createNotification($insert_id, 'DTR', 'Create');
 					if($this->input->post('add_exempt') == 1){
 							$post_exempt = array();
 							$post_exempt['description'] = $this->input->post('excempt_desc');
@@ -1283,25 +1253,7 @@ class Toolplaza extends CI_Controller{
 						$data['total']      	= 	$this->input->post('class1') + $this->input->post('class2') + $this->input->post('class3') + $this->input->post('class4') + $this->input->post('class5') + $this->input->post('class6') + $this->input->post('class7') + $this->input->post('class8') + $this->input->post('class9') + $this->input->post('class10');
 						$data['adddate']		=	time();
 						$data['status']			=   0;
-						/** some changes by yasir for notifications START
-						$this->db->where('id',$this->session->userdata('supervisor_id'));
-						$supervisor = $this->db->get('tpsupervisor')->result_array();
-						$tollplaza =$this->db->get_where('toolplaza',array('id'=>$supervisor[0]['tollplaza'],'status'=>1))->result_array();
-						$notificatoin_msg =  $tollplaza[0]['name']." ". date("F, Y",strtotime($check[0]['for_month'])) .' mtr Updated.';
-							$data11 = array(
-							'user_id' => $this->session->userdata('supervisor_id'),
-							'user_type' => 1,
-							'for_user_id' =>  1,
-							'for_user_type' => 3,
-							'ref_id' 	=> $para2,
-							'alert_type'  => 2,
-							'date' => date("Y-m-d H:i:s"),
-							'is_read' => 0,
-							'notification_msg' => $notificatoin_msg                
-							 );
-
-							$this->db->insert('notifications', $data11); 
-					/** some changes by yasir for notifications END*/
+						$this->createNotification($para2,'DTR', 'Update');
 						$this->db->where('id', $para2);
 						$this->db->update('dtr', $data);
 						
@@ -2106,8 +2058,11 @@ class Toolplaza extends CI_Controller{
 		$table = 'dsr';	$data = $dsr_data;
 		if($page == 'C'){
 			$data_dsr = $this->dsr_model->insert_dsr($table, $data);
+			$dsr_id = $this->db->insert_id;
+			//$this->createNotification($dsr_id, 'DSR', 'Create');
 		}
 		if($page == 'U'){
+			$this->createNotification($para2, 'DSR', 'Update');
 			$where = array('id' => $para2);
 			$data_dsr = $this->dsr_model->update_where_dsr($where, $table, $data);
 		}
@@ -3032,69 +2987,73 @@ class Toolplaza extends CI_Controller{
 	///////////////////////////////////////////////////////////////
 
 	public function notify_counter($para1 = ''){	
-		$this->db->where('for_user_type',1);
-		$this->db->where('for_user_id',$this->session->userdata('supervisor_id'));
-		$this->db->where('user_type',3);
-		$this->db->where('is_read',0);
-		$this->db->order_by("id", "desc");
-		$this->db->limit(4);
-		$disapprovedMtrs = $this->db->get('notifications')->result_array();
-		//echo $this->db->last_query(); exit;
-               
-                  if(!empty($disapprovedMtrs))
-                  {
-                    $notifyCounter = 0;
-                    foreach($disapprovedMtrs as $row)
-                    {
-                      
-                      $notifyCounter++;
-					}
-				}
-				if(!empty($disapprovedMtrs))
-                    { 
-                      if($notifyCounter>3)
-                      {
-                       echo "3+"; 
-                      }
-                      else
-                      {
-                        echo $notifyCounter ;
-                      }
-                    }
+        $this->load->model('notifications');
+		$Notifications = new notifications();
+		$count = $Notifications->supervisorCountUnread($this->session->userdata('supervisor_id'));
+        echo $count;
 	}
 	public function notify_msg($para1 = ''){
-		// $firstname = 'a';
-        // $lastname = 'b';
-        // $customer_mobile = 'd';
-        // $this->db->select('*')->from('users')
-        // ->group_start()
-        //           ->where('a', $firstname)
-        //           ->where('b', $lastname)
-        //           ->where('c', '1')
-        //           ->or_group_start()
-        //                   ->where('d', $customer_mobile)
-        //                   ->where('e', '1')
-        //           ->group_end()
-        //   ->group_end()
-        // ->get();
-	//    echo $this->db->last_query();
-	    $this->db->where('for_user_type',1);
-		$this->db->where('for_user_id',$this->session->userdata('supervisor_id'));
-		$this->db->where('user_type',3);
-		$this->db->order_by("id", "desc");
-		$this->db->limit(3);
-		$this->page_data['notifications'] = $this->db->get('notifications')->result();
-		
-		
-		//echo "<pre>";
-		//print_r($this->page_data['notifications']); exit;
-		//echo $this->db->last_query(); exit;
+	    $this->load->model('notifications');
+		$Notifications = new notifications();
+		$this->page_data['notifications'] = $Notifications->supervisorRead($this->session->userdata('supervisor_id'));
 		$this->load->view('front/toolplaza/notify_msg', $this->page_data);		
 	}
 	public function delete_notification($para1 = '' ){
-		$this->db->where('id', $this->input->post('id'));
-		$this->db->delete('notifications');
-		return redirect('toolplaza/notify_msg/');	
+		$this->load->model('notifications');
+		$Notifications = new notifications();
+		$del = $Notifications->delete($this->input->post('id'));
+		if($del == 1){
+			return redirect('toolplaza/notify_msg/');	
+		}		
+	}
+	public function createNotification($para2,$name, $function){
+		//$name is used for name of module ie, Inventory, MTR, DTR, DSR
+		//$function is used for type of action ie Create, Update
+		//$date is used for the date at which the action on module took place ie, $check[0]['for_month'] for MTR, $data['for_date'] of DTR,  $datecreated for DSR
+		/** some changes by Numaan for notifications START*/
+		$user_id =  $this->session->userdata('supervisor_id');
+		$modelNot = $this->load->model('notifications');
+		$notification = new notifications();
+		$notification->setName($name);
+			
+		$notification = $notification->supervisor($para2, $user_id, $function);
+		unset($notification, $date, $function, $modelNot);
+		/** some changes by Numaan for notifications END*/
+	}
+	public function specific_notification($para1 = '', $para2 = '', $para3 = ' '){
+		if($para1 == 'list')
+		{
+			$this->load->model('notifications');
+			$notification = new notifications();
+			$notification->loadEntity($para2);
+			$view = $notification->getLookupTable();
+			switch($notification->getAlertType()){				
+				case 2:
+					$this->page_data[$notification->getLookupTable()] = $notification->loadEntity($para2);
+					$this->page_data['name'] = 'Monthly Traffic Report';
+					break;
+				case 3:
+					$this->page_data[$notification->getLookupTable()] = $notification->loadEntity($para2);
+					$this->page_data['name'] = 'Daily Traffic Report';
+					break;
+				case 4:
+					$this->page_data[$notification->getLookupTable()][$notification->getLookupTable()] = $notification->loadEntity($para2);
+					$this->page_data['name'] = 'Daily Site Report';
+					break;
+				default: 
+					$this->page_data[$notification->getLookupTable()] = $notification->loadEntity($para2);
+					break;
+				
+			}
+			$this->load->view('front/toolplaza/'.$view.'_list', $this->page_data);
+		}
+		else
+		{
+			
+			$this->page_data['page_name'] = 'specific_notification';
+			$this->page_data['not_id'] = $para1;			
+			$this->load->view('front/toolplaza/specific_notification', $this->page_data);	
+		}
 	}
 
 

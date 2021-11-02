@@ -14,7 +14,7 @@
                                         <select class="form-control required" name="toll_plaza" id="toll_plaza">
                                             <option value="">Choose Plaza</option>
                                             <?php foreach($tollplaza as $row){?>
-                                            <option value="<?php echo $row['id']?>"><?php echo $row['name'];?></option>
+                                            <option value="<?php echo $row->getId()?>"><?php echo $row->getName();?></option>
                                             <?php } ?>
                                         </select>
                                     </div>

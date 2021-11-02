@@ -24,7 +24,6 @@
                       <th class="sorting_asc" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending" style="width: auto;">SR #</th>
                       <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Name</th>
                       <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Description</th>
-                      <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Comments</th>
                       <th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: auto;">Action</th>
                     </tr>
                   </thead>
@@ -49,18 +48,7 @@
                       <td class="sorting_1"><?php echo $counter;?></td>
                       <td><?php echo $manufacturer['name'];?></td>
                       <td><?php echo $manufacturer['description'];?></td>
-                      <td>
-                      <?php
-                      if($manufacturer['comments'])
-                      {
-                      echo $manufacturer['comments'];
-                      }
-                      else
-                      {
-                        echo "No comments apple";
-                      }
-                      ?>
-                      </td>
+                      
                       <td> <span class="btn btn-success btn-xs btn-labeled fas fa-edit" id="cancel_reason" name="manufacturer_edit" onclick="ajax_html('<?php echo base_url().'inventory/manufacturer_edit/'.$manufacturer['id'];?>','edit_manufacturer_contents');" data-toggle="modal" data-target="#manufacturer-edit">&nbsp;Edit</span>
                      &nbsp
                     <span class="btn btn-danger btn-xs  fas fa-trash-alt" onclick="delete_confirm_tab('Really want to delete This','<?php echo base_url().'inventory/manufacturers/delete/'.$manufacturer['id'];?>')"> 

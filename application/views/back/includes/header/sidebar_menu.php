@@ -166,12 +166,16 @@
                         </li>
                         <li>
                             <a style="color:#fff;" href="<?php echo base_url(); ?>admin" aria-expanded="true"><i style="color:#fff;" class="fa fa-building"></i><span>Tollplaza</span></a>
-                            <ul class="collapse <?php if ($page == 'Tollplaza' || $page == 'MTR' || $page == 'dtr' || $page == 'dsr' || $page == 'Toll Plaza Supervisor' || $page == 'Toll Plaza Staff' || $page == 'OMC' || $page == 'Tarrif') {
+                            <ul class="collapse <?php if ($page == 'Tollplaza' || $page == 'MTR' || $page == 'custom traffic summary' || $page == 'dtr' || $page == 'dsr' || $page == 'custom traffic' || $page == 'Toll Plaza Supervisor' || $page == 'Toll Plaza Staff' || $page == 'OMC' || $page == 'Tarrif') {
                                                     echo "in";
                                                 } ?>">
                                 <li <?php if ($page == 'Tollplaza') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/tollplaza"><i style="color:#fff;" class="fa fa-building"></i> <span>All Tollplaza</span></a></li>
                                 <li <?php if ($page == 'MTR') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/mtr"><i style="color:#fff;" class="fa fa-file"></i> <span>Monthly Traffic Report</span></a></li>
                                 <li <?php if ($page == 'dtr') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/dtr"><i style="color:#fff;" class="fa fa-file"></i> <span>Daily Traffic Report</span></a></li>
+                                 
+                                 <li <?php if ($page == 'custom traffic') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/traffic_report_custom"><i style="color:#fff;" class="fa fa-file"></i> <span>Custom Traffic Report</span></a></li>
+                                 <li <?php if ($page == 'custom traffic summary') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/traffic_summary_custom"><i style="color:#fff;" class="fa fa-file"></i> <span>Custom Traffic Summary</span></a></li>
+                                
                                 <li <?php if ($page == 'dsr') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/dsr"><i style="color:#fff;" class="fa fa-file"></i> <span>Daily Site Report</span></a></li>
                                 <li <?php if ($page == 'Toll Plaza Supervisor') echo "class='active'"; ?>style="line-height:10px;"><a href="<?php echo base_url() ?>admin/toolplaza_supervisor"><i style="color:#fff;" class="fa fa-group"></i> <span>Supervisor</span></a></li>
                                 <li <?php if ($page == 'Toll Plaza Staff') echo "class='active'"; ?>style="line-height:10px;"><a href="<?php echo base_url() ?>admin/tpstaff"><i style="color:#fff;" class="fa fa-group"></i> <span>Staff</span></a></li>

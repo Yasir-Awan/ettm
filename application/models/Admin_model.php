@@ -1036,7 +1036,6 @@ class Admin_model extends CI_MODEL
 
 	function get_chartdata($tollplaza = '', $month = '')
 	{
-
 		$chart = array();
 		$revenue = array();
 		$chart['class1']['data'] = 0;
@@ -1044,12 +1043,13 @@ class Admin_model extends CI_MODEL
 		$chart['class3']['data'] = 0;
 		$chart['class4']['data'] = 0;
 		$chart['class5']['data'] = 0;
+		$chart['total']['traffic'] = 0;
 		$revenue['class1']['data'] = 0;
 		$revenue['class2']['data'] = 0;
 		$revenue['class3']['data'] = 0;
 		$revenue['class4']['data'] = 0;
 		$revenue['class5']['data'] = 0;
-
+		$revenue['total']['revenue'] = 0;
 
 		$month = str_replace('/', '-', $month);
 		$month = $month . "-01";
@@ -1314,13 +1314,17 @@ class Admin_model extends CI_MODEL
 			$start_date = '';
 			$end_date = '';
 		}
-
-
 		return array('start_date' => $start_date, 'end_date' => $end_date);
 	}
 	function dtr_chartdata()
 	{
-
+		if ($this->session->userdata('omcid')) {
+			$data = $this->db->select('*')->where('omc', 1)->order_by('id', 'desc')->limit(1)->get('dtr')->result_array();
+			$data_min = $this->db->select('*')->where('omc', 1)->order_by('id', 'asc')->limit(1)->get('dtr')->result_array();
+		} else {
+			$data = $this->db->select('*')->order_by('id', 'desc')->limit(1)->get('dtr')->result_array();
+			$data_min = $this->db->select('*')->order_by('id', 'asc')->limit(1)->get('dtr')->result_array();
+		}
 		$data = $this->db->select('*')->order_by('id', 'desc')->limit(1)->get('dtr')->result_array();
 		$data_min = $this->db->select('*')->order_by('id', 'asc')->limit(1)->get('dtr')->result_array();
 		$datedata = date('n', strtotime($data[0]['for_date']));
@@ -1330,7 +1334,6 @@ class Admin_model extends CI_MODEL
 		$dtr_monthh = $this->db->select('*')->where('MONTH(for_date)', $datedata)->where('toolplaza', $data[0]['toolplaza'])->order_by('for_date', 'asc')->get('dtr')->result_array();
 
 		$dtr_id = $data[0]['id'];
-
 		if ($dtr_month && $dtr_month_min) {
 			$data1 = explode('-', $dtr_month[0]['for_date']);
 			$data2 = explode('-', $dtr_month_min[0]['for_date']);
@@ -1349,9 +1352,6 @@ class Admin_model extends CI_MODEL
 			$month_year = explode('-', $dtr_month[0]['for_date']);
 			$start_date = $dtr_monthh[0]['for_date'];
 			$end_date = $dtr_monthh[0]['for_date'];
-
-
-
 			$sql = "Select * From terrif Where FIND_IN_SET (" . $dtr_monthh[0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
 			$tarrif =  $this->db->query($sql)->result_array();
 			//$chart['date'] = $data[0]['for_date'];
@@ -1398,104 +1398,101 @@ class Admin_model extends CI_MODEL
 		}
 		return array('dtr_id' => $dtr_id, 'start_date' => $start_date1, 'end_date' => $end_date1, 'chart' => $chart, 'revenue' => $revenue);
 	}
-	function dtr_chart_tooldata()
-	{
-		$toolplaza = $this->db->get('toolplaza')->result_array();
-		$data = $this->db->select('*')->order_by('id', 'desc')->limit(1)->get('dtr')->result_array();
-		$data_min = $this->db->select('*')->order_by('id', 'asc')->limit(1)->get('dtr')->result_array();
-		$datedata = date('n', strtotime($data[0]['for_date']));
-		$datedatamin = date('n', strtotime($data_min[0]['for_date']));
-		//Loop for repeating graphs for Tollplaza
-		$i = 1;
-		$k = 0;
-		$dtr_tool = array();
-		foreach ($toolplaza as $tool) {
-			$dtr_tool[$i] = $this->db->select('*')->where('MONTH(for_date)', $datedata)->where('toolplaza', $i)->order_by('for_date', 'desc')->get('dtr')->result_array();
-			$dtr_tool_min[$i] = $this->db->select('*')->where('MONTH(for_date)', $datedata)->where('toolplaza', $i)->order_by('for_date', 'asc')->get('dtr')->result_array();
+	// function dtr_chart_tooldata()
+	// {
+	// 	$toolplaza = $this->db->get('toolplaza')->result_array();
+	// 	$data = $this->db->select('*')->order_by('id', 'desc')->limit(1)->get('dtr')->result_array();
+	// 	$data_min = $this->db->select('*')->order_by('id', 'asc')->limit(1)->get('dtr')->result_array();
+	// 	$datedata = date('n', strtotime($data[0]['for_date']));
+	// 	$datedatamin = date('n', strtotime($data_min[0]['for_date']));
+	// 	//Loop for repeating graphs for Tollplaza
+	// 	$i = 1;
+	// 	$k = 0;
+	// 	$dtr_tool = array();
+	// 	foreach ($toolplaza as $tool) {
+	// 		$dtr_tool[$i] = $this->db->select('*')->where('MONTH(for_date)', $datedata)->where('toolplaza', $i)->order_by('for_date', 'desc')->get('dtr')->result_array();
+	// 		$dtr_tool_min[$i] = $this->db->select('*')->where('MONTH(for_date)', $datedata)->where('toolplaza', $i)->order_by('for_date', 'asc')->get('dtr')->result_array();
+	// 		if ($dtr_tool[$i] && $dtr_tool_min[$i]) {
+	// 			$data1 = explode('-', $dtr_tool[$i][0]['for_date']);
+
+	// 			$data2 = explode('-', $dtr_tool_min[$i][0]['for_date']);
+
+	// 			$start_date1 = implode('/', array($data2[0], $data2[1]));
+
+	// 			$end_date1 = implode('/', array($data1[0], $data1[1]));
+	// 		} elseif ($dtr_tool[$i] == false && $dtr_tool_min[$i] == false) {
+	// 		}
+	// 		$chart_tool[$i] = array();
+	// 		$revenue_tool[$i] = array();
+	// 		if ($dtr_tool_min[$i]) {
+	// 			$chart_tool[$i]['tollplaza'] = $this->db->get_where('toolplaza', array('id' => $i))->row()->name;
+	// 			$chart_tool[$i]['toolplaza_id'] = $dtr_tool_min[$i][0]['toolplaza'];
 
 
+	// 			$chart_tool[$i]['month']	= date("Y-m", strtotime($dtr_tool_min[$i][0]['for_date']));
+	// 			$month_year = explode('-', $dtr_tool[$i][0]['for_date']);
+	// 			$start_date = $dtr_tool_min[$i][0]['for_date'];
+	// 			$end_date = $dtr_tool[$i][0]['for_date'];
+	// 			$sql = "Select * From terrif Where FIND_IN_SET (" . $i . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
 
-			if ($dtr_tool[$i] && $dtr_tool_min[$i]) {
-				$data1 = explode('-', $dtr_tool[$i][0]['for_date']);
+	// 			$tarrif =  $this->db->query($sql)->result_array();
+	// 			//$chart['date'] = $data[0]['for_date'];
+	// 			$u = 0;
+	// 			foreach ($dtr_tool_min[$i] as $dtr) {
+	// 				$u++;
+	// 				$chart_tool[$i]['dtr'][$u]['dtr_id'] =  $dtr['id'];
+	// 				$chart_tool[$i]['dtr'][$u]['label'] = date("j", strtotime($dtr['for_date']));
+	// 				$chart_tool[$i]['dtr'][$u]['class1']['label'] =  'Car';
+	// 				$chart_tool[$i]['dtr'][$u]['class2']['label'] =  'Wagon';
+	// 				$chart_tool[$i]['dtr'][$u]['class3']['label'] =  'Truck';
+	// 				$chart_tool[$i]['dtr'][$u]['class4']['label'] =  'Bus';
+	// 				$chart_tool[$i]['dtr'][$u]['class5']['label'] =  'AT Truck';
+	// 				$chart_tool[$i]['dtr'][$u]['class1']['data'] =  $dtr['class1'];
+	// 				$chart_tool[$i]['dtr'][$u]['class2']['data'] =  $dtr['class2'];
+	// 				$chart_tool[$i]['dtr'][$u]['class3']['data'] =  $dtr['class3'] + $dtr['class5'] + $dtr['class6'];
+	// 				$chart_tool[$i]['dtr'][$u]['class4']['data'] =  $dtr['class4'];
+	// 				$chart_tool[$i]['dtr'][$u]['class5']['data'] =  $dtr['class7'] + $dtr['class8'] + $dtr['class9'] + $dtr['class10'];
+	// 				$chart_tool[$i]['dtr'][$u]['total'] = $dtr['total'];
+	// 			}
 
-				$data2 = explode('-', $dtr_tool_min[$i][0]['for_date']);
+	// 			if ($tarrif) {
+	// 				$revenue_tool[$i]['special_message'] = " ";
+	// 				$revenue_tool[$i]['month']	= date("Y-m", strtotime($dtr_tool[$i][0]['for_date']));
 
-				$start_date1 = implode('/', array($data2[0], $data2[1]));
+	// 				$u = 0;
+	// 				foreach ($dtr_tool_min[$i] as $dtr) {
+	// 					$u++;
+	// 					$revenue_tool[$i]['dtr' . $u]['dtr_id'] = $dtr['id'];
+	// 					$revenue_tool[$i]['dtr' . $u]['label'] = date("j", strtotime($dtr['for_date']));
+	// 					$revenue_tool[$i]['dtr' . $u]['class1']['label'] = 'Car';
+	// 					$revenue_tool[$i]['dtr' . $u]['class2']['label'] = 'Wagon';
+	// 					$revenue_tool[$i]['dtr' . $u]['class3']['label'] = 'Truck';
+	// 					$revenue_tool[$i]['dtr' . $u]['class4']['label'] = 'Bus';
+	// 					$revenue_tool[$i]['dtr' . $u]['class5']['label'] = 'AT Truck';
+	// 					$revenue_tool[$i]['dtr' . $u]['class1']['data'] = $dtr['class1'] * $tarrif[0]['class_1_value'];
+	// 					$revenue_tool[$i]['dtr' . $u]['class2']['data'] = $dtr['class2'] * $tarrif[0]['class_2_value'];
+	// 					$revenue_tool[$i]['dtr' . $u]['class3']['data'] =	($dtr['class3'] *  $tarrif[0]['class_3_value']) + ($dtr['class5'] * $tarrif[0]['class_5_value']) + ($dtr['class6'] * $tarrif[0]['class_6_value']);
+	// 					$revenue_tool[$i]['dtr' . $u]['class4']['data'] = $dtr['class4'] * $tarrif[0]['class_4_value'];
+	// 					$revenue_tool[$i]['dtr' . $u]['class5']['data'] = ($dtr['class7']  * $tarrif[0]['class_7_value']) + ($dtr['class8'] *  $tarrif[0]['class_8_value']) + ($dtr['class9'] * $tarrif[0]['class_9_value']) + ($dtr['class10'] * $tarrif[0]['class_10_value']);
+	// 					$revenue_tool[$i]['dtr' . $u]['data'] = ($dtr['class1'] * $tarrif[0]['class_1_value']) + ($dtr['class2'] * $tarrif[0]['class_2_value']) + ($dtr['class3'] * $tarrif[0]['class_3_value']) + ($dtr['class4'] * $tarrif[0]['class_4_value']) + ($dtr['class5'] * $tarrif[0]['class_5_value']) + ($dtr['class6'] * $tarrif[0]['class_6_value']) + ($dtr['class7'] * $tarrif[0]['class_7_value']) + ($dtr['class8'] * $tarrif[0]['class_8_value']) + ($dtr['class9'] * $tarrif[0]['class_9_value']) + ($dtr['class10'] * $tarrif[0]['class_10_value']);
+	// 				}
+	// 			} else {
+	// 				$revenue_tool[$i]['special_message'] = "No Tarrif found for this dtr";
+	// 				$revenue_tool[$i]['month']	= date("Y-m", strtotime($dtr_month[0]['for_date']));
+	// 				$j = 0;
+	// 				foreach ($dtr_tool_min[$i] as $dtr) {
+	// 					$j++;
+	// 					$revenue_tool[$i]['revenue' . $j]['label'] = date("j", strtotime($dtr['for_date']));
+	// 					$revenue_tool[$i]['revenue' . $j]['data'] = 0;
+	// 				}
+	// 			}
+	// 		}
+	// 		$i++;
+	// 		$k++;
+	// 	}
 
-				$end_date1 = implode('/', array($data1[0], $data1[1]));
-			} elseif ($dtr_tool[$i] == false && $dtr_tool_min[$i] == false) {
-			}
-			$chart_tool[$i] = array();
-			$revenue_tool[$i] = array();
-			if ($dtr_tool_min[$i]) {
-				$chart_tool[$i]['tollplaza'] = $this->db->get_where('toolplaza', array('id' => $i))->row()->name;
-				$chart_tool[$i]['toolplaza_id'] = $dtr_tool_min[$i][0]['toolplaza'];
-
-
-				$chart_tool[$i]['month']	= date("Y-m", strtotime($dtr_tool_min[$i][0]['for_date']));
-				$month_year = explode('-', $dtr_tool[$i][0]['for_date']);
-				$start_date = $dtr_tool_min[$i][0]['for_date'];
-				$end_date = $dtr_tool[$i][0]['for_date'];
-				$sql = "Select * From terrif Where FIND_IN_SET (" . $i . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
-
-				$tarrif =  $this->db->query($sql)->result_array();
-				//$chart['date'] = $data[0]['for_date'];
-				$u = 0;
-				foreach ($dtr_tool_min[$i] as $dtr) {
-					$u++;
-					$chart_tool[$i]['dtr'][$u]['dtr_id'] =  $dtr['id'];
-					$chart_tool[$i]['dtr'][$u]['label'] = date("j", strtotime($dtr['for_date']));
-					$chart_tool[$i]['dtr'][$u]['class1']['label'] =  'Car';
-					$chart_tool[$i]['dtr'][$u]['class2']['label'] =  'Wagon';
-					$chart_tool[$i]['dtr'][$u]['class3']['label'] =  'Truck';
-					$chart_tool[$i]['dtr'][$u]['class4']['label'] =  'Bus';
-					$chart_tool[$i]['dtr'][$u]['class5']['label'] =  'AT Truck';
-					$chart_tool[$i]['dtr'][$u]['class1']['data'] =  $dtr['class1'];
-					$chart_tool[$i]['dtr'][$u]['class2']['data'] =  $dtr['class2'];
-					$chart_tool[$i]['dtr'][$u]['class3']['data'] =  $dtr['class3'] + $dtr['class5'] + $dtr['class6'];
-					$chart_tool[$i]['dtr'][$u]['class4']['data'] =  $dtr['class4'];
-					$chart_tool[$i]['dtr'][$u]['class5']['data'] =  $dtr['class7'] + $dtr['class8'] + $dtr['class9'] + $dtr['class10'];
-					$chart_tool[$i]['dtr'][$u]['total'] = $dtr['total'];
-				}
-
-				if ($tarrif) {
-					$revenue_tool[$i]['special_message'] = " ";
-					$revenue_tool[$i]['month']	= date("Y-m", strtotime($dtr_tool[$i][0]['for_date']));
-
-					$u = 0;
-					foreach ($dtr_tool_min[$i] as $dtr) {
-						$u++;
-						$revenue_tool[$i]['dtr' . $u]['dtr_id'] = $dtr['id'];
-						$revenue_tool[$i]['dtr' . $u]['label'] = date("j", strtotime($dtr['for_date']));
-						$revenue_tool[$i]['dtr' . $u]['class1']['label'] = 'Car';
-						$revenue_tool[$i]['dtr' . $u]['class2']['label'] = 'Wagon';
-						$revenue_tool[$i]['dtr' . $u]['class3']['label'] = 'Truck';
-						$revenue_tool[$i]['dtr' . $u]['class4']['label'] = 'Bus';
-						$revenue_tool[$i]['dtr' . $u]['class5']['label'] = 'AT Truck';
-						$revenue_tool[$i]['dtr' . $u]['class1']['data'] = $dtr['class1'] * $tarrif[0]['class_1_value'];
-						$revenue_tool[$i]['dtr' . $u]['class2']['data'] = $dtr['class2'] * $tarrif[0]['class_2_value'];
-						$revenue_tool[$i]['dtr' . $u]['class3']['data'] =	($dtr['class3'] *  $tarrif[0]['class_3_value']) + ($dtr['class5'] * $tarrif[0]['class_5_value']) + ($dtr['class6'] * $tarrif[0]['class_6_value']);
-						$revenue_tool[$i]['dtr' . $u]['class4']['data'] = $dtr['class4'] * $tarrif[0]['class_4_value'];
-						$revenue_tool[$i]['dtr' . $u]['class5']['data'] = ($dtr['class7']  * $tarrif[0]['class_7_value']) + ($dtr['class8'] *  $tarrif[0]['class_8_value']) + ($dtr['class9'] * $tarrif[0]['class_9_value']) + ($dtr['class10'] * $tarrif[0]['class_10_value']);
-						$revenue_tool[$i]['dtr' . $u]['data'] = ($dtr['class1'] * $tarrif[0]['class_1_value']) + ($dtr['class2'] * $tarrif[0]['class_2_value']) + ($dtr['class3'] * $tarrif[0]['class_3_value']) + ($dtr['class4'] * $tarrif[0]['class_4_value']) + ($dtr['class5'] * $tarrif[0]['class_5_value']) + ($dtr['class6'] * $tarrif[0]['class_6_value']) + ($dtr['class7'] * $tarrif[0]['class_7_value']) + ($dtr['class8'] * $tarrif[0]['class_8_value']) + ($dtr['class9'] * $tarrif[0]['class_9_value']) + ($dtr['class10'] * $tarrif[0]['class_10_value']);
-					}
-				} else {
-					$revenue_tool[$i]['special_message'] = "No Tarrif found for this dtr";
-					$revenue_tool[$i]['month']	= date("Y-m", strtotime($dtr_month[0]['for_date']));
-					$j = 0;
-					foreach ($dtr_tool_min[$i] as $dtr) {
-						$j++;
-						$revenue_tool[$i]['revenue' . $j]['label'] = date("j", strtotime($dtr['for_date']));
-						$revenue_tool[$i]['revenue' . $j]['data'] = 0;
-					}
-				}
-			}
-			$i++;
-			$k++;
-		}
-
-		return array('start_date' => $start_date1, 'end_date' => $end_date1, 'chart' => $chart_tool, 'revenue' => $revenue_tool);
-	}
+	// 	return array('start_date' => $start_date1, 'end_date' => $end_date1, 'chart' => $chart_tool, 'revenue' => $revenue_tool);
+	// }
 	function dtr_chart_tooldata_asc()
 	{
 		$toolplaza = $this->db->get('toolplaza')->result_array();
@@ -2337,6 +2334,94 @@ class Admin_model extends CI_MODEL
 			return TRUE;
 		} else {
 			return FALSE;
+		}
+	}
+
+
+	function get_tollplaza_dates_dtr($toolplaza = '')
+	{
+		$data = $this->db->select('*')->where('toolplaza', $toolplaza)->order_by('for_date', 'desc')->limit(1)->get('dtr')->result_array();
+		$data_min = $this->db->select('*')->where('toolplaza', $toolplaza)->order_by('for_date', 'asc')->limit(1)->get('dtr')->result_array();
+
+		if ($data && $data_min) {
+			$start_date = str_replace("-", "/", $data_min[0]['for_date']); // implode('/', array($data2[0], $data2[1]));
+			$end_date = str_replace("-", "/", $data[0]['for_date']);
+		} else {
+			$start_date = '';
+			$end_date = '';
+		}
+
+
+		return array('start_date' => $start_date, 'end_date' => $end_date);
+	}
+
+	function get_custom_report_data($tollplaza = '', $start_date = '', $end_date = '')
+	{
+		$terrif = array();
+		$records = array();
+		$sql = "Select * From terrif Where FIND_IN_SET (" . $tollplaza . " ,toolplaza)  AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
+		$terrif[0]['terrif'] =  $this->db->query($sql)->result_array();
+		// echo "<pre>";
+		// print_r($terrif); exit;
+		if (empty($terrif[0]['terrif'])) {
+			$terrif = array();
+			$sql = "Select * From terrif Where FIND_IN_SET (" . $tollplaza . " ,toolplaza)  AND (start_date <= '" . $start_date . "') ORDER BY `start_date` DESC LIMIT 1";
+			$terrif[0]['terrif'] =  $this->db->query($sql)->result_array();
+			$terrif[0]['start_date'] = $start_date;
+			$terrif[0]['end_date'] = $end_date;
+			if ($terrif[0]['terrif']) {
+				$tend_date = $terrif[0]['terrif'][0]['end_date'];
+				if ($end_date > $tend_date) {
+					$sql = "Select * From terrif Where FIND_IN_SET (" . $tollplaza . " ,toolplaza)  AND (start_date <= '" . date('Y-m-d', strtotime($tend_date . ' +1 day')) . "' AND end_date >= '" . $end_date . "')";
+					$trif =  $this->db->query($sql)->result_array();
+					$records  	=		$this->db->select('dtr.*, dtr_exempt.class1 as class1_exempt,dtr_exempt.class2 as class2_exempt,dtr_exempt.class3 as class3_exempt,dtr_exempt.class4 as class4_exempt,dtr_exempt.class5 as class5_exempt,dtr_exempt.class6 as class6_exempt,dtr_exempt.class7 as class7_exempt,dtr_exempt.class8 as class8_exempt,dtr_exempt.class9 as class9_exempt,dtr_exempt.class10 as class10_exempt')
+						->from('dtr')
+						->where('toolplaza', $tollplaza)
+						->where('for_date >=', $start_date)
+						->where('for_date <=', $tend_date)
+						->order_by('for_date', 'ASC')
+						->join('dtr_exempt', 'dtr_exempt.dtr_id = dtr.id', 'left outer')
+						->get()->result_array();
+					$terrif[0]['records'] = $records;
+					//echo $this->db->last_query(); exit;
+
+					if ($trif && $trif[0]['end_date'] >= $end_date) {
+						$terrif[1]['terrif'] = $trif;
+						$records1 		 =   $this->db->select('dtr.*, dtr_exempt.class1 as class1_exempt,dtr_exempt.class2 as class2_exempt,dtr_exempt.class3 as class3_exempt,dtr_exempt.class4 as class4_exempt,dtr_exempt.class5 as class5_exempt,dtr_exempt.class6 as class6_exempt,dtr_exempt.class7 as class7_exempt,dtr_exempt.class8 as class8_exempt,dtr_exempt.class9 as class9_exempt,dtr_exempt.class10 as class10_exempt')
+							->from('dtr')
+							->where('toolplaza', $tollplaza)
+							->where('for_date >=', date('Y-m-d', strtotime($tend_date . ' +1 day')))
+							->where('for_date <=', $end_date)
+							->order_by('for_date', 'ASC')
+							->join('dtr_exempt', 'dtr_exempt.dtr_id = dtr.id', 'left outer')
+							->get()->result_array();
+						$terrif[1]['records'] = $records1;
+
+						return $terrif;
+					} else {
+						return FALSE;
+					}
+				} else {
+					return FALSE;
+				}
+			} else {
+				return FALSE;
+			}
+		} else {
+			$records = $this->db->select('dtr.*, dtr_exempt.class1 as class1_exempt,dtr_exempt.class2 as class2_exempt,dtr_exempt.class3 as class3_exempt,dtr_exempt.class4 as class4_exempt,dtr_exempt.class5 as class5_exempt,dtr_exempt.class6 as class6_exempt,dtr_exempt.class7 as class7_exempt,dtr_exempt.class8 as class8_exempt,dtr_exempt.class9 as class9_exempt,dtr_exempt.class10 as class10_exempt')
+				->from('dtr')
+				->where('toolplaza', $tollplaza)
+				->where('for_date >=', $start_date)
+				->where('for_date <=', $end_date)
+				->join('dtr_exempt', 'dtr_exempt.dtr_id = dtr.id', 'left outer')
+				->order_by('for_date', 'ASC')
+				->get()->result_array();
+			// echo $this->db->last_query(); 
+
+			$terrif[0]['records'] = $records;
+			$terrif[0]['start_date'] = $start_date;
+			$terrif[0]['end_date'] = $end_date;
+			return $terrif;
 		}
 	}
 }

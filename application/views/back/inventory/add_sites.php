@@ -11,7 +11,10 @@
              <?php if($this->session->userdata('role')==3){ ?>
               <option value="3">M3</option>
              <?php } ?>
-             <?php if($this->session->userdata('role')==5||$this->session->userdata('role')==1){ ?>
+             <?php if($this->session->userdata('role')==14){ ?>
+              <option value="14">Havelian-Thakot</option>
+             <?php } ?>
+             <?php if($this->session->userdata('role')==5){ ?>
               <option value="5">M5</option>
              <?php } ?>
              <?php if($this->session->userdata('role')==1 || $this->session->userdata('role')==2){ ?>
@@ -27,6 +30,7 @@
               <option value="11">KKHH</option>
               <option value="12">N-25</option>
               <option value="13">N-40</option>
+              <option value="14">Head Quater</option>
              <?php } ?>
              </select>
              </div>
@@ -93,6 +97,8 @@
               <option value="N4">N4</option>
               <option value="N5">N5</option>
               <option value="N6">N6</option>
+              <option value="N7">N7</option>
+              <option value="N8">N8</option>
               <option value="North Bound">North Bound</option>
              </select>
              </div>
@@ -106,6 +112,8 @@
             <option value="N4 Inside Booth" >N4 Booth</option>
             <option value="N5 Inside Booth" >N5 Booth</option>
             <option value="N6 Inside Booth" >N6 Booth</option>
+            <option value="N7 Inside Booth" >N7 Booth</option>
+            <option value="N8 Inside Booth" >N8 Booth</option>
             </select>
              </div>
           </div>
@@ -122,6 +130,8 @@
               <option value="S4">S4</option>
               <option value="S5">S5</option>
               <option value="S6">S6</option>
+              <option value="S7">S7</option>
+              <option value="S8">S8</option>
               <option value="South Bound">South Bound</option>
              </select>
              </div>
@@ -135,6 +145,8 @@
             <option value="S4 Inside Booth" >S4 Booth</option>
             <option value="S5 Inside Booth" >S5 Booth</option>
             <option value="S6 Inside Booth" >S6 Booth</option>
+            <option value="S7 Inside Booth" >S7 Booth</option>
+            <option value="S8 Inside Booth" >S8 Booth</option>
             </select>
              </div>
           </div>

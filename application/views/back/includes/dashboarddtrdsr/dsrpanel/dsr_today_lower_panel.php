@@ -38,7 +38,9 @@
 </div>
 <script>
 $(document).ready(function() {
-    $('#dsr-table').DataTable();
+    $('#dsr-table').DataTable({
+		"pageLength": 20
+	});
 	$("[data-toggle='toggle']").bootstrapToggle('destroy')                 
                     $("[data-toggle='toggle']").bootstrapToggle();
 } );

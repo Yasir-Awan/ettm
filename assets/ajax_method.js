@@ -11,7 +11,7 @@ var height = $( window ).height();
 				  +'</div>';
 				  function form_submit(form_id,noty,e){
 
-		
+					//alert(); return false;
 					var alerta = $('#form'); // alert div for show alert message
 					var form = $('#'+form_id);
 					//alert(form_id); return false;
@@ -120,7 +120,7 @@ var height = $( window ).height();
 								},
 								success: function(data) {
 								var obj = JSON.parse(data);
-								// console.log(obj); return false;
+								
 							
 							if(!obj.response){
 								var buttonp = $('.enterer');
