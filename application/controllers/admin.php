@@ -854,10 +854,11 @@ class Admin extends CI_Controller
 							},
 							$internal[$k]['transaction'][$i]
 						);
+
 						$array[$k][$i][0] = '';
 						$count = 0;
 						if ($array[$k][$i]) {
-							foreach ($array[$k][$i][1] as $entry) {
+							foreach ($array[$k][$i] as $entry) {
 								if (strpos($entry, '=')) {
 									$array[$k][$i][1][$count] = explode('=', $entry);
 
@@ -940,7 +941,7 @@ class Admin extends CI_Controller
 						$array[$k][$i][0] = '';
 						$count = 0;
 						if ($array[$k][$i]) {
-							foreach ($array[$k][$i][1] as $entry) {
+							foreach ($array[$k][$i] as $entry) {
 								if (strpos($entry, '=')) {
 									$array[$k][$i][1][$count] = explode('=', $entry);
 
@@ -1025,7 +1026,7 @@ class Admin extends CI_Controller
 
 														?>
 		<pre><?php echo print_r($data[$k]['file']); ?></pre><?php exit;
-															$this->load->view('back/toolplaza_data', $data_end);
+															$this->load->view('back/toolplaza_data',);
 														}
 														///////////////////////////////////////////////////////////////
 														////	/** Login Logout START  *////////////////////
@@ -1505,8 +1506,8 @@ class Admin extends CI_Controller
 																	$table = 'tcd';
 																	$where = array('id' => $para2);
 																	$tcd_data = $this->database_model->get_where($table, $where)->result_array();
-																	$id = $dsr_updated[0]['supervisor_id'];
-																	$tool = $dsr_updated[0]['toolplaza_id'];
+																	// $id = $dsr_updated[0]['supervisor_id'];
+																	// $tool = $dsr_updated[0]['toolplaza_id'];
 																	$this->database_model->delete($para2, $table);
 																} elseif ($para1 == 'view_reason') {
 																	$select = array('status', 'disapprove_reason');

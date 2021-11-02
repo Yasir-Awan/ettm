@@ -594,95 +594,95 @@ class Admin_model extends CI_MODEL
 		return array('mtr_id' => $mtr_id, 'start_date' => $start_date1, 'end_date' => $end_date1, 'chart' => $chart, 'revenue' => $revenue);
 	}
 
-	function nhmp($para = '')
-	{
-		if ($para) {
-			$month = str_replace('/', '-', $para);
-			$month = $month . "-01";
-			$records = $this->db->select('*')->where('for_month', $month)->get('mtr')->result_array();
-		} else {
-			$query = $this->db->select_max('for_month')->get('mtr')->result_array();
-			$records = $this->db->select('*')->where('for_month', $query[0]['for_month'])->get('mtr')->result_array();
-		}
-		$data_min = $this->db->select('*')->order_by('for_month', 'asc')->limit(1)->get('mtr')->result_array();
-		// echo "<pre>"; print_r($records); exit;
-		if ($records && $data_min) {
-			$data1 = explode('-', $records[0]['for_month']);
-			$data2 = explode('-', $data_min[0]['for_month']);
-			$start_date1 = implode('/', array($data2[0], $data2[1]));
-			$end_date1 = implode('/', array($data1[0], $data1[1]));
-		} else {
-			$start_date = '';
-			$end_date = '';
-		}
+	// function nhmp($para = '')
+	// {
+	// 	if ($para) {
+	// 		$month = str_replace('/', '-', $para);
+	// 		$month = $month . "-01";
+	// 		$records = $this->db->select('*')->where('for_month', $month)->get('mtr')->result_array();
+	// 	} else {
+	// 		$query = $this->db->select_max('for_month')->get('mtr')->result_array();
+	// 		$records = $this->db->select('*')->where('for_month', $query[0]['for_month'])->get('mtr')->result_array();
+	// 	}
+	// 	$data_min = $this->db->select('*')->order_by('for_month', 'asc')->limit(1)->get('mtr')->result_array();
+	// 	// echo "<pre>"; print_r($records); exit;
+	// 	if ($records && $data_min) {
+	// 		$data1 = explode('-', $records[0]['for_month']);
+	// 		$data2 = explode('-', $data_min[0]['for_month']);
+	// 		$start_date1 = implode('/', array($data2[0], $data2[1]));
+	// 		$end_date1 = implode('/', array($data1[0], $data1[1]));
+	// 	} else {
+	// 		$start_date = '';
+	// 		$end_date = '';
+	// 	}
 
-		$chart = array();
-		$revenue = array();
-		$plazavise = array();
-		foreach ($records as $data) {
-			if ($data) {
-				$chart['tollplaza'] = $this->db->get_where('toolplaza', array('id' => $data['toolplaza']))->row()->name;
-				$chart['toolplaza_id'] = $data['toolplaza'];
-				$month_year = explode('-', $records[0]['for_month']);
+	// 	$chart = array();
+	// 	$revenue = array();
+	// 	$plazavise = array();
+	// 	foreach ($records as $data) {
+	// 		if ($data) {
+	// 			$chart['tollplaza'] = $this->db->get_where('toolplaza', array('id' => $data['toolplaza']))->row()->name;
+	// 			$chart['toolplaza_id'] = $data['toolplaza'];
+	// 			$month_year = explode('-', $records[0]['for_month']);
 
-				$start_date = $month_year[0] . '-' . $month_year[1] . '-' . $records[0]['start_date'];
-				$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $records[0]['end_date'];
-				$chart['mtr_id'] =  $data['id'];
+	// 			$start_date = $month_year[0] . '-' . $month_year[1] . '-' . $records[0]['start_date'];
+	// 			$end_date = $month_year[0] . '-' . $month_year[1] . '-' . $records[0]['end_date'];
+	// 			$chart['mtr_id'] =  $data['id'];
 
-				$sql = "Select * From terrif Where FIND_IN_SET (" . $data['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
-				$tarrif =  $this->db->query($sql)->result_array();
-				$chart['month'] = $data['for_month'];
-				$chart['class1']['data'] = $data['class1'];
-				$chart['class2']['data'] = $data['class2'];
-				$chart['class3']['data'] = $data['class3'] + $data['class5'] + $data['class6'];
-				$chart['class4']['data'] = $data['class4'];
-				$chart['class5']['data'] = $data['class7'] + $data['class8'] + $data['class9'] + $data['class10'];
-				$chart['total']['traffic'] = $data['total'];
-				$chart['class1']['label'] = "Car";
-				$chart['class2']['label'] = "Wagon";
-				$chart['class3']['label'] = "Truck";
-				$chart['class4']['label'] = "Bus";
-				$chart['class5']['label'] = "AT Truck";
+	// 			$sql = "Select * From terrif Where FIND_IN_SET (" . $data['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
+	// 			$tarrif =  $this->db->query($sql)->result_array();
+	// 			$chart['month'] = $data['for_month'];
+	// 			$chart['class1']['data'] = $data['class1'];
+	// 			$chart['class2']['data'] = $data['class2'];
+	// 			$chart['class3']['data'] = $data['class3'] + $data['class5'] + $data['class6'];
+	// 			$chart['class4']['data'] = $data['class4'];
+	// 			$chart['class5']['data'] = $data['class7'] + $data['class8'] + $data['class9'] + $data['class10'];
+	// 			$chart['total']['traffic'] = $data['total'];
+	// 			$chart['class1']['label'] = "Car";
+	// 			$chart['class2']['label'] = "Wagon";
+	// 			$chart['class3']['label'] = "Truck";
+	// 			$chart['class4']['label'] = "Bus";
+	// 			$chart['class5']['label'] = "AT Truck";
 
-				if ($tarrif) {
-					$revenue['special_message'] = " ";
-					$revenue['month']          = $data['for_month'];
-					$revenue['class1']['data'] = $data['class1'] * $tarrif[0]['class_1_value'];
-					$revenue['class2']['data'] = $data['class2'] * $tarrif[0]['class_2_value'];
-					$revenue['class3']['data'] = ($data['class3'] *  $tarrif[0]['class_3_value']) + ($data['class5'] * $tarrif[0]['class_5_value']) + ($data['class6'] * $tarrif[0]['class_6_value']);
-					$revenue['class4']['data'] = $data['class4'] * $tarrif[0]['class_4_value'];
-					$revenue['class5']['data'] = ($data['class7']  * $tarrif[0]['class_7_value']) + ($data['class8'] *  $tarrif[0]['class_8_value']) + ($data['class9'] * $tarrif[0]['class_9_value']) + ($data['class10'] * $tarrif[0]['class_10_value']);
-					$revenue['total']['revenue'] = ($data['class1'] * $tarrif[0]['class_1_value']) + ($data['class2'] * $tarrif[0]['class_2_value']) +
-						($data['class3'] *  $tarrif[0]['class_3_value']) + ($data['class4'] * $tarrif[0]['class_4_value']) +
-						($data['class5'] * $tarrif[0]['class_5_value']) + ($data['class6'] * $tarrif[0]['class_6_value']) +
-						($data['class7']  * $tarrif[0]['class_7_value']) + ($data['class8'] *  $tarrif[0]['class_8_value']) +
-						($data['class9'] * $tarrif[0]['class_9_value']) + ($data['class10'] * $tarrif[0]['class_10_value']);
-					$revenue['class1']['label'] = "Car";
-					$revenue['class2']['label'] = "Wagon";
-					$revenue['class3']['label'] = "Truck";
-					$revenue['class4']['label'] = "Bus";
-					$revenue['class5']['label'] = "AT Truck";
-				} else {
-					$revenue['special_message'] = "No Tarrif found for this mtr";
-					$revenue['month']          = $data['for_month'];
-					$revenue['class1']['data'] = 0;
-					$revenue['class2']['data'] = 0;
-					$revenue['class3']['data'] = 0;
-					$revenue['class4']['data'] = 0;
-					$revenue['class5']['data'] = 0;
-					$revenue['class1']['label'] = "Car";
-					$revenue['class2']['label'] = "Wagon";
-					$revenue['class3']['label'] = "Truck";
-					$revenue['class4']['label'] = "Bus";
-					$revenue['class5']['label'] = "AT Truck";
-				}
-			}
-			$plazavise['traffic'][] = $chart;
-			$plazavise['revenue'][] = $revenue;
-		}
-		// echo "<pre>"; print_r($plazavise['revenue']); exit;
-		return array('mtr_id' => $mtr_id, 'start_date' => $start_date1, 'end_date' => $end_date1, 'chart' => $plazavise['traffic'], 'revenue' => $plazavise['revenue']);
-	}
+	// 			if ($tarrif) {
+	// 				$revenue['special_message'] = " ";
+	// 				$revenue['month']          = $data['for_month'];
+	// 				$revenue['class1']['data'] = $data['class1'] * $tarrif[0]['class_1_value'];
+	// 				$revenue['class2']['data'] = $data['class2'] * $tarrif[0]['class_2_value'];
+	// 				$revenue['class3']['data'] = ($data['class3'] *  $tarrif[0]['class_3_value']) + ($data['class5'] * $tarrif[0]['class_5_value']) + ($data['class6'] * $tarrif[0]['class_6_value']);
+	// 				$revenue['class4']['data'] = $data['class4'] * $tarrif[0]['class_4_value'];
+	// 				$revenue['class5']['data'] = ($data['class7']  * $tarrif[0]['class_7_value']) + ($data['class8'] *  $tarrif[0]['class_8_value']) + ($data['class9'] * $tarrif[0]['class_9_value']) + ($data['class10'] * $tarrif[0]['class_10_value']);
+	// 				$revenue['total']['revenue'] = ($data['class1'] * $tarrif[0]['class_1_value']) + ($data['class2'] * $tarrif[0]['class_2_value']) +
+	// 					($data['class3'] *  $tarrif[0]['class_3_value']) + ($data['class4'] * $tarrif[0]['class_4_value']) +
+	// 					($data['class5'] * $tarrif[0]['class_5_value']) + ($data['class6'] * $tarrif[0]['class_6_value']) +
+	// 					($data['class7']  * $tarrif[0]['class_7_value']) + ($data['class8'] *  $tarrif[0]['class_8_value']) +
+	// 					($data['class9'] * $tarrif[0]['class_9_value']) + ($data['class10'] * $tarrif[0]['class_10_value']);
+	// 				$revenue['class1']['label'] = "Car";
+	// 				$revenue['class2']['label'] = "Wagon";
+	// 				$revenue['class3']['label'] = "Truck";
+	// 				$revenue['class4']['label'] = "Bus";
+	// 				$revenue['class5']['label'] = "AT Truck";
+	// 			} else {
+	// 				$revenue['special_message'] = "No Tarrif found for this mtr";
+	// 				$revenue['month']          = $data['for_month'];
+	// 				$revenue['class1']['data'] = 0;
+	// 				$revenue['class2']['data'] = 0;
+	// 				$revenue['class3']['data'] = 0;
+	// 				$revenue['class4']['data'] = 0;
+	// 				$revenue['class5']['data'] = 0;
+	// 				$revenue['class1']['label'] = "Car";
+	// 				$revenue['class2']['label'] = "Wagon";
+	// 				$revenue['class3']['label'] = "Truck";
+	// 				$revenue['class4']['label'] = "Bus";
+	// 				$revenue['class5']['label'] = "AT Truck";
+	// 			}
+	// 		}
+	// 		$plazavise['traffic'][] = $chart;
+	// 		$plazavise['revenue'][] = $revenue;
+	// 	}
+	// 	// echo "<pre>"; print_r($plazavise['revenue']); exit;
+	// 	return array('mtr_id' => $mtr_id, 'start_date' => $start_date1, 'end_date' => $end_date1, 'chart' => $plazavise['traffic'], 'revenue' => $plazavise['revenue']);
+	// }
 
 	function timer_chartdata($plaza = '', $month = '')
 	{
