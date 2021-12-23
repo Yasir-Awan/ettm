@@ -5558,7 +5558,6 @@ class Inventory extends CI_Controller
 		} else {
 			$search = $this->input->post('search')['value'];
 			$inventory_rows =  $this->Inventory_model->allposts_search($limit, $start, $search, $order, $dir, $table);
-
 			$totalFiltered = $this->Inventory_model->count_inventory_search($search, $table);
 		}
 		// echo "<pre>";
@@ -5578,6 +5577,9 @@ class Inventory extends CI_Controller
 			$records[$counter]['identification_no'] = $row->identification_no;
 			$records[$counter]['name'] = '<a href="#" onclick="show_asset(\'' . base_url() . 'inventory/selected_install/list/' . $row->id . '/\',\'display_selected_install\');"
 			data-toggle="modal" data-target="#inventoryModal">' . $itemName[0]['name'] . '</a>';
+			if ($row->transaction_type == '10') {
+				$records[$counter]['transaction_type'] = '<span class="text-danger" > Faulty Item</span>';
+			}
 			if ($row->transaction_type == '3') {
 				$records[$counter]['transaction_type'] = '<span class="text-success" > Installed</span>';
 			}
@@ -5592,9 +5594,6 @@ class Inventory extends CI_Controller
 			}
 			if ($row->transaction_type == '9') {
 				$records[$counter]['transaction_type'] = '<span class="text-success" > Re Installed</span>';
-			}
-			if ($row->transaction_type == '10') {
-				$records[$counter]['transaction_type'] = '<span class="text-success" > Faulty</span>';
 			}
 			if ($row->transaction_type == '11') {
 				$records[$counter]['transaction_type'] = '<span class="text-success" > Component Faulty</span>';

@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------------
@@ -52,3 +52,22 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'home';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+$route['api/login'] = 'api/ApiLoginController/index';
+$route['api/site_inventory/(:any)'] = 'api/ApiSiteInventoryController/index/$1';
+$route['api/item_detail/(:any)'] = 'api/ApiItemDetailController/index/$1';
+$route['api/item_faulty/(:any)'] = 'api/ApiItemFaultyController/index/$1';
+/** Routes for repairing items START */
+$route['api/item_repair_warranty'] = 'api/ApiItemRepairWarrantyController/index';
+$route['api/item_repair_standard/(:any)'] = 'api/ApiItemRepairStandardController/index/$1';
+$route['api/admin_details/(:any)'] = 'api/ApiAdminDetailsController/index/$1';
+$route['api/supervisor_details/(:any)'] = 'api/ApiSupervisorDetailsController/index/$1';
+$route['api/member_details/(:any)'] = 'api/ApiMemberDetailsController/index/$1';
+$route['api/tsp_company_details/(:any)'] = 'api/ApiTspCompanyDetailsController/index/$1';
+/** Routes for repairing items END */
+/** Reinstall Equipment Start */
+$route['api/item_reinstall/(:any)'] = 'api/ApiItemReinstallController/index/$1';
+/** Reinstall Equipment End */
+/** Reinstall Equipment Start */
+$route['api/item_retire/(:any)'] = 'api/ApiItemRetireController/index/$1';
+/** Reinstall Equipment End */

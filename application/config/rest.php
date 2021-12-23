@@ -110,7 +110,8 @@ $config['rest_realm'] = 'REST API';
 |           authorization key
 |
 */
-$config['rest_auth'] = FALSE;
+// $config['rest_auth'] = FALSE;
+$config['rest_auth'] = 'basic';
 
 /*
 |--------------------------------------------------------------------------
@@ -126,8 +127,8 @@ $config['rest_auth'] = FALSE;
 | Note: If 'rest_auth' is set to 'session' then change 'auth_source' to the name of the session variable
 |
 */
-$config['auth_source'] = 'ldap';
-
+// $config['auth_source'] = 'ldap';
+$config['auth_source'] = '';
 /*
 |--------------------------------------------------------------------------
 | Allow Authentication and API Keys
@@ -298,7 +299,7 @@ $config['rest_database_group'] = 'default';
 | The table name in your database that stores API keys
 |
 */
-$config['rest_keys_table'] = 'keys';
+$config['rest_keys_table'] = 'api_keys';
 
 /*
 |--------------------------------------------------------------------------
@@ -334,7 +335,7 @@ $config['rest_enable_keys'] = TRUE;
 | column name to match e.g. my_key
 |
 */
-$config['rest_key_column'] = 'key';
+$config['rest_key_column'] = 'my_key';
 
 /*
 |--------------------------------------------------------------------------
