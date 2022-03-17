@@ -50,7 +50,7 @@ var height = $( window ).height();
 								if(here.closest('div').find('.badge-danger').length){
 			
 								} else {
-								 
+								
 									here.closest('div').append(''
 										+'  <span id="'+take+'" class="badge badge-danger" >'
 										+'      '+txt
@@ -62,14 +62,12 @@ var height = $( window ).height();
 								if(here.closest('div').find('.require_alert').length){
 			
 								} else {
-								   
 									here.closest('div').append(''
 										+'  <span id="'+take+'" class="badge badge-danger" >'
 										+'      *Required'
 										+'  </span>'
 									);
 								}
-			
 							}
 							var topp = 100;
 							if(form_id == 'product_add' || form_id == 'product_edit'){
@@ -159,7 +157,6 @@ var height = $( window ).height();
 						
 						if(form_id == 'product_add' || form_id == 'product_edit'){
 							var ih = $('.require_alert').last().closest('.tab-pane').attr('id');
-							
 							$("[href=#"+ih+"]").click();
 						}
 						//$('body').scrollTo('#scroll');

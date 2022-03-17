@@ -10,19 +10,23 @@ class ApiSiteInventoryController extends REST_Controller
     }
     public function index_get($site)
     {
-        if ($site) {
+        $headers = apache_request_headers();
+        $head = explode(" ", $headers['Authorization']);
 
-            $inventory = new ApiSiteRelatedInventoryModel;
-            $site_inventory = $inventory->get_SiteInventory($site);
+        $token = $head[1];
+        if ($token == $this->session->userdata('access_token')) {
+            if ($site) {
+                $inventory = new ApiSiteRelatedInventoryModel;
+                $site_inventory = $inventory->get_SiteInventory($site);
 
-            if (!empty($site_inventory)) {
-                $this->response($site_inventory, 200);
-            } else {
-                $this->response(['status' => FALSE, 'message' => 'Inventory Not Found.'], REST_Controller::HTTP_NOT_FOUND);
+                if (!empty($site_inventory)) {
+                    $this->response($site_inventory, 200);
+                } else {
+                    $this->response(['status' => FALSE, 'message' => 'Inventory Not Found.'], REST_Controller::HTTP_NOT_FOUND);
+                }
             }
         } else {
-            echo "in else";
-            exit;
+            $this->response('Unauthorized Access', 401);
         }
         // echo "<pre>";
         // print_r($site_inventory);

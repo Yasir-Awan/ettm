@@ -110,8 +110,8 @@ $config['rest_realm'] = 'REST API';
 |           authorization key
 |
 */
-// $config['rest_auth'] = FALSE;
-$config['rest_auth'] = 'basic';
+$config['rest_auth'] = FALSE;
+// $config['rest_auth'] = 'session';
 
 /*
 |--------------------------------------------------------------------------
@@ -351,7 +351,7 @@ $config['rest_key_column'] = 'my_key';
 | $config['rest_limits_method'] = 'ROUTED_URL';  // Put a limit on the routed URL
 |
 */
-$config['rest_limits_method'] = 'ROUTED_URL';
+$config['rest_limits_method'] = 'API_KEY';
 
 /*
 |--------------------------------------------------------------------------
@@ -546,7 +546,7 @@ $config['rest_language'] = 'english';
 | will access it through a browser
 |
 */
-$config['check_cors'] = FALSE;
+$config['check_cors'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -561,7 +561,8 @@ $config['allowed_cors_headers'] = [
   'X-Requested-With',
   'Content-Type',
   'Accept',
-  'Access-Control-Request-Method'
+  'Access-Control-Request-Method',
+  'Authorization',
 ];
 
 /*
@@ -590,7 +591,7 @@ $config['allowed_cors_methods'] = [
 | source domain
 |
 */
-$config['allow_any_cors_domain'] = FALSE;
+$config['allow_any_cors_domain'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------

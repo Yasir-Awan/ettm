@@ -1,8 +1,10 @@
-<?php 
-defined('BASEPATH') OR EXIT('NO DIRECT SCRIPT ALLOWED');
+<?php
+defined('BASEPATH') or exit('NO DIRECT SCRIPT ALLOWED');
 
-class Home extends CI_Controller{
-	public function __construct(){
+class Home extends CI_Controller
+{
+	public function __construct()
+	{
 		parent::__construct();
 		$this->load->helper('url');
 		$this->page_data = array();
@@ -26,105 +28,116 @@ class Home extends CI_Controller{
         echo "<pre>";
         print_r($array); exit;*/
 
-		$this->load->view('front/index' , $this->page_data);
+		$this->load->view('front/index', $this->page_data);
 	}
 
-	public function member_login(){
-
+	public function member_login()
+	{
 		$safe = 'yes';
-        $char = '';
-        foreach($_POST as $k=>$row){
-            if (preg_match('/[\'^":()}{#~><>|=¬]/', $row,$match))
-            {
-                
-                    $safe = 'no';
-                    $char = $match[0];
-                
-            }
-        }
-        $this->load->library('form_validation');
-        $this->form_validation->set_rules('username', 'Username' , 'trim|required');
-        $this->form_validation->set_rules('password', 'Password' , 'trim|required');
-	
-        if($this->form_validation->run() == FALSE){
+		$char = '';
+		foreach ($_POST as $k => $row) {
+			if (preg_match('/[\'^":()}{#~><>|=¬]/', $row, $match)) {
 
-        	echo json_encode(array('response' => FALSE , 'message' => validation_errors())); exit;
-        }else{
+				$safe = 'no';
+				$char = $match[0];
+			}
+		}
+		$this->load->library('form_validation');
+		$this->form_validation->set_rules('username', 'Username', 'trim|required');
+		$this->form_validation->set_rules('password', 'Password', 'trim|required');
 
-        	if($safe == 'yes'){
-        		$username = $this->input->post('username');
-        		$password = $this->input->post('password');
-        		$member  = $this->db->get_where('member', array('username' => $username, 'password' => sha1($password)))->result_array();
-        		if($member){
-        			if($member[0]['status'] == 0){
-        				echo json_encode(array('response'=>FALSE, 'message'=>'Your account is not active please contact administrator')); exit;
-        			}else{
-        				$this->session->set_userdata('member_id', $member[0]['id']);
-						$this->session->set_userdata('member_name', $member[0]['fname'] .' '.$member[0]['lname']);
+		if ($this->form_validation->run() == FALSE) {
+
+			echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+			exit;
+		} else {
+
+			if ($safe == 'yes') {
+				$username = $this->input->post('username');
+				$password = $this->input->post('password');
+				$member  = $this->db->get_where('member', array('username' => $username, 'password' => sha1($password)))->result_array();
+				if ($member) {
+					if ($member[0]['status'] == 0) {
+						echo json_encode(array('response' => FALSE, 'message' => 'Your account is not active please contact administrator'));
+						exit;
+					} else {
+						$this->session->set_userdata('member_id', $member[0]['id']);
+						$this->session->set_userdata('member_name', $member[0]['fname'] . ' ' . $member[0]['lname']);
 						$this->session->set_userdata('site', $member[0]['site']);
 
-        				echo json_encode(array('response' => TRUE , 'message' => 'Successful Login' , 'is_redirect' => TRUE , 'redirect_url' => base_url().'member'));
-        			}
-
-        		}else{
-        			echo json_encode(array('response'=>FALSE, 'message'=>'Invalid Username or wrong password')); exit;
-        		}
-        	}else{
-        		echo json_encode(array('response'=>FALSE, 'message'=>'Disallowed charecter : " '.$char.' " in the POST')); exit;
-        	}
-        }
+						echo json_encode(array('response' => TRUE, 'message' => 'Successful Login', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'member'));
+					}
+				} else {
+					echo json_encode(array('response' => FALSE, 'message' => 'Invalid Username or wrong password'));
+					exit;
+				}
+			} else {
+				echo json_encode(array('response' => FALSE, 'message' => 'Disallowed charecter : " ' . $char . ' " in the POST'));
+				exit;
+			}
+		}
 	}
 
 
-	public function toolplaza_login(){
+	public function toolplaza_login()
+	{
 		$safe = 'yes';
-        $char = '';
-        foreach($_POST as $k=>$row){
-            if (preg_match('/[\'^":()}{#~><>|=¬]/', $row,$match))
-            {
-                
-                    $safe = 'no';
-                    $char = $match[0];
-                
-            }
-        }
-        $this->load->library('form_validation');
-        $this->form_validation->set_rules('username', 'Username' , 'trim|required');
-        $this->form_validation->set_rules('password', 'Password' , 'trim|required');
-	
-        if($this->form_validation->run() == FALSE){
+		$char = '';
+		foreach ($_POST as $k => $row) {
+			if (preg_match('/[\'^":()}{#~><>|=¬]/', $row, $match)) {
 
-        	echo json_encode(array('response' => FALSE , 'message' => validation_errors())); exit;
-        }else{
+				$safe = 'no';
+				$char = $match[0];
+			}
+		}
+		$this->load->library('form_validation');
+		$this->form_validation->set_rules('username', 'Username', 'trim|required');
+		$this->form_validation->set_rules('password', 'Password', 'trim|required');
 
-        	if($safe == 'yes'){
-        		$username = $this->input->post('username');
-        		$password = $this->input->post('password');
-        		$supervisor  = $this->db->get_where('tpsupervisor', array('username' => $username, 'password' => sha1($password)))->result_array();
-        		if($supervisor){
-        			if($supervisor[0]['status'] == 0){
-        				echo json_encode(array('response'=>FALSE, 'message'=>'Your account is not active please contact administrator')); exit;
-        			}else{
-        				$this->session->set_userdata('supervisor_id', $supervisor[0]['id']);
+		if ($this->form_validation->run() == FALSE) {
+			echo json_encode(array('response' => FALSE, 'message' => validation_errors()));
+			exit;
+		} else {
+			if ($safe == 'yes') {
+				$username = $this->input->post('username');
+				$password = $this->input->post('password');
+				$jwt = new JWT();
+				$JwtSecretKey = "Mysecretwordshere";
+				$supervisor  = $this->db->get_where('tpsupervisor', array('username' => $username, 'password' => sha1($password)))->result_array();
+				if ($supervisor) {
+					if ($supervisor[0]['status'] == 0) {
+						echo json_encode(array('response' => FALSE, 'message' => 'Your account is not active please contact administrator'));
+						exit;
+					} else {
+						$data = array(
+							'supervisor_id' => $supervisor[0]['id'],
+							'site' => $supervisor[0]['site'],
+							'supervisor_name' => $supervisor[0]['fname'] . ' ' . $supervisor[0]['lname'],
+							'username' => $supervisor[0]['username'],
+							'contact' => $supervisor[0]['contact'],
+							'role' => $supervisor[0]['role'],
+							'status' => $supervisor[0]['status'],
+						);
+						$token = $jwt->encode($data, $JwtSecretKey, 'HS256');
+						$this->session->set_userdata('supervisor_id', $supervisor[0]['id']);
 						$this->session->set_userdata('toolplaza', $supervisor[0]['tollplaza']);
 						$this->session->set_userdata('site', $supervisor[0]['site']);
-        				$this->session->set_userdata('supervisor_name', $supervisor[0]['fname'] .' '.$supervisor[0]['lname']);
-        				echo json_encode(array('response' => TRUE , 'message' => 'Successful Login' , 'is_redirect' => TRUE , 'redirect_url' => base_url().'toolplaza'));
-        			}
-
-        		}else{
-        			echo json_encode(array('response'=>FALSE, 'message'=>'Invalid Username or wrong password')); exit;
-        		}
-        	}else{
-        		echo json_encode(array('response'=>FALSE, 'message'=>'Disallowed charecter : " '.$char.' " in the POST')); exit;
-        	}
-        }
-
+						$this->session->set_userdata('supervisor_name', $supervisor[0]['fname'] . ' ' . $supervisor[0]['lname']);
+						$this->session->set_userdata('username', $supervisor[0]['username']);
+						$this->session->set_userdata('contact', $supervisor[0]['contact']);
+						$this->session->set_userdata('role', $supervisor[0]['role']);
+						$this->session->set_userdata('status', $supervisor[0]['status']);
+						$this->session->set_userdata('access_token', $token);
+						echo json_encode(array('response' => TRUE, 'message' => 'Successful Login', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'toolplaza'));
+					}
+				} else {
+					echo json_encode(array('response' => FALSE, 'message' => 'Invalid Username or wrong password'));
+					exit;
+				}
+			} else {
+				echo json_encode(array('response' => FALSE, 'message' => 'Disallowed charecter : " ' . $char . ' " in the POST'));
+				exit;
+			}
+		}
 	}
-
-
-
-
 }
-
-?>

@@ -1064,7 +1064,6 @@ class Admin extends CI_Controller
 																		echo json_encode(array('response' => TRUE, 'message' => 'Successfull Login', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'admin/index'));
 																	}
 																} else {
-
 																	echo json_encode(array('response' => FALSE, 'message' => 'Invalid Username or wrong Passord'));
 																	exit;
 																}

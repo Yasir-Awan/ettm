@@ -13,8 +13,7 @@
                     <li <?php if ($page == 'Dashboard') echo "class='active'"; ?>>
                         <?php if ($this->session->userdata('omcid')) { ?>
                             <a style="color:#fff;" href="<?php echo base_url(); ?>omc" aria-expanded="true"><i style="color:#fff;" class="ti-dashboard"></i><span>Dashboard</span></a>
-                        <?php  }      ?>
-
+                        <?php  }  ?>
                     </li>
                     <li <?php if ($page == 'inventory_dashboard') echo "class='active'"; ?>>
                         <?php
@@ -36,6 +35,9 @@
                                 </li>
                                 <li <?php if ($page == 'admin') echo "class='active'"; ?>>
                                     <a href="<?php echo base_url() ?>admin/admins"><i style="color:#fff;" class="fa fa-group"></i> <span>Admins</span></a>
+                                </li>
+                                <li <?php if ($page == 'UPS Dashboard') echo "class='active'"; ?>>
+                                    <a href="<?php echo base_url(); ?>ups_dashboard" aria-expanded="true"><i style="color:#fff;" class="ti-dashboard"></i> <span>&nbsp UPS Dashboard</span></a>
                                 </li>
                             </ul>
                         </li>
@@ -142,7 +144,6 @@
                     </li>
                     <?php if ($this->session->userdata('role') == 1 || $this->session->userdata('role') == 2 || $this->session->userdata('role') == 4) {     ?>
                         <a style="color:#fff;margin-left:30px;" href="<?php echo base_url(); ?>admin" aria-expanded="true"><i style="color:#fff;" class="ti-dashboard"></i> <span>&nbsp Dashboard</span></a>
-
                     <?php }
                     if ($this->session->userdata('role') == 4 || $this->session->userdata('role') == 1) { ?>
                         <li>
@@ -172,10 +173,10 @@
                                 <li <?php if ($page == 'Tollplaza') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/tollplaza"><i style="color:#fff;" class="fa fa-building"></i> <span>All Tollplaza</span></a></li>
                                 <li <?php if ($page == 'MTR') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/mtr"><i style="color:#fff;" class="fa fa-file"></i> <span>Monthly Traffic Report</span></a></li>
                                 <li <?php if ($page == 'dtr') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/dtr"><i style="color:#fff;" class="fa fa-file"></i> <span>Daily Traffic Report</span></a></li>
-                                 
-                                 <li <?php if ($page == 'custom traffic') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/traffic_report_custom"><i style="color:#fff;" class="fa fa-file"></i> <span>Custom Traffic Report</span></a></li>
-                                 <li <?php if ($page == 'custom traffic summary') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/traffic_summary_custom"><i style="color:#fff;" class="fa fa-file"></i> <span>Custom Traffic Summary</span></a></li>
-                                
+
+                                <li <?php if ($page == 'custom traffic') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/traffic_report_custom"><i style="color:#fff;" class="fa fa-file"></i> <span>Custom Traffic Report</span></a></li>
+                                <li <?php if ($page == 'custom traffic summary') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/traffic_summary_custom"><i style="color:#fff;" class="fa fa-file"></i> <span>Custom Traffic Summary</span></a></li>
+
                                 <li <?php if ($page == 'dsr') echo "class='active'"; ?> style="line-height:10px;"><a href="<?php echo base_url() ?>admin/dsr"><i style="color:#fff;" class="fa fa-file"></i> <span>Daily Site Report</span></a></li>
                                 <li <?php if ($page == 'Toll Plaza Supervisor') echo "class='active'"; ?>style="line-height:10px;"><a href="<?php echo base_url() ?>admin/toolplaza_supervisor"><i style="color:#fff;" class="fa fa-group"></i> <span>Supervisor</span></a></li>
                                 <li <?php if ($page == 'Toll Plaza Staff') echo "class='active'"; ?>style="line-height:10px;"><a href="<?php echo base_url() ?>admin/tpstaff"><i style="color:#fff;" class="fa fa-group"></i> <span>Staff</span></a></li>

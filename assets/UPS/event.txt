@@ -1,0 +1,1147 @@
+v1.0.0
+Date	Time	Name	Contact	Location	System IP
+01/06/2022	14:00:01	Unknown	Unknown	Unknown	172.19.10.133
+
+Date	Time	Event	Code
+01/06/2022	13:58:41	System: FTP user 'apc' logged in from 172.19.10.150.	0x0016
+01/06/2022	13:58:40	System: FTP user 'apc' logged out from 172.19.10.150.	0x0020
+01/06/2022	13:58:39	System: FTP user 'apc' logged in from 172.19.10.150.	0x0016
+01/05/2022	09:58:13	System: Web user 'apc' logged out from 172.19.10.138.	0x001F
+01/05/2022	09:48:14	System: Web user 'apc' logged in from 172.19.10.138.	0x0015
+01/05/2022	07:36:05	UPS: Returned from battery backup power.	0x010A
+01/05/2022	07:36:04	UPS: Switched to battery backup power.	0x0109
+01/04/2022	20:02:35	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/04/2022	20:02:20	UPS: Returned from battery backup power.	0x010A
+01/04/2022	20:02:19	UPS: Switched to battery backup power.	0x0109
+01/04/2022	20:02:15	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/04/2022	15:38:03	System: Web user 'apc' logged out from 172.19.10.138.	0x001F
+01/04/2022	15:28:03	System: Web user 'apc' logged in from 172.19.10.138.	0x0015
+01/04/2022	09:22:29	System: Web user 'apc' logged out from 172.19.10.138.	0x001F
+01/04/2022	09:13:18	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/04/2022	09:12:57	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/04/2022	09:09:37	System: Web user 'apc' logged in from 172.19.10.138.	0x0015
+01/04/2022	07:30:29	UPS: Returned from battery backup power.	0x010A
+01/04/2022	07:30:27	UPS: Switched to battery backup power.	0x0109
+01/04/2022	06:58:19	UPS: Returned from battery backup power.	0x010A
+01/04/2022	06:58:18	UPS: Switched to battery backup power.	0x0109
+01/03/2022	09:38:38	System: Web user 'apc' logged out from 172.19.10.138.	0x001F
+01/03/2022	09:28:34	System: Web user 'apc' logged in from 172.19.10.138.	0x0015
+01/01/2022	16:46:08	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/01/2022	16:45:52	UPS: Returned from battery backup power.	0x010A
+01/01/2022	16:45:51	UPS: Switched to battery backup power.	0x0109
+01/01/2022	16:45:48	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/01/2022	16:28:29	UPS: Not synchronized fault cleared.	0x022E
+01/01/2022	16:28:29	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/01/2022	16:28:07	UPS: Not synchronized fault.	0x022D
+01/01/2022	16:28:06	UPS: Returned from battery backup power.	0x010A
+01/01/2022	16:27:12	UPS: Switched to battery backup power.	0x0109
+01/01/2022	16:27:09	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/31/2021	10:31:11	System: Web user 'apc' logged out from 172.19.10.138.	0x001F
+12/31/2021	10:14:42	System: Web user 'apc' logged in from 172.19.10.138.	0x0015
+12/31/2021	09:41:49	System: Web user 'apc' logged out from 172.19.10.138.	0x001F
+12/31/2021	09:28:19	System: Web user 'apc' logged in from 172.19.10.138.	0x0015
+12/30/2021	12:16:42	System: Web user 'apc' logged out from 172.19.10.138.	0x001F
+12/30/2021	12:06:24	System: Web user 'apc' logged in from 172.19.10.138.	0x0015
+12/28/2021	14:04:34	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/28/2021	14:04:16	UPS: Returned from battery backup power.	0x010A
+12/28/2021	14:04:10	UPS: Switched to battery backup power.	0x0109
+12/28/2021	14:04:06	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/28/2021	09:13:38	UPS: Not synchronized fault cleared.	0x022E
+12/28/2021	09:13:38	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/28/2021	09:13:21	UPS: Returned from battery backup power.	0x010A
+12/28/2021	09:13:20	UPS: Switched to battery backup power.	0x0109
+12/28/2021	09:13:14	UPS: Not synchronized fault.	0x022D
+12/28/2021	09:13:13	UPS: Returned from battery backup power.	0x010A
+12/28/2021	09:12:01	UPS: Switched to battery backup power.	0x0109
+12/28/2021	09:11:57	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/28/2021	02:40:38	UPS: Returned from battery backup power.	0x010A
+12/28/2021	02:40:37	UPS: Switched to battery backup power.	0x0109
+12/27/2021	13:09:01	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/27/2021	13:08:41	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/27/2021	10:51:00	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/27/2021	10:50:40	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/27/2021	10:07:45	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/27/2021	10:07:30	UPS: Returned from battery backup power.	0x010A
+12/27/2021	10:07:29	UPS: Switched to battery backup power.	0x0109
+12/27/2021	10:07:25	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/27/2021	09:02:16	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/27/2021	09:01:55	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/27/2021	03:39:20	UPS: Returned from battery backup power.	0x010A
+12/27/2021	03:39:19	UPS: Switched to battery backup power.	0x0109
+12/27/2021	01:26:27	UPS: Returned from battery backup power.	0x010A
+12/27/2021	01:26:25	UPS: Switched to battery backup power.	0x0109
+12/27/2021	01:22:08	UPS: Returned from battery backup power.	0x010A
+12/27/2021	01:22:07	UPS: Switched to battery backup power.	0x0109
+12/27/2021	01:04:53	UPS: Returned from battery backup power.	0x010A
+12/27/2021	01:04:52	UPS: Switched to battery backup power.	0x0109
+12/26/2021	12:21:19	UPS: Returned from battery backup power.	0x010A
+12/26/2021	12:21:18	UPS: Switched to battery backup power.	0x0109
+12/22/2021	12:07:52	System: Web user 'apc' logged out from 172.19.10.110.	0x001F
+12/22/2021	11:57:51	System: Web user 'apc' logged in from 172.19.10.110.	0x0015
+12/22/2021	11:56:26	System: Web user 'apc' logged out from 172.19.10.110.	0x001F
+12/22/2021	11:46:18	System: Web user 'apc' logged in from 172.19.10.110.	0x0015
+12/21/2021	15:18:55	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/21/2021	15:18:40	UPS: Returned from battery backup power.	0x010A
+12/21/2021	15:18:38	UPS: Switched to battery backup power.	0x0109
+12/21/2021	15:18:35	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/17/2021	16:02:43	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/17/2021	15:52:43	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/17/2021	10:56:13	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/17/2021	10:46:13	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/17/2021	10:46:03	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/17/2021	10:36:03	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/16/2021	17:18:04	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/16/2021	17:08:04	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/16/2021	15:54:56	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/16/2021	15:33:26	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/16/2021	12:49:21	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/16/2021	12:39:17	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/16/2021	12:25:55	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/16/2021	12:15:54	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/16/2021	11:27:18	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/16/2021	11:17:18	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/15/2021	10:56:50	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/15/2021	10:46:45	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/15/2021	09:50:25	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/15/2021	09:50:09	UPS: Returned from battery backup power.	0x010A
+12/15/2021	09:50:08	UPS: Switched to battery backup power.	0x0109
+12/15/2021	09:50:05	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/15/2021	04:29:32	UPS: Returned from battery backup power.	0x010A
+12/15/2021	04:29:31	UPS: Switched to battery backup power.	0x0109
+12/15/2021	03:51:56	UPS: Returned from battery backup power.	0x010A
+12/15/2021	03:51:55	UPS: Switched to battery backup power.	0x0109
+12/14/2021	16:55:38	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/14/2021	16:45:38	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/14/2021	15:56:31	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/14/2021	15:46:31	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/14/2021	10:31:12	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/14/2021	10:12:28	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/14/2021	09:15:48	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/14/2021	09:15:33	UPS: Returned from battery backup power.	0x010A
+12/14/2021	09:15:31	UPS: Switched to battery backup power.	0x0109
+12/14/2021	09:15:28	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/13/2021	14:59:12	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/13/2021	14:49:12	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/13/2021	13:20:54	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/13/2021	13:10:54	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/13/2021	11:41:29	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/13/2021	11:26:14	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/08/2021	12:51:43	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/08/2021	12:41:43	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/08/2021	12:32:59	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/08/2021	12:22:59	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/08/2021	10:28:44	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/08/2021	10:18:44	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/07/2021	16:54:45	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/07/2021	16:44:46	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/07/2021	11:47:41	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/07/2021	11:35:16	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/06/2021	15:50:56	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/06/2021	15:50:38	UPS: Returned from battery backup power.	0x010A
+12/06/2021	15:50:31	UPS: Switched to battery backup power.	0x0109
+12/06/2021	15:50:28	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/06/2021	15:33:23	UPS: Not synchronized fault cleared.	0x022E
+12/06/2021	15:33:23	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/06/2021	15:33:21	UPS: Returned from battery backup power.	0x010A
+12/06/2021	15:33:20	UPS: Switched to battery backup power.	0x0109
+12/06/2021	15:32:58	UPS: Not synchronized fault.	0x022D
+12/06/2021	15:32:57	UPS: Returned from battery backup power.	0x010A
+12/06/2021	15:32:27	UPS: Switched to battery backup power.	0x0109
+12/06/2021	15:32:23	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/06/2021	15:13:45	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/06/2021	14:53:43	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/06/2021	13:42:06	UPS: Not synchronized fault cleared.	0x022E
+12/06/2021	13:42:06	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/06/2021	13:41:45	UPS: Not synchronized fault.	0x022D
+12/06/2021	13:41:45	UPS: Returned from battery backup power.	0x010A
+12/06/2021	13:41:37	UPS: Switched to battery backup power.	0x0109
+12/06/2021	13:41:34	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/06/2021	13:28:42	UPS: Not synchronized fault cleared.	0x022E
+12/06/2021	13:28:42	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/06/2021	13:28:33	UPS: Returned from battery backup power.	0x010A
+12/06/2021	13:28:32	UPS: Switched to battery backup power.	0x0109
+12/06/2021	13:28:20	UPS: Not synchronized fault.	0x022D
+12/06/2021	13:28:17	UPS: Returned from battery backup power.	0x010A
+12/06/2021	13:27:38	UPS: Switched to battery backup power.	0x0109
+12/06/2021	13:27:34	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/05/2021	09:40:44	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/05/2021	09:40:26	UPS: Returned from battery backup power.	0x010A
+12/05/2021	09:40:12	UPS: Switched to battery backup power.	0x0109
+12/05/2021	09:40:08	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/05/2021	09:33:17	UPS: Not synchronized fault cleared.	0x022E
+12/05/2021	09:33:17	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/05/2021	09:32:56	UPS: Returned from battery backup power.	0x010A
+12/05/2021	09:32:55	UPS: Not synchronized fault.	0x022D
+12/05/2021	09:32:55	UPS: Switched to battery backup power.	0x0109
+12/05/2021	09:32:52	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/05/2021	09:26:20	UPS: Not synchronized fault cleared.	0x022E
+12/05/2021	09:26:20	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/05/2021	09:25:58	UPS: Not synchronized fault.	0x022D
+12/05/2021	09:25:57	UPS: Returned from battery backup power.	0x010A
+12/05/2021	09:25:26	UPS: Switched to battery backup power.	0x0109
+12/05/2021	09:25:23	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/05/2021	09:20:44	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/05/2021	09:20:28	UPS: Returned from battery backup power.	0x010A
+12/05/2021	09:20:27	UPS: Switched to battery backup power.	0x0109
+12/05/2021	09:20:23	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/05/2021	09:16:22	UPS: Not synchronized fault cleared.	0x022E
+12/05/2021	09:16:22	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/05/2021	09:15:58	UPS: Not synchronized fault.	0x022D
+12/05/2021	09:15:57	UPS: Returned from battery backup power.	0x010A
+12/05/2021	09:15:21	UPS: Switched to battery backup power.	0x0109
+12/05/2021	09:15:18	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/05/2021	07:26:04	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/05/2021	07:25:49	UPS: Returned from battery backup power.	0x010A
+12/05/2021	07:25:48	UPS: Switched to battery backup power.	0x0109
+12/05/2021	07:25:45	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/03/2021	15:31:20	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/03/2021	15:21:20	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/03/2021	12:37:37	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/03/2021	12:23:16	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/03/2021	11:36:07	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/03/2021	11:03:09	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/03/2021	11:03:04	System: Detected an unauthorized user attempting to access the Web interface from 172.19.10.130.	0x0006
+12/02/2021	20:37:58	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/02/2021	20:37:41	UPS: Returned from battery backup power.	0x010A
+12/02/2021	20:37:41	UPS: Switched to battery backup power.	0x0109
+12/02/2021	20:37:37	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/02/2021	20:36:11	UPS: Not synchronized fault cleared.	0x022E
+12/02/2021	20:36:11	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/02/2021	20:35:45	UPS: Not synchronized fault.	0x022D
+12/02/2021	20:35:44	UPS: Returned from battery backup power.	0x010A
+12/02/2021	20:35:13	UPS: Switched to battery backup power.	0x0109
+12/02/2021	20:35:10	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/02/2021	13:15:05	System: Web user 'apc' logged out from 172.19.10.138.	0x001F
+12/02/2021	12:57:51	System: Web user 'apc' logged in from 172.19.10.138.	0x0015
+12/02/2021	11:05:55	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/02/2021	10:55:55	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/02/2021	10:24:46	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/02/2021	10:14:46	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/02/2021	10:04:23	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/02/2021	09:54:23	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/02/2021	09:33:00	UPS: Not synchronized fault cleared.	0x022E
+12/02/2021	09:33:00	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/02/2021	09:32:40	UPS: Not synchronized fault.	0x022D
+12/02/2021	09:32:39	UPS: Returned from battery backup power.	0x010A
+12/02/2021	09:32:35	UPS: Switched to battery backup power.	0x0109
+12/02/2021	09:32:31	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/02/2021	09:23:33	UPS: Not synchronized fault cleared.	0x022E
+12/02/2021	09:23:33	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/02/2021	09:23:29	UPS: Returned from battery backup power.	0x010A
+12/02/2021	09:23:28	UPS: Switched to battery backup power.	0x0109
+12/02/2021	09:23:10	UPS: Not synchronized fault.	0x022D
+12/02/2021	09:23:07	UPS: Returned from battery backup power.	0x010A
+12/02/2021	09:22:33	UPS: Switched to battery backup power.	0x0109
+12/02/2021	09:22:30	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/01/2021	16:22:42	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/01/2021	16:12:42	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/01/2021	14:03:37	UPS: Not synchronized fault cleared.	0x022E
+12/01/2021	14:03:37	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/01/2021	14:03:16	UPS: Not synchronized fault.	0x022D
+12/01/2021	14:03:16	UPS: Returned from battery backup power.	0x010A
+12/01/2021	14:03:12	UPS: Switched to battery backup power.	0x0109
+12/01/2021	14:03:08	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/01/2021	12:25:59	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/01/2021	12:15:59	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/01/2021	12:03:07	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/01/2021	11:53:08	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/01/2021	11:13:33	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+12/01/2021	11:02:23	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+12/01/2021	10:40:41	System: FTP user 'apc' logged out from 172.19.10.110.	0x0020
+12/01/2021	10:32:03	System: FTP user 'apc' logged in from 172.19.10.110.	0x0016
+12/01/2021	10:32:03	System: FTP user 'apc' logged out from 172.19.10.110.	0x0020
+12/01/2021	10:32:03	System: FTP user 'apc' logged in from 172.19.10.110.	0x0016
+12/01/2021	09:13:35	UPS: Not synchronized fault cleared.	0x022E
+12/01/2021	09:13:35	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/01/2021	09:13:12	UPS: Returned from battery backup power.	0x010A
+12/01/2021	09:13:11	UPS: Switched to battery backup power.	0x0109
+12/01/2021	09:13:11	UPS: Not synchronized fault.	0x022D
+12/01/2021	09:13:08	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/01/2021	09:13:01	UPS: Not synchronized fault cleared.	0x022E
+12/01/2021	09:13:01	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/01/2021	09:12:39	UPS: Not synchronized fault.	0x022D
+12/01/2021	09:12:38	UPS: Returned from battery backup power.	0x010A
+12/01/2021	09:11:40	UPS: Switched to battery backup power.	0x0109
+12/01/2021	09:11:37	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/30/2021	17:15:29	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/30/2021	16:55:18	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/30/2021	16:52:08	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/30/2021	16:42:09	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/30/2021	14:52:34	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/30/2021	14:42:33	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/30/2021	12:28:55	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/30/2021	12:18:54	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/30/2021	11:26:17	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/30/2021	11:07:31	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/29/2021	13:54:08	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/29/2021	13:44:08	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/29/2021	10:30:10	System: Web user 'apc' logged out from 172.19.10.138.	0x001F
+11/29/2021	10:19:46	System: Web user 'apc' logged in from 172.19.10.138.	0x0015
+11/29/2021	10:04:57	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/29/2021	09:48:35	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/26/2021	17:01:51	System: Web user 'apc' logged out from 172.19.10.138.	0x001F
+11/26/2021	16:50:04	System: Web user 'apc' logged in from 172.19.10.138.	0x0015
+11/26/2021	15:54:45	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/26/2021	15:43:43	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/26/2021	15:11:49	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/26/2021	14:59:50	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/26/2021	13:07:11	UPS: Returned from battery backup power.	0x010A
+11/26/2021	13:07:09	UPS: Switched to battery backup power.	0x0109
+11/26/2021	12:06:08	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/26/2021	11:56:08	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/26/2021	10:11:28	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/26/2021	09:58:01	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/25/2021	17:54:55	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/25/2021	17:43:53	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/25/2021	17:11:12	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/25/2021	17:01:12	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/25/2021	16:56:15	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/25/2021	16:41:02	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/25/2021	16:26:10	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/25/2021	16:14:48	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/25/2021	12:21:50	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/25/2021	12:11:50	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/25/2021	12:04:48	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/25/2021	11:54:16	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/25/2021	10:17:03	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/25/2021	10:06:50	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/24/2021	17:31:00	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/24/2021	17:21:01	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/24/2021	17:18:47	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/24/2021	17:00:26	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/24/2021	12:42:53	System: Console user 'apc' logged out from 172.19.10.125.	0x001E
+11/24/2021	12:40:41	System: Console user 'apc' logged in from 172.19.10.125.	0x0014
+11/24/2021	12:37:17	System: FTP user 'apc' logged out from 172.19.10.130.	0x0020
+11/24/2021	12:27:15	System: FTP user 'apc' logged in from 172.19.10.130.	0x0016
+11/24/2021	12:27:14	System: FTP user 'apc' logged out from 172.19.10.130.	0x0020
+11/24/2021	12:27:14	System: FTP user 'apc' logged in from 172.19.10.130.	0x0016
+11/24/2021	10:55:50	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/24/2021	10:43:20	System: Configuration change. Data log interval.	0x0033
+11/24/2021	10:41:21	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/24/2021	10:13:23	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/24/2021	09:59:53	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/23/2021	20:08:33	UPS: Not synchronized fault cleared.	0x022E
+11/23/2021	20:08:33	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/23/2021	20:08:14	UPS: Returned from battery backup power.	0x010A
+11/23/2021	20:08:12	UPS: Not synchronized fault.	0x022D
+11/23/2021	20:08:12	UPS: Switched to battery backup power.	0x0109
+11/23/2021	20:08:09	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/23/2021	20:07:56	UPS: Not synchronized fault cleared.	0x022E
+11/23/2021	20:07:56	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/23/2021	20:07:37	UPS: Not synchronized fault.	0x022D
+11/23/2021	20:07:29	UPS: Returned from battery backup power.	0x010A
+11/23/2021	20:06:59	UPS: Switched to battery backup power.	0x0109
+11/23/2021	20:06:55	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/23/2021	20:05:43	UPS: Not synchronized fault cleared.	0x022E
+11/23/2021	20:05:43	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/23/2021	20:05:24	UPS: Returned from battery backup power.	0x010A
+11/23/2021	20:05:23	UPS: Switched to battery backup power.	0x0109
+11/23/2021	20:05:22	UPS: Not synchronized fault.	0x022D
+11/23/2021	20:05:19	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/23/2021	20:04:47	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/23/2021	20:04:29	UPS: Returned from battery backup power.	0x010A
+11/23/2021	20:04:27	UPS: Switched to battery backup power.	0x0109
+11/23/2021	20:04:23	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/23/2021	20:03:49	UPS: Not synchronized fault cleared.	0x022E
+11/23/2021	20:03:49	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/23/2021	20:03:27	UPS: Returned from battery backup power.	0x010A
+11/23/2021	20:03:26	UPS: Not synchronized fault.	0x022D
+11/23/2021	20:03:26	UPS: Switched to battery backup power.	0x0109
+11/23/2021	20:03:23	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/23/2021	19:35:21	UPS: Not synchronized fault cleared.	0x022E
+11/23/2021	19:35:21	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/23/2021	19:35:02	UPS: Returned from battery backup power.	0x010A
+11/23/2021	19:35:00	UPS: Switched to battery backup power.	0x0109
+11/23/2021	19:35:00	UPS: Not synchronized fault.	0x022D
+11/23/2021	19:34:57	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/23/2021	19:00:19	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/23/2021	18:59:59	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/23/2021	18:57:23	UPS: Not synchronized fault cleared.	0x022E
+11/23/2021	18:57:03	UPS: Not synchronized fault.	0x022D
+11/23/2021	18:25:30	UPS: Not synchronized fault cleared.	0x022E
+11/23/2021	18:25:30	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/23/2021	18:25:08	UPS: Not synchronized fault.	0x022D
+11/23/2021	18:25:05	UPS: Returned from battery backup power.	0x010A
+11/23/2021	18:25:04	UPS: Switched to battery backup power.	0x0109
+11/23/2021	18:25:01	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/23/2021	18:22:26	UPS: Not synchronized fault cleared.	0x022E
+11/23/2021	18:22:26	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/23/2021	18:22:03	UPS: Not synchronized fault.	0x022D
+11/23/2021	18:22:02	UPS: Returned from battery backup power.	0x010A
+11/23/2021	18:21:26	UPS: Switched to battery backup power.	0x0109
+11/23/2021	18:21:23	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/23/2021	12:18:33	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/23/2021	11:59:41	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/23/2021	11:29:29	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/23/2021	11:19:28	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/23/2021	11:06:17	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/23/2021	10:56:16	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/23/2021	10:24:10	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/23/2021	10:14:10	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/23/2021	10:12:16	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/23/2021	10:00:11	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/22/2021	17:18:16	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/22/2021	16:56:19	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/22/2021	16:04:27	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/22/2021	15:54:27	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/22/2021	14:59:25	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/22/2021	14:49:22	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/22/2021	14:49:17	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/22/2021	14:48:03	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/22/2021	13:16:18	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/22/2021	13:04:32	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/22/2021	12:42:54	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/22/2021	12:32:53	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/22/2021	11:24:10	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/22/2021	11:12:25	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/22/2021	11:11:09	System: Web user 'apc' logged out from 172.19.10.138.	0x001F
+11/22/2021	10:40:17	System: Web user 'apc' logged in from 172.19.10.138.	0x0015
+11/22/2021	09:34:59	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/22/2021	09:24:52	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/21/2021	19:48:32	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/21/2021	19:48:16	UPS: Returned from battery backup power.	0x010A
+11/21/2021	19:48:14	UPS: Switched to battery backup power.	0x0109
+11/21/2021	19:48:11	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/21/2021	19:47:58	UPS: Not synchronized fault cleared.	0x022E
+11/21/2021	19:47:58	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/21/2021	19:47:32	UPS: Not synchronized fault.	0x022D
+11/21/2021	19:47:31	UPS: Returned from battery backup power.	0x010A
+11/21/2021	19:44:36	UPS: Switched to battery backup power.	0x0109
+11/21/2021	19:44:33	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/19/2021	14:14:35	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+11/19/2021	14:02:02	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+11/19/2021	11:45:53	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/19/2021	11:45:34	UPS: Returned from battery backup power.	0x010A
+11/19/2021	11:45:28	UPS: Switched to battery backup power.	0x0109
+11/19/2021	11:45:25	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/19/2021	11:15:06	UPS: Not synchronized fault cleared.	0x022E
+11/19/2021	11:15:06	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/19/2021	11:14:45	UPS: Not synchronized fault.	0x022D
+11/19/2021	11:14:44	UPS: Returned from battery backup power.	0x010A
+11/19/2021	11:13:58	UPS: Switched to battery backup power.	0x0109
+11/19/2021	11:13:55	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/19/2021	11:08:00	UPS: Not synchronized fault cleared.	0x022E
+11/19/2021	11:08:00	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/19/2021	11:07:40	UPS: Not synchronized fault.	0x022D
+11/19/2021	11:07:39	UPS: Returned from battery backup power.	0x010A
+11/19/2021	11:07:31	UPS: Switched to battery backup power.	0x0109
+11/19/2021	11:07:27	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/19/2021	10:58:02	UPS: Not synchronized fault cleared.	0x022E
+11/19/2021	10:58:02	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/19/2021	10:57:41	UPS: Not synchronized fault.	0x022D
+11/19/2021	10:57:41	UPS: Returned from battery backup power.	0x010A
+11/19/2021	10:56:43	UPS: Switched to battery backup power.	0x0109
+11/19/2021	10:56:40	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/18/2021	20:25:42	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/18/2021	20:25:24	UPS: Returned from battery backup power.	0x010A
+11/18/2021	20:25:04	UPS: Switched to battery backup power.	0x0109
+11/18/2021	20:25:00	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/18/2021	20:24:56	UPS: Not synchronized fault cleared.	0x022E
+11/18/2021	20:24:56	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/18/2021	20:24:35	UPS: Not synchronized fault.	0x022D
+11/18/2021	20:24:34	UPS: Returned from battery backup power.	0x010A
+11/18/2021	20:23:45	UPS: Switched to battery backup power.	0x0109
+11/18/2021	20:23:41	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/18/2021	20:22:44	UPS: Not synchronized fault cleared.	0x022E
+11/18/2021	20:22:44	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/18/2021	20:22:23	UPS: Not synchronized fault.	0x022D
+11/18/2021	20:22:22	UPS: Returned from battery backup power.	0x010A
+11/18/2021	20:22:11	UPS: Switched to battery backup power.	0x0109
+11/18/2021	20:22:08	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/18/2021	18:06:44	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/18/2021	18:06:26	UPS: Returned from battery backup power.	0x010A
+11/18/2021	18:06:17	UPS: Switched to battery backup power.	0x0109
+11/18/2021	18:06:14	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/18/2021	18:04:20	UPS: Not synchronized fault cleared.	0x022E
+11/18/2021	18:04:20	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/18/2021	18:03:58	UPS: Not synchronized fault.	0x022D
+11/18/2021	18:03:58	UPS: Returned from battery backup power.	0x010A
+11/18/2021	18:03:29	UPS: Switched to battery backup power.	0x0109
+11/18/2021	18:03:26	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/18/2021	16:10:47	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/18/2021	16:10:32	UPS: Returned from battery backup power.	0x010A
+11/18/2021	16:10:30	UPS: Switched to battery backup power.	0x0109
+11/18/2021	16:10:27	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/18/2021	14:13:50	UPS: Communications established.	0x0101
+11/18/2021	14:13:39	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/18/2021	14:13:31	System: Warmstart.	0x0002
+11/18/2021	14:11:17	UPS: Not synchronized fault cleared.	0x022E
+11/18/2021	14:11:17	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/18/2021	14:10:56	UPS: Not synchronized fault.	0x022D
+11/18/2021	14:10:55	UPS: Returned from battery backup power.	0x010A
+11/18/2021	14:10:29	UPS: Switched to battery backup power.	0x0109
+11/18/2021	14:10:26	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/18/2021	14:01:37	System: Web user 'apc' logged out from 172.19.10.142.	0x001F
+11/18/2021	14:00:34	System: Web user 'apc' logged in from 172.19.10.142.	0x0015
+11/18/2021	13:57:52	UPS: Communications established.	0x0101
+11/18/2021	13:57:41	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/18/2021	13:57:33	System: Coldstart.	0x0001
+11/18/2021	09:43:43	UPS: Not synchronized fault cleared.	0x022E
+11/18/2021	09:43:43	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/18/2021	09:43:21	UPS: Not synchronized fault.	0x022D
+11/18/2021	09:43:20	UPS: Returned from battery backup power.	0x010A
+11/18/2021	09:43:16	UPS: Switched to battery backup power.	0x0109
+11/18/2021	09:43:12	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/18/2021	09:27:37	UPS: Not synchronized fault cleared.	0x022E
+11/18/2021	09:27:37	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/18/2021	09:27:14	UPS: Not synchronized fault.	0x022D
+11/18/2021	09:27:13	UPS: Returned from battery backup power.	0x010A
+11/18/2021	09:26:44	UPS: Switched to battery backup power.	0x0109
+11/18/2021	09:26:41	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/18/2021	09:15:49	UPS: Not synchronized fault cleared.	0x022E
+11/18/2021	09:15:49	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/18/2021	09:15:29	UPS: Not synchronized fault.	0x022D
+11/18/2021	09:15:28	UPS: Returned from battery backup power.	0x010A
+11/18/2021	09:13:35	UPS: Switched to battery backup power.	0x0109
+11/18/2021	09:13:32	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/17/2021	20:49:08	UPS: Communications established.	0x0101
+11/17/2021	20:48:57	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/17/2021	20:48:49	System: Warmstart.	0x0002
+11/17/2021	20:11:05	UPS: Communications established.	0x0101
+11/17/2021	20:10:54	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/17/2021	20:10:46	System: Warmstart.	0x0002
+11/17/2021	19:19:08	UPS: Communications established.	0x0101
+11/17/2021	19:18:57	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/17/2021	19:18:49	System: Warmstart.	0x0002
+11/17/2021	19:16:09	System: Web user 'apc' logged out from 172.19.10.132.	0x001F
+11/17/2021	19:05:18	System: Web user 'apc' logged in from 172.19.10.132.	0x0015
+11/16/2021	09:40:29	UPS: Not synchronized fault cleared.	0x022E
+11/16/2021	09:40:29	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/16/2021	09:40:24	UPS: Not synchronized fault.	0x022D
+11/16/2021	09:40:08	UPS: Returned from battery backup power.	0x010A
+11/16/2021	09:40:08	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/16/2021	09:40:05	UPS: Switched to battery backup power.	0x0109
+11/16/2021	09:05:08	UPS: Not synchronized fault cleared.	0x022E
+11/16/2021	09:05:08	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/16/2021	09:04:40	UPS: Not synchronized fault.	0x022D
+11/16/2021	09:04:32	UPS: Returned from battery backup power.	0x010A
+11/16/2021	09:03:54	UPS: Switched to battery backup power.	0x0109
+11/16/2021	09:03:53	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/13/2021	22:09:38	UPS: Returned from battery backup power.	0x010A
+11/13/2021	22:09:38	UPS: Switched to battery backup power.	0x0109
+11/13/2021	02:27:23	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/13/2021	02:27:08	UPS: Returned from battery backup power.	0x010A
+11/13/2021	02:27:07	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/13/2021	02:27:07	UPS: Switched to battery backup power.	0x0109
+11/12/2021	16:39:20	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/12/2021	16:38:50	UPS: Returned from battery backup power.	0x010A
+11/12/2021	16:38:48	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/12/2021	16:38:46	UPS: Switched to battery backup power.	0x0109
+11/12/2021	16:21:24	UPS: Not synchronized fault cleared.	0x022E
+11/12/2021	16:21:24	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/12/2021	16:21:09	UPS: Not synchronized fault.	0x022D
+11/12/2021	16:21:02	UPS: Returned from battery backup power.	0x010A
+11/12/2021	16:20:14	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/12/2021	16:20:10	UPS: Switched to battery backup power.	0x0109
+11/12/2021	03:55:35	UPS: Returned from battery backup power.	0x010A
+11/12/2021	03:55:35	UPS: Switched to battery backup power.	0x0109
+11/11/2021	19:50:18	UPS: Returned from battery backup power.	0x010A
+11/11/2021	19:50:17	UPS: Switched to battery backup power.	0x0109
+11/11/2021	08:27:20	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/11/2021	08:27:05	UPS: Returned from battery backup power.	0x010A
+11/11/2021	08:27:04	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/11/2021	08:27:03	UPS: Switched to battery backup power.	0x0109
+11/11/2021	06:07:27	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/11/2021	06:07:12	UPS: Returned from battery backup power.	0x010A
+11/11/2021	06:07:11	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/11/2021	06:07:10	UPS: Switched to battery backup power.	0x0109
+11/11/2021	05:58:41	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/11/2021	05:58:26	UPS: Returned from battery backup power.	0x010A
+11/11/2021	05:58:25	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/11/2021	05:58:24	UPS: Switched to battery backup power.	0x0109
+11/11/2021	05:57:35	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/11/2021	05:57:21	UPS: Returned from battery backup power.	0x010A
+11/11/2021	05:57:20	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/11/2021	05:57:19	UPS: Switched to battery backup power.	0x0109
+11/09/2021	18:53:52	UPS: Communications established.	0x0101
+11/09/2021	18:53:41	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/09/2021	18:53:33	System: Warmstart.	0x0002
+11/09/2021	18:31:16	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/09/2021	18:31:00	UPS: Returned from battery backup power.	0x010A
+11/09/2021	18:30:59	UPS: Switched to battery backup power.	0x0109
+11/09/2021	18:30:56	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/09/2021	18:28:37	UPS: Not synchronized fault cleared.	0x022E
+11/09/2021	18:28:36	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/09/2021	18:28:15	UPS: Not synchronized fault.	0x022D
+11/09/2021	18:28:12	UPS: Returned from battery backup power.	0x010A
+11/09/2021	18:27:18	UPS: Switched to battery backup power.	0x0109
+11/09/2021	18:27:15	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/09/2021	06:58:08	UPS: Returned from battery backup power.	0x010A
+11/09/2021	06:58:06	UPS: Switched to battery backup power.	0x0109
+11/06/2021	04:54:10	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/06/2021	04:53:54	UPS: Returned from battery backup power.	0x010A
+11/06/2021	04:53:53	UPS: Switched to battery backup power.	0x0109
+11/06/2021	04:53:50	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/05/2021	06:40:11	UPS: Returned from battery backup power.	0x010A
+11/05/2021	06:40:10	UPS: Switched to battery backup power.	0x0109
+11/04/2021	17:30:04	UPS: Communications established.	0x0101
+11/04/2021	17:29:53	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/04/2021	17:29:45	System: Warmstart.	0x0002
+11/04/2021	17:08:28	UPS: Communications established.	0x0101
+11/04/2021	17:08:17	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/04/2021	17:08:10	System: Warmstart.	0x0002
+11/04/2021	15:15:45	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+11/04/2021	15:15:30	UPS: Returned from battery backup power.	0x010A
+11/04/2021	15:15:28	UPS: Switched to battery backup power.	0x0109
+11/04/2021	15:15:25	UPS: Bypass not in range; either frequency or voltage.	0x020F
+11/04/2021	13:12:31	UPS: Communications established.	0x0101
+11/04/2021	13:12:20	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/04/2021	13:12:12	System: Warmstart.	0x0002
+11/04/2021	12:57:47	UPS: Communications established.	0x0101
+11/04/2021	12:57:36	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/04/2021	12:57:28	System: Warmstart.	0x0002
+11/04/2021	12:53:22	System: Web user 'apc' logged out from 172.19.10.110.	0x001F
+11/04/2021	12:37:33	System: Web user 'apc' logged in from 172.19.10.110.	0x0015
+11/03/2021	18:36:14	UPS: Communications established.	0x0101
+11/03/2021	18:36:03	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/03/2021	18:35:55	System: Warmstart.	0x0002
+11/03/2021	18:12:06	UPS: Communications established.	0x0101
+11/03/2021	18:11:56	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/03/2021	18:11:48	System: Warmstart.	0x0002
+11/03/2021	17:50:38	UPS: Communications established.	0x0101
+11/03/2021	17:50:27	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/03/2021	17:50:19	System: Warmstart.	0x0002
+11/03/2021	17:48:33	System: Web user 'apc' logged out from 172.19.10.110.	0x001F
+11/03/2021	17:37:54	System: Web user 'apc' logged in from 172.19.10.110.	0x0015
+11/02/2021	17:35:42	UPS: Communications established.	0x0101
+11/02/2021	17:35:31	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/02/2021	17:35:23	System: Warmstart.	0x0002
+11/02/2021	17:23:45	UPS: Communications established.	0x0101
+11/02/2021	17:23:34	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/02/2021	17:23:27	System: Coldstart.	0x0001
+11/02/2021	15:07:53	UPS: Communications established.	0x0101
+11/02/2021	15:07:42	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/02/2021	15:07:34	System: Coldstart.	0x0001
+11/02/2021	15:02:46	UPS: Battery over temperature.	0x0A0B
+11/02/2021	15:02:46	UPS: Communications established.	0x0101
+11/02/2021	15:02:23	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/02/2021	15:02:15	System: Coldstart.	0x0001
+11/02/2021	13:15:44	UPS: Communications established.	0x0101
+11/02/2021	13:15:33	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/02/2021	13:15:25	System: Warmstart.	0x0002
+11/02/2021	13:12:52	System: Web user 'apc' logged out from 172.19.10.20.	0x001F
+11/02/2021	13:03:41	System: FTP user 'apc' logged out from 172.19.10.20.	0x0020
+11/02/2021	13:03:40	System: FTP user 'apc' logged in from 172.19.10.20.	0x0016
+11/02/2021	13:02:51	UPS: Communications established.	0x0101
+11/02/2021	13:02:49	System: Web user 'apc' logged in from 172.19.10.20.	0x0015
+11/02/2021	13:02:40	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+11/02/2021	13:02:32	System: Coldstart.	0x0001
+11/02/2021	12:55:56	System: FTP user 'apc' logged out from 172.19.10.20.	0x0020
+11/02/2021	12:53:11	System: FTP user 'apc' logged in from 172.19.10.20.	0x0016
+11/02/2021	12:52:49	System: FTP user 'apc' logged out from 172.19.10.20.	0x0020
+11/02/2021	12:52:47	System: FTP user 'apc' logged in from 172.19.10.20.	0x0016
+11/02/2021	12:47:34	System: Web user 'apc' logged out from 172.19.10.20.	0x001F
+11/02/2021	12:45:56	System: FTP user 'apc' logged out from 172.19.10.20.	0x0020
+11/02/2021	12:43:54	System: Set Time.	0x0021
+11/02/2021	22:43:48	System: Set Date.	0x0021
+11/02/2021	22:43:38	System: Set Date or Time.	0x0021
+11/02/2021	22:43:38	System: Configuration change. NTP GMT offset.	0x0033
+11/02/2021	12:43:38	System: Set Time.	0x0021
+11/02/2021	17:32:18	System: Set Date.	0x0021
+01/17/2016	17:30:24	System: FTP user 'apc' logged in from 172.19.10.20.	0x0016
+01/17/2016	17:30:14	System: FTP user 'apc' logged out from 172.19.10.20.	0x0020
+01/17/2016	17:30:13	System: FTP user 'apc' logged in from 172.19.10.20.	0x0016
+01/17/2016	17:29:36	System: Configuration change. System inactivity timeout.	0x0033
+01/17/2016	17:29:01	System: FTP user 'apc' logged out from 172.19.10.20.	0x0020
+01/17/2016	17:29:00	System: FTP user 'apc' logged in from 172.19.10.20.	0x0016
+01/17/2016	17:28:51	System: FTP user 'apc' logged out from 172.19.10.20.	0x0020
+01/17/2016	17:28:50	System: FTP user 'apc' logged in from 172.19.10.20.	0x0016
+01/17/2016	17:27:49	UPS: Battery over temperature.	0x0A0B
+01/17/2016	17:27:49	UPS: Communications established.	0x0101
+01/17/2016	17:27:38	System: Web user 'apc' logged in from 172.19.10.20.	0x0015
+01/17/2016	17:27:29	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+01/17/2016	17:27:22	System: Warmstart.	0x0002
+01/17/2016	17:27:10	System: Restarting. Configuration change.	0x0009
+01/17/2016	17:27:10	System: Web user 'apc' logged out from 172.19.10.20.	0x001F
+01/17/2016	17:26:48	System: Configuration change. FTP server enable.	0x0033
+01/17/2016	17:25:44	UPS: Battery over temperature.	0x0A0B
+01/17/2016	17:25:44	UPS: Communications established.	0x0101
+01/17/2016	17:25:30	System: Web user 'apc' logged in from 172.19.10.20.	0x0015
+01/17/2016	17:25:22	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+01/17/2016	17:25:14	System: Warmstart.	0x0002
+01/17/2016	17:25:02	System: Restarting. Configuration change.	0x0009
+01/17/2016	17:25:02	System: Web user 'apc' logged out from 172.19.10.20.	0x001F
+01/17/2016	17:24:53	System: Configuration change. FTP server disable.	0x0033
+01/17/2016	17:24:49	System: Web user 'apc' logged in from 172.19.10.20.	0x0015
+01/17/2016	17:24:29	System: FTP user 'apc' logged out from 172.19.10.20.	0x0020
+01/17/2016	17:17:07	System: Web user 'apc' logged out from 172.19.10.20.	0x001F
+01/17/2016	17:14:27	System: FTP user 'apc' logged in from 172.19.10.20.	0x0016
+01/17/2016	17:14:27	System: FTP user 'apc' logged out from 172.19.10.20.	0x0020
+01/17/2016	17:14:26	System: FTP user 'apc' logged in from 172.19.10.20.	0x0016
+01/17/2016	17:13:59	System: Web user 'apc' logged in from 172.19.10.20.	0x0015
+01/17/2016	17:07:41	System: Web user 'apc' logged out from 172.19.10.20.	0x001F
+01/17/2016	17:07:35	System: Web user 'apc' logged in from 172.19.10.20.	0x0015
+01/17/2016	16:54:02	System: FTP user 'apc' logged out from 172.19.10.20.	0x0020
+01/17/2016	16:51:59	System: Web user 'apc' logged out from 172.19.10.20.	0x001F
+01/17/2016	16:48:17	System: Web user 'apc' logged in from 172.19.10.20.	0x0015
+01/17/2016	16:47:52	System: Web user 'apc' logged out from 172.19.10.20.	0x001F
+01/17/2016	16:45:17	System: FTP user 'apc' logged in from 172.19.10.20.	0x0016
+01/17/2016	16:45:16	System: FTP user 'apc' logged out from 172.19.10.20.	0x0020
+01/17/2016	16:45:16	System: FTP user 'apc' logged in from 172.19.10.20.	0x0016
+01/17/2016	16:44:30	System: Web user 'apc' logged in from 172.19.10.20.	0x0015
+01/17/2016	16:43:18	System: Web user 'apc' logged out from 172.19.10.20.	0x001F
+01/17/2016	16:39:48	System: Web user 'apc' logged in from 172.19.10.20.	0x0015
+01/17/2016	16:37:21	System: Web user 'apc' logged out from 172.19.10.20.	0x001F
+01/17/2016	16:32:37	System: Web user 'apc' logged in from 172.19.10.20.	0x0015
+01/16/2016	22:38:01	UPS: Battery over temperature.	0x0A0B
+01/16/2016	22:38:00	UPS: Communications established.	0x0101
+01/16/2016	22:37:44	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+01/16/2016	22:37:36	System: Warmstart.	0x0002
+01/16/2016	21:33:33	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+01/16/2016	21:27:59	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+01/16/2016	21:22:10	System: Web user 'apc' logged out from 172.19.10.130.	0x001F
+01/16/2016	21:18:54	System: Web user 'apc' logged in from 172.19.10.130.	0x0015
+01/16/2016	21:18:08	System: Web user 'apc' logged out from 172.19.10.161.	0x001F
+01/16/2016	21:15:09	System: Web user 'apc' logged in from 172.19.10.161.	0x0015
+01/16/2016	21:14:27	UPS: Battery over temperature.	0x0A0B
+01/16/2016	21:14:27	UPS: Communications established.	0x0101
+01/16/2016	21:14:05	System: Network service started. System IP is 172.19.10.133 from manually configured settings.	0x0007
+01/16/2016	21:13:57	System: Warmstart.	0x0002
+01/16/2016	21:13:45	System: Restarting. Configuration change.	0x0009
+01/16/2016	21:13:45	System: Web user 'apc' logged out from 192.168.0.4.	0x001F
+01/16/2016	21:13:19	System: Configuration change. TCP/IP gateway.	0x0033
+01/16/2016	21:13:19	System: Configuration change. TCP/IP address.	0x0033
+01/16/2016	21:10:58	System: Web user 'apc' logged in from 192.168.0.4.	0x0015
+01/16/2016	19:20:39	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/16/2016	19:20:13	UPS: Returned from battery backup power.	0x010A
+01/16/2016	19:20:10	UPS: Switched to battery backup power.	0x0109
+01/16/2016	19:20:07	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/16/2016	14:11:30	UPS: Not synchronized fault cleared.	0x022E
+01/16/2016	14:11:30	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/16/2016	14:11:04	UPS: Returned from battery backup power.	0x010A
+01/16/2016	14:11:03	UPS: Switched to battery backup power.	0x0109
+01/16/2016	14:10:56	UPS: Not synchronized fault.	0x022D
+01/16/2016	14:10:50	UPS: Returned from battery backup power.	0x010A
+01/16/2016	14:10:13	UPS: Switched to battery backup power.	0x0109
+01/16/2016	14:10:09	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/15/2016	22:11:35	UPS: Returned from battery backup power.	0x010A
+01/15/2016	22:11:32	UPS: Switched to battery backup power.	0x0109
+01/15/2016	10:53:59	UPS: Returned from battery backup power.	0x010A
+01/15/2016	10:53:58	UPS: Switched to battery backup power.	0x0109
+01/14/2016	15:39:06	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/14/2016	15:38:33	UPS: Returned from battery backup power.	0x010A
+01/14/2016	15:38:32	UPS: Switched to battery backup power.	0x0109
+01/14/2016	15:38:28	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/14/2016	15:35:57	UPS: Not synchronized fault cleared.	0x022E
+01/14/2016	15:35:57	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/14/2016	15:35:19	UPS: Not synchronized fault.	0x022D
+01/14/2016	15:35:18	UPS: Returned from battery backup power.	0x010A
+01/14/2016	15:34:42	UPS: Switched to battery backup power.	0x0109
+01/14/2016	15:34:39	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/13/2016	21:17:31	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/13/2016	21:17:01	UPS: Returned from battery backup power.	0x010A
+01/13/2016	21:16:58	UPS: Switched to battery backup power.	0x0109
+01/13/2016	21:16:55	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/13/2016	21:02:44	UPS: Not synchronized fault cleared.	0x022E
+01/13/2016	21:02:44	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/13/2016	21:02:25	UPS: Returned from battery backup power.	0x010A
+01/13/2016	21:02:24	UPS: Not synchronized fault.	0x022D
+01/13/2016	21:02:22	UPS: Switched to battery backup power.	0x0109
+01/13/2016	21:02:19	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/13/2016	21:01:43	UPS: Not synchronized fault cleared.	0x022E
+01/13/2016	21:01:43	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/13/2016	21:01:10	UPS: Not synchronized fault.	0x022D
+01/13/2016	21:01:09	UPS: Returned from battery backup power.	0x010A
+01/13/2016	21:00:15	UPS: Switched to battery backup power.	0x0109
+01/13/2016	21:00:12	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/13/2016	20:27:09	UPS: Battery over temperature.	0x0A0B
+01/13/2016	20:27:09	UPS: Communications established.	0x0101
+01/13/2016	20:26:47	System: Network service started. System IP is 192.168.0.2 from manually configured settings.	0x0007
+01/13/2016	20:26:39	System: Warmstart.	0x0002
+01/13/2016	20:15:30	System: Web user 'apc' logged out from 192.168.0.4.	0x001F
+01/13/2016	20:12:23	UPS: Battery over temperature.	0x0A0B
+01/13/2016	20:12:22	UPS: Communications established.	0x0101
+01/13/2016	20:12:08	System: Web user 'apc' logged in from 192.168.0.4.	0x0015
+01/13/2016	20:11:59	System: Network service started. System IP is 192.168.0.2 from manually configured settings.	0x0007
+01/13/2016	20:11:52	System: Coldstart.	0x0001
+01/13/2016	20:05:28	System: Web user 'apc' logged in from 192.168.0.4.	0x0015
+01/13/2016	19:54:36	UPS: Battery over temperature.	0x0A0B
+01/13/2016	19:54:35	UPS: Communications established.	0x0101
+01/13/2016	19:54:13	System: Network service started. System IP is 192.168.0.2 from manually configured settings.	0x0007
+01/13/2016	19:54:05	System: Coldstart.	0x0001
+01/13/2016	18:07:00	UPS: Communications established.	0x0101
+01/13/2016	18:06:49	System: Network service started. System IP is 192.168.0.2 from manually configured settings.	0x0007
+01/13/2016	18:06:42	System: Warmstart.	0x0002
+01/13/2016	17:45:06	UPS: Communications established.	0x0101
+01/13/2016	17:44:55	System: Network service started. System IP is 192.168.0.2 from manually configured settings.	0x0007
+01/13/2016	17:44:47	System: Coldstart.	0x0001
+01/13/2016	16:56:21	System: Web user 'apc' logged out from 192.168.0.5.	0x001F
+01/13/2016	16:55:30	System: Web user 'apc' logged in from 192.168.0.5.	0x0015
+01/13/2016	16:54:43	System: Web user 'apc' logged out from 192.168.0.5.	0x001F
+01/13/2016	16:54:30	System: Web user 'apc' logged in from 192.168.0.5.	0x0015
+01/13/2016	16:54:08	System: Web user 'apc' logged out from 192.168.0.5.	0x001F
+01/13/2016	16:54:04	System: Web user 'apc' logged in from 192.168.0.5.	0x0015
+01/13/2016	16:53:57	System: Web user 'apc' logged out from 192.168.0.5.	0x001F
+01/13/2016	16:53:48	System: Web user 'apc' logged in from 192.168.0.5.	0x0015
+01/13/2016	16:53:42	System: Web user 'apc' logged out from 192.168.0.5.	0x001F
+01/13/2016	16:47:22	System: Web user 'apc' logged in from 192.168.0.5.	0x0015
+01/13/2016	16:46:38	System: Web user 'apc' logged out from 192.168.0.5.	0x001F
+01/13/2016	16:45:47	System: Web user 'apc' logged in from 192.168.0.5.	0x0015
+01/13/2016	16:45:27	System: Console user 'apc' logged out from serial port.	0x001E
+01/13/2016	16:45:10	UPS: Communications established.	0x0101
+01/13/2016	16:45:04	System: Console user 'apc' logged in from serial port.	0x0014
+01/13/2016	16:44:58	System: Network service started. System IP is 192.168.0.2 from manually configured settings.	0x0007
+01/13/2016	16:44:51	System: Warmstart.	0x0002
+01/13/2016	16:44:39	System: Restarting. Console user  request.	0x0009
+01/13/2016	16:44:29	System: Certificates and host keys erased.	0x0038
+01/13/2016	16:43:58	System: Console user 'apc' logged in from serial port.	0x0014
+01/13/2016	16:41:35	UPS: Communications established.	0x0101
+01/13/2016	16:41:23	System: Network service started. System IP is 192.168.0.2 from manually configured settings.	0x0007
+01/13/2016	16:41:16	System: Warmstart.	0x0002
+01/13/2016	16:40:53	System: Restarting. Configuration change.	0x0009
+01/13/2016	16:40:32	System: Configuration change. TCP/IP gateway.	0x0033
+01/13/2016	16:40:10	UPS: Communications established.	0x0101
+01/13/2016	16:40:03	System: Console user 'apc' logged in from serial port.	0x0014
+01/13/2016	16:39:59	System: Network service started. System IP is 192.168.0.2 from manually configured settings.	0x0007
+01/13/2016	16:39:51	System: Coldstart.	0x0001
+01/13/2016	16:35:01	System: Configuration change. TCP/IP gateway.	0x0033
+01/13/2016	16:34:28	System: Configuration change. TCP/IP address.	0x0033
+01/13/2016	16:34:05	System: Console user 'apc' logged in from serial port.	0x0014
+01/13/2016	16:33:44	UPS: Communications established.	0x0101
+01/13/2016	16:33:29	System: Network service started. System IP is 131.111.83.202 from manually configured settings.	0x0007
+01/13/2016	16:33:22	System: Coldstart.	0x0001
+01/13/2016	00:14:31	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/13/2016	00:14:12	UPS: Returned from battery backup power.	0x010A
+01/13/2016	00:14:12	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/13/2016	00:14:11	UPS: Switched to battery backup power.	0x0109
+01/13/2016	00:07:43	UPS: Not synchronized fault cleared.	0x022E
+01/13/2016	00:07:43	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/13/2016	00:07:24	UPS: Not synchronized fault.	0x022D
+01/13/2016	00:07:13	UPS: Returned from battery backup power.	0x010A
+01/13/2016	00:06:48	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/13/2016	00:06:43	UPS: Switched to battery backup power.	0x0109
+01/12/2016	23:39:24	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/12/2016	23:39:06	UPS: Returned from battery backup power.	0x010A
+01/12/2016	23:39:06	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/12/2016	23:39:05	UPS: Switched to battery backup power.	0x0109
+01/12/2016	23:31:40	UPS: Not synchronized fault cleared.	0x022E
+01/12/2016	23:31:40	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/12/2016	23:31:15	UPS: Not synchronized fault.	0x022D
+01/12/2016	23:31:05	UPS: Returned from battery backup power.	0x010A
+01/12/2016	23:30:36	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/12/2016	23:30:34	UPS: Switched to battery backup power.	0x0109
+01/12/2016	23:28:24	UPS: Not synchronized fault cleared.	0x022E
+01/12/2016	23:28:23	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/12/2016	23:28:03	UPS: Returned from battery backup power.	0x010A
+01/12/2016	23:28:02	UPS: Switched to battery backup power.	0x0109
+01/12/2016	23:28:01	UPS: Not synchronized fault.	0x022D
+01/12/2016	23:28:01	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/12/2016	23:25:06	UPS: Not synchronized fault cleared.	0x022E
+01/12/2016	23:25:06	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/12/2016	23:24:56	UPS: Not synchronized fault.	0x022D
+01/12/2016	23:24:42	UPS: Returned from battery backup power.	0x010A
+01/12/2016	23:24:08	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/12/2016	23:24:04	UPS: Switched to battery backup power.	0x0109
+01/11/2016	21:35:33	UPS: Communications established.	0x0101
+01/11/2016	21:35:22	System: Network service started. System IP is 131.111.83.202 from manually configured settings.	0x0007
+01/11/2016	21:35:15	System: Warmstart.	0x0002
+01/11/2016	17:16:24	UPS: Communications established.	0x0101
+01/11/2016	17:16:13	System: Network service started. System IP is 131.111.83.202 from manually configured settings.	0x0007
+01/11/2016	17:16:05	System: Warmstart.	0x0002
+01/11/2016	13:50:48	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/11/2016	13:50:27	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/11/2016	13:18:10	UPS: Returned from battery backup power.	0x010A
+01/11/2016	13:18:08	UPS: Switched to battery backup power.	0x0109
+01/11/2016	09:27:27	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/11/2016	09:27:12	UPS: Returned from battery backup power.	0x010A
+01/11/2016	09:27:11	UPS: Switched to battery backup power.	0x0109
+01/11/2016	09:27:08	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/10/2016	18:23:01	UPS: Communications established.	0x0101
+01/10/2016	18:22:50	System: Network service started. System IP is 131.111.83.202 from manually configured settings.	0x0007
+01/10/2016	18:22:43	System: Warmstart.	0x0002
+01/10/2016	18:05:29	UPS: Communications established.	0x0101
+01/10/2016	18:05:18	System: Network service started. System IP is 131.111.83.202 from manually configured settings.	0x0007
+01/10/2016	18:05:11	System: Coldstart.	0x0001
+01/10/2016	16:33:20	UPS: Not synchronized fault cleared.	0x022E
+01/10/2016	16:33:20	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/10/2016	16:32:59	UPS: Not synchronized fault.	0x022D
+01/10/2016	16:32:58	UPS: Returned from battery backup power.	0x010A
+01/10/2016	16:32:54	UPS: Switched to battery backup power.	0x0109
+01/10/2016	16:32:51	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/10/2016	16:13:08	UPS: Not synchronized fault cleared.	0x022E
+01/10/2016	16:13:08	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/10/2016	16:12:59	UPS: Returned from battery backup power.	0x010A
+01/10/2016	16:12:58	UPS: Switched to battery backup power.	0x0109
+01/10/2016	16:12:45	UPS: Not synchronized fault.	0x022D
+01/10/2016	16:12:41	UPS: Returned from battery backup power.	0x010A
+01/10/2016	16:12:10	UPS: Switched to battery backup power.	0x0109
+01/10/2016	16:12:07	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/10/2016	15:30:27	UPS: Not synchronized fault cleared.	0x022E
+01/10/2016	15:30:27	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/10/2016	15:30:07	UPS: Not synchronized fault.	0x022D
+01/10/2016	15:30:06	UPS: Returned from battery backup power.	0x010A
+01/10/2016	15:30:03	UPS: Switched to battery backup power.	0x0109
+01/10/2016	15:30:00	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/10/2016	14:28:23	UPS: Not synchronized fault cleared.	0x022E
+01/10/2016	14:28:23	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/10/2016	14:28:23	UPS: Returned from battery backup power.	0x010A
+01/10/2016	14:28:21	UPS: Switched to battery backup power.	0x0109
+01/10/2016	14:28:00	UPS: Not synchronized fault.	0x022D
+01/10/2016	14:27:59	UPS: Returned from battery backup power.	0x010A
+01/10/2016	14:27:29	UPS: Switched to battery backup power.	0x0109
+01/10/2016	14:27:25	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/10/2016	14:12:57	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/10/2016	14:12:39	UPS: Returned from battery backup power.	0x010A
+01/10/2016	14:12:36	UPS: Switched to battery backup power.	0x0109
+01/10/2016	14:12:33	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/10/2016	13:42:37	UPS: Not synchronized fault cleared.	0x022E
+01/10/2016	13:42:37	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/10/2016	13:42:17	UPS: Returned from battery backup power.	0x010A
+01/10/2016	13:42:16	UPS: Not synchronized fault.	0x022D
+01/10/2016	13:42:15	UPS: Switched to battery backup power.	0x0109
+01/10/2016	13:42:12	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/10/2016	13:41:15	UPS: Not synchronized fault cleared.	0x022E
+01/10/2016	13:41:15	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/10/2016	13:40:51	UPS: Not synchronized fault.	0x022D
+01/10/2016	13:40:50	UPS: Returned from battery backup power.	0x010A
+01/10/2016	13:40:19	UPS: Switched to battery backup power.	0x0109
+01/10/2016	13:40:16	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/10/2016	09:42:43	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/10/2016	09:42:27	UPS: Returned from battery backup power.	0x010A
+01/10/2016	09:42:26	UPS: Switched to battery backup power.	0x0109
+01/10/2016	09:42:23	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/10/2016	09:38:58	UPS: Not synchronized fault cleared.	0x022E
+01/10/2016	09:38:58	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/10/2016	09:38:34	UPS: Not synchronized fault.	0x022D
+01/10/2016	09:38:33	UPS: Returned from battery backup power.	0x010A
+01/10/2016	09:37:37	UPS: Switched to battery backup power.	0x0109
+01/10/2016	09:37:34	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/09/2016	17:33:35	UPS: Returned from battery backup power.	0x010A
+01/09/2016	17:33:33	UPS: Switched to battery backup power.	0x0109
+01/09/2016	13:03:22	UPS: Returned from battery backup power.	0x010A
+01/09/2016	13:03:21	UPS: Switched to battery backup power.	0x0109
+01/09/2016	12:16:34	UPS: Returned from battery backup power.	0x010A
+01/09/2016	12:16:33	UPS: Switched to battery backup power.	0x0109
+01/06/2016	18:02:32	UPS: Not synchronized fault cleared.	0x022E
+01/06/2016	18:02:32	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/06/2016	18:02:12	UPS: Not synchronized fault.	0x022D
+01/06/2016	18:02:11	UPS: Returned from battery backup power.	0x010A
+01/06/2016	18:02:09	UPS: Switched to battery backup power.	0x0109
+01/06/2016	18:02:05	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/06/2016	17:56:16	UPS: Not synchronized fault cleared.	0x022E
+01/06/2016	17:56:16	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/06/2016	17:55:54	UPS: Not synchronized fault.	0x022D
+01/06/2016	17:55:53	UPS: Returned from battery backup power.	0x010A
+01/06/2016	17:55:26	UPS: Switched to battery backup power.	0x0109
+01/06/2016	17:55:23	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/06/2016	17:49:30	UPS: Not synchronized fault cleared.	0x022E
+01/06/2016	17:49:30	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/06/2016	17:49:09	UPS: Not synchronized fault.	0x022D
+01/06/2016	17:49:09	UPS: Returned from battery backup power.	0x010A
+01/06/2016	17:49:05	UPS: Switched to battery backup power.	0x0109
+01/06/2016	17:49:02	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/06/2016	17:38:52	UPS: Not synchronized fault cleared.	0x022E
+01/06/2016	17:38:52	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/06/2016	17:38:31	UPS: Returned from battery backup power.	0x010A
+01/06/2016	17:38:30	UPS: Switched to battery backup power.	0x0109
+01/06/2016	17:38:30	UPS: Not synchronized fault.	0x022D
+01/06/2016	17:38:27	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/06/2016	17:38:21	UPS: Not synchronized fault cleared.	0x022E
+01/06/2016	17:38:21	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/06/2016	17:37:59	UPS: Not synchronized fault.	0x022D
+01/06/2016	17:37:58	UPS: Returned from battery backup power.	0x010A
+01/06/2016	17:37:27	UPS: Switched to battery backup power.	0x0109
+01/06/2016	17:37:24	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/06/2016	14:19:35	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/06/2016	14:19:17	UPS: Returned from battery backup power.	0x010A
+01/06/2016	14:19:09	UPS: Switched to battery backup power.	0x0109
+01/06/2016	14:19:06	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/06/2016	14:05:26	UPS: Not synchronized fault cleared.	0x022E
+01/06/2016	14:05:26	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/06/2016	14:05:26	UPS: Returned from battery backup power.	0x010A
+01/06/2016	14:05:25	UPS: Switched to battery backup power.	0x0109
+01/06/2016	14:05:00	UPS: Not synchronized fault.	0x022D
+01/06/2016	14:04:59	UPS: Returned from battery backup power.	0x010A
+01/06/2016	14:04:25	UPS: Switched to battery backup power.	0x0109
+01/06/2016	14:04:22	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/05/2016	19:20:34	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/05/2016	19:20:16	UPS: Returned from battery backup power.	0x010A
+01/05/2016	19:20:12	UPS: Switched to battery backup power.	0x0109
+01/05/2016	19:20:08	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/05/2016	14:03:26	UPS: Not synchronized fault cleared.	0x022E
+01/05/2016	14:03:26	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/05/2016	14:03:07	UPS: Returned from battery backup power.	0x010A
+01/05/2016	14:03:05	UPS: Not synchronized fault.	0x022D
+01/05/2016	14:03:05	UPS: Switched to battery backup power.	0x0109
+01/05/2016	14:03:02	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/05/2016	14:03:00	UPS: Not synchronized fault cleared.	0x022E
+01/05/2016	14:03:00	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/05/2016	14:02:35	UPS: Not synchronized fault.	0x022D
+01/05/2016	14:02:34	UPS: Returned from battery backup power.	0x010A
+01/05/2016	14:01:57	UPS: Switched to battery backup power.	0x0109
+01/05/2016	14:01:53	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/05/2016	13:26:57	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/05/2016	13:26:41	UPS: Returned from battery backup power.	0x010A
+01/05/2016	13:26:40	UPS: Switched to battery backup power.	0x0109
+01/05/2016	13:26:37	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/05/2016	01:29:39	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/05/2016	01:29:23	UPS: Returned from battery backup power.	0x010A
+01/05/2016	01:29:22	UPS: Switched to battery backup power.	0x0109
+01/05/2016	01:29:18	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/03/2016	23:56:31	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/03/2016	23:56:15	UPS: Returned from battery backup power.	0x010A
+01/03/2016	23:56:14	UPS: Switched to battery backup power.	0x0109
+01/03/2016	23:56:11	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/02/2016	15:20:32	UPS: Not synchronized fault cleared.	0x022E
+01/02/2016	15:20:32	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/02/2016	15:20:12	UPS: Not synchronized fault.	0x022D
+01/02/2016	15:20:11	UPS: Returned from battery backup power.	0x010A
+01/02/2016	15:19:48	UPS: Switched to battery backup power.	0x0109
+01/02/2016	15:19:45	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/02/2016	07:26:38	UPS: Returned from battery backup power.	0x010A
+01/02/2016	07:26:37	UPS: Switched to battery backup power.	0x0109
+01/02/2016	06:05:30	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/02/2016	06:05:14	UPS: Returned from battery backup power.	0x010A
+01/02/2016	06:05:13	UPS: Switched to battery backup power.	0x0109
+01/02/2016	06:05:10	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/02/2016	04:33:30	UPS: Not synchronized fault cleared.	0x022E
+01/02/2016	04:33:30	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/02/2016	04:33:11	UPS: Returned from battery backup power.	0x010A
+01/02/2016	04:33:09	UPS: Not synchronized fault.	0x022D
+01/02/2016	04:33:09	UPS: Switched to battery backup power.	0x0109
+01/02/2016	04:33:06	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/02/2016	04:12:40	UPS: Not synchronized fault cleared.	0x022E
+01/02/2016	04:12:40	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/02/2016	04:12:18	UPS: Not synchronized fault.	0x022D
+01/02/2016	04:12:15	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/02/2016	04:11:53	UPS: Returned from battery backup power.	0x010A
+01/02/2016	04:11:52	UPS: Switched to battery backup power.	0x0109
+01/02/2016	04:09:40	UPS: Not synchronized fault cleared.	0x022E
+01/02/2016	04:09:40	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/02/2016	04:09:18	UPS: Not synchronized fault.	0x022D
+01/02/2016	04:09:17	UPS: Returned from battery backup power.	0x010A
+01/02/2016	04:08:39	UPS: Switched to battery backup power.	0x0109
+01/02/2016	04:08:36	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/01/2016	20:54:46	UPS: Not synchronized fault cleared.	0x022E
+01/01/2016	20:54:46	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/01/2016	20:54:26	UPS: Returned from battery backup power.	0x010A
+01/01/2016	20:54:25	UPS: Not synchronized fault.	0x022D
+01/01/2016	20:54:25	UPS: Switched to battery backup power.	0x0109
+01/01/2016	20:54:22	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/01/2016	20:52:16	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/01/2016	20:51:56	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/01/2016	20:38:23	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/01/2016	20:38:03	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/01/2016	19:57:21	UPS: Not synchronized fault cleared.	0x022E
+01/01/2016	19:57:00	UPS: Not synchronized fault.	0x022D
+01/01/2016	19:49:29	UPS: Not synchronized fault cleared.	0x022E
+01/01/2016	19:49:07	UPS: Not synchronized fault.	0x022D
+01/01/2016	19:39:27	UPS: Not synchronized fault cleared.	0x022E
+01/01/2016	19:39:06	UPS: Not synchronized fault.	0x022D
+01/01/2016	19:26:18	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/01/2016	19:25:58	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/01/2016	19:23:23	UPS: Not synchronized fault cleared.	0x022E
+01/01/2016	19:23:23	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+01/01/2016	19:23:03	UPS: Not synchronized fault.	0x022D
+01/01/2016	19:23:00	UPS: Returned from battery backup power.	0x010A
+01/01/2016	19:22:07	UPS: Switched to battery backup power.	0x0109
+01/01/2016	19:22:04	UPS: Bypass not in range; either frequency or voltage.	0x020F
+01/01/2016	11:11:19	UPS: Returned from battery backup power.	0x010A
+01/01/2016	11:11:18	UPS: Switched to battery backup power.	0x0109
+12/29/2015	23:01:04	UPS: Not synchronized fault cleared.	0x022E
+12/29/2015	23:01:04	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/29/2015	23:00:43	UPS: Not synchronized fault.	0x022D
+12/29/2015	23:00:42	UPS: Returned from battery backup power.	0x010A
+12/29/2015	23:00:39	UPS: Switched to battery backup power.	0x0109
+12/29/2015	23:00:35	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/29/2015	22:40:40	UPS: Not synchronized fault cleared.	0x022E
+12/29/2015	22:40:40	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/29/2015	22:40:20	UPS: Returned from battery backup power.	0x010A
+12/29/2015	22:40:19	UPS: Switched to battery backup power.	0x0109
+12/29/2015	22:40:18	UPS: Not synchronized fault.	0x022D
+12/29/2015	22:40:15	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/29/2015	22:39:27	UPS: Not synchronized fault cleared.	0x022E
+12/29/2015	22:39:27	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/29/2015	22:39:02	UPS: Not synchronized fault.	0x022D
+12/29/2015	22:38:59	UPS: Returned from battery backup power.	0x010A
+12/29/2015	22:38:27	UPS: Switched to battery backup power.	0x0109
+12/29/2015	22:38:24	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/29/2015	15:43:50	UPS: Communications established.	0x0101
+12/29/2015	15:43:39	System: Network service started. System IP is 131.111.83.202 from manually configured settings.	0x0007
+12/29/2015	15:43:32	System: Warmstart.	0x0002
+12/29/2015	08:43:29	UPS: Returned from battery backup power.	0x010A
+12/29/2015	08:43:27	UPS: Switched to battery backup power.	0x0109
+12/29/2015	08:43:27	UPS: Not synchronized fault cleared.	0x022E
+12/29/2015	08:43:27	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/29/2015	08:43:05	UPS: Not synchronized fault.	0x022D
+12/29/2015	08:43:02	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/29/2015	08:40:28	UPS: Not synchronized fault cleared.	0x022E
+12/29/2015	08:40:28	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/29/2015	08:40:04	UPS: Not synchronized fault.	0x022D
+12/29/2015	08:40:04	UPS: Returned from battery backup power.	0x010A
+12/29/2015	08:39:32	UPS: Switched to battery backup power.	0x0109
+12/29/2015	08:39:29	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/28/2015	17:04:13	UPS: Communications established.	0x0101
+12/28/2015	17:04:02	System: Network service started. System IP is 131.111.83.202 from manually configured settings.	0x0007
+12/28/2015	17:03:54	System: Warmstart.	0x0002
+12/28/2015	13:47:16	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/28/2015	13:47:01	UPS: Returned from battery backup power.	0x010A
+12/28/2015	13:47:00	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/28/2015	13:46:59	UPS: Switched to battery backup power.	0x0109
+12/28/2015	10:17:21	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/28/2015	10:16:55	UPS: Returned from battery backup power.	0x010A
+12/28/2015	10:16:54	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/28/2015	10:16:53	UPS: Switched to battery backup power.	0x0109
+12/28/2015	10:16:16	UPS: Not synchronized fault cleared.	0x022E
+12/28/2015	10:16:16	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/28/2015	10:16:07	UPS: Not synchronized fault.	0x022D
+12/28/2015	10:15:53	UPS: Returned from battery backup power.	0x010A
+12/28/2015	10:15:18	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/28/2015	10:15:18	UPS: Switched to battery backup power.	0x0109
+12/27/2015	04:53:45	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/27/2015	04:53:30	UPS: Returned from battery backup power.	0x010A
+12/27/2015	04:53:29	UPS: Switched to battery backup power.	0x0109
+12/27/2015	04:53:29	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/27/2015	00:03:28	UPS: Returned from battery backup power.	0x010A
+12/27/2015	00:03:27	UPS: Switched to battery backup power.	0x0109
+12/26/2015	23:22:34	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/26/2015	23:22:16	UPS: Returned from battery backup power.	0x010A
+12/26/2015	23:22:15	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/26/2015	23:22:14	UPS: Switched to battery backup power.	0x0109
+12/26/2015	17:00:03	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/26/2015	16:59:49	UPS: Returned from battery backup power.	0x010A
+12/26/2015	16:59:48	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/26/2015	16:59:47	UPS: Switched to battery backup power.	0x0109
+12/26/2015	16:36:54	UPS: Not synchronized fault cleared.	0x022E
+12/26/2015	16:36:54	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/26/2015	16:36:49	UPS: Not synchronized fault.	0x022D
+12/26/2015	16:36:33	UPS: Returned from battery backup power.	0x010A
+12/26/2015	16:36:29	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/26/2015	16:36:26	UPS: Switched to battery backup power.	0x0109
+12/26/2015	16:18:21	UPS: Not synchronized fault cleared.	0x022E
+12/26/2015	16:18:21	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/26/2015	16:17:52	UPS: Returned from battery backup power.	0x010A
+12/26/2015	16:17:51	UPS: Switched to battery backup power.	0x0109
+12/26/2015	16:17:50	UPS: Not synchronized fault.	0x022D
+12/26/2015	16:17:46	UPS: Not synchronized fault cleared.	0x022E
+12/26/2015	16:17:16	UPS: Not synchronized fault.	0x022D
+12/26/2015	16:17:11	UPS: Returned from battery backup power.	0x010A
+12/26/2015	16:16:38	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/26/2015	16:16:34	UPS: Switched to battery backup power.	0x0109
+12/26/2015	16:15:38	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/26/2015	16:15:20	UPS: Returned from battery backup power.	0x010A
+12/26/2015	16:15:19	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/26/2015	16:15:18	UPS: Switched to battery backup power.	0x0109
+12/26/2015	01:08:44	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/26/2015	01:08:13	UPS: Returned from battery backup power.	0x010A
+12/26/2015	01:08:13	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/26/2015	01:08:12	UPS: Switched to battery backup power.	0x0109
+12/26/2015	00:57:39	UPS: Not synchronized fault cleared.	0x022E
+12/26/2015	00:57:39	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/26/2015	00:57:13	UPS: Not synchronized fault.	0x022D
+12/26/2015	00:57:13	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/26/2015	00:54:39	UPS: Not synchronized fault cleared.	0x022E
+12/26/2015	00:54:39	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/26/2015	00:54:18	UPS: Not synchronized fault.	0x022D
+12/26/2015	00:54:11	UPS: Returned from battery backup power.	0x010A
+12/26/2015	00:53:48	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/26/2015	00:53:36	UPS: Switched to battery backup power.	0x0109
+12/25/2015	20:58:35	UPS: Returned from battery backup power.	0x010A
+12/25/2015	20:58:35	UPS: Switched to battery backup power.	0x0109
+12/25/2015	20:32:05	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/25/2015	20:31:51	UPS: Returned from battery backup power.	0x010A
+12/25/2015	20:31:49	UPS: Bypass not in range; either frequency or voltage.	0x020F
+12/25/2015	20:31:48	UPS: Switched to battery backup power.	0x0109
+12/23/2015	15:08:17	UPS: Bypass not in range cleared; either frequency or voltage.	0x0210
+12/23/2015	15:07:46	UPS: Returned from battery backup power.	0x010A
+12/23/2015	15:07:44	UPS: Bypass not in 

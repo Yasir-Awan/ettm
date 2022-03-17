@@ -3907,6 +3907,7 @@ class Inventory extends CI_Controller
 							if ($this->input->post('replacing_company') == 1) {
 								$companyType = 1;
 								$companyName = $this->input->post('replacing_tsp');
+
 								$companyAddress = $this->input->post('tsp_address');
 								$companyPersonType = $this->input->post('tsp_person_type');
 								$companyPerson = $this->input->post('tsp_person');
@@ -4086,7 +4087,6 @@ class Inventory extends CI_Controller
 							if ($install) {
 								$subitems = $this->db->get_where('installed_subitems', array('id' => $install[0]['id']))->result_array();
 								foreach ($subitems as $subasset) {
-
 									$installing_subitem_data = array(
 										'transaction_type' => 13,
 										'company_type' => '3',

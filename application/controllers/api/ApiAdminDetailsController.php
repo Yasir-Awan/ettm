@@ -10,11 +10,17 @@ class ApiAdminDetailsController extends REST_Controller
     }
     public function index_get($id)
     {
-        if ($id) {
-            $itemDetail = new ApiAdminDetailsModel;
-            $item_detail = $itemDetail->get_admin_detail($id);
-            if (!empty($item_detail)) {
-                $this->response($item_detail, 200);
+        $headers = apache_request_headers();
+        $head = explode(" ", $headers['Authorization']);
+
+        $token = $head[1];
+        if ($token == $this->session->userdata('access_token')) {
+            if ($id) {
+                $itemDetail = new ApiAdminDetailsModel;
+                $item_detail = $itemDetail->get_admin_detail($id);
+                if (!empty($item_detail)) {
+                    $this->response($item_detail, 200);
+                }
             }
         } else {
             $this->response(['status' => FALSE, 'message' => 'No Record Found.'], REST_Controller::HTTP_NOT_FOUND);

@@ -54,7 +54,8 @@ $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
 $route['api/login'] = 'api/ApiLoginController/index';
-$route['api/site_inventory/(:any)'] = 'api/ApiSiteInventoryController/index/$1';
+// $route['api/site_inventory/(:any)'] = 'api/ApiSiteInventoryController/index/$1';
+$route['api/filtered_site_inventory/(:any)/(:any)'] = 'api/ApiFilteredSiteInventoryController/index/$1/$2';
 $route['api/item_detail/(:any)'] = 'api/ApiItemDetailController/index/$1';
 $route['api/item_faulty/(:any)'] = 'api/ApiItemFaultyController/index/$1';
 /** Routes for repairing items START */
@@ -71,3 +72,8 @@ $route['api/item_reinstall/(:any)'] = 'api/ApiItemReinstallController/index/$1';
 /** Reinstall Equipment Start */
 $route['api/item_retire/(:any)'] = 'api/ApiItemRetireController/index/$1';
 /** Reinstall Equipment End */
+
+/** UPS API START */
+$route['api/upsdata_list'] = 'upsapi/ApiUpsDataListController/index';
+$route['api/adminlogin'] = 'upsapi/ApiAdminLoginController/index';
+/** UPS API END*/

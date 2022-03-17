@@ -4,8 +4,6 @@ class ApiLoginModel extends CI_Model
 {
     public function get_supervisor($userName, $password)
     {
-        // echo "in Model";
-        // exit;
         $query = $this->db->get_where('tpsupervisor', array('username' => $userName, 'password' => $password));
         return $query->result_array();
     }
