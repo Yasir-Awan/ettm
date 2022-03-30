@@ -18,18 +18,20 @@ class Ups_data_acquisition extends CI_Controller
     public function index()
     {
         $ups_ip = $this->db->get_where('ups_ftp_credentials', array('status' => 1))->result_array();
+        // echo "<pre>"; print_r($ups_ip); exit;
         $ins_data = array();
         foreach ($ups_ip as $row) {
             $fileDateTimeStamp = '';
             $systemId = $row['id'];
             $site = $row['site'];
-            // $db_start_date = $this->db->select('*')->where('system_id', $systemId)->order_by('date', 'asc')->limit(1)->get('ups_data')->result_array();
+            $db_start_date = $this->db->select('*')->where('system_id', $systemId)->order_by('date', 'asc')->limit(1)->get('ups_data')->result_array();
             $db_end_date = $this->db->select('*')->where('system_id', $systemId)->order_by('date', 'desc')->limit(1)->get('ups_data')->result_array();
             // echo $db_start_date[0]['date'];
             // echo $db_end_date[0]['date'];
             $ftp_server = $row['ip'];
             // define some variables
-            $local_file = 'C:/xampp/htdocs/nha/assets/UPS/local.txt';
+            
+            $local_file = 'D:/Xampp/htdocs/nha/assets/UPS/local.txt';
             $server_file = 'ftp://' . $row['ip'] . '/data.txt';
             // set up basic connection
             $ftp = ftp_connect($ftp_server);
@@ -39,9 +41,7 @@ class Ups_data_acquisition extends CI_Controller
             if (ftp_get($ftp, $local_file, $server_file, FTP_BINARY)) {
                 echo "Successfully written to $local_file <br>";
 
-                // echo "exit;";
-                // exit;
-                $file_data = file_get_contents('C:/xampp/htdocs/nha/assets/UPS/local.txt');
+                $file_data = file_get_contents('D:/Xampp/htdocs/nha/assets/UPS/local.txt');
                 $data_exp = array_values(array_filter(explode(PHP_EOL, $file_data)));
 
                 $result = array_map(function ($val) {
@@ -72,11 +72,7 @@ class Ups_data_acquisition extends CI_Controller
                 $contents = array_values($result);
                 $finl = array_reverse($contents);
 
-                // echo "<pre>";
-                // print_r($finl);
-
                 if (empty($db_end_date[0]['date'])) {
-                    echo "no data of this ups";
                     $counter = 0;
                     foreach ($finl as $key => $value) {
                         $dates_param =  explode('/', $value[0]);
@@ -171,13 +167,13 @@ class Ups_data_acquisition extends CI_Controller
                         $ins_data[$counter]['ups_temperature'] = $value[30];
                         $counter++;
                     }
-                    // echo "data already exists";
+                    echo "data already exists";
                 }
 
                 if ($ins_data) {
                     $this->db->insert_batch('ups_data', $ins_data);
                     unset($ins_data);
-                    // file_put_contents("C:/xampp/htdocs/nha/assets/UPS/local.txt", "");
+                    file_put_contents("D:/Xampp/htdocs/nha/assets/UPS/local.txt", "");
                 }
                 // else {
                 //     $this->db->where('id', $systemId);

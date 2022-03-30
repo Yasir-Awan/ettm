@@ -22,7 +22,9 @@
             <th>Vbp</th>
             <th>Vout</th>
             <th>Iout</th>
-            <th>Total</th>
+            <th>Wout</th>
+            <th>Vbat</th>
+            <th>Temp</th>
           </tr>
         </thead>
         <tbody>
@@ -34,6 +36,9 @@
               <td><?php echo ceil($row['avg_Vbp1']); ?></td>
               <td><?php echo ceil($row['avg_Iin1']); ?></td>
               <td><?php echo ceil($row['avg_Vout1']); ?></td>
+              <td><?php echo ceil($row['avg_Wout1']); ?></td>
+              <td><?php echo ceil($row['avg_Vbat']); ?></td>
+              <td><?php echo ceil($row['avg_Temp']); ?></td>
             </tr>
           <?php } ?>
         </tbody>

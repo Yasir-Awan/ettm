@@ -1126,7 +1126,6 @@ class Admin_model extends CI_MODEL
 			$end_date = '';
 		}
 
-
 		return array('start_date' => $start_date, 'end_date' => $end_date);
 	}
 

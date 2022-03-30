@@ -189,6 +189,73 @@
 <!-- offset area end -->
 <!-- jquery latest version -->
 <script>
+    <?php if ($page == "UPS Dashboard") { ?>
+        $('body').on('change', '#ups_site', function() {
+            var tollplaza = $(this).val();
+            if (tollplaza) {
+                // $('#ups_formonth').val('');
+                $.ajax({
+                    type: 'POST',
+                    url: "<?php echo base_url(); ?>ups_dashboard/check_upsSites_dates/" + tollplaza,
+                    beforeSend: function() {
+                        //var top = '200';
+                        $('.ups_date').hide('normal'); // change submit button text
+                    },
+                    success: function(data) {
+                        $('.ups_date').show('normal');
+                        var obj = JSON.parse(data);
+                        if (obj.start_date == '' || obj.end_date == '') {
+                            notify("No record Found for this Tollplaza", 'info', 'top', 'right');
+                            $('#ups_formonth').datepicker('remove');
+                            $('#ups_formonth').val('');
+                            $('#ups_formonth').prop('disabled', true);
+                        } else {
+                            $('#ups_formonth').datepicker('remove');
+                            $('#ups_formonth').val('');
+                            $('#ups_formonth').prop('disabled', false);
+                            $("#ups_formonth").datepicker({
+                                format: "yyyy/mm",
+                                startDate: obj.start_date,
+                                autoclose: true,
+                                endDate: obj.end_date,
+                                startView: "months",
+                                minViewMode: "months",
+                                maxViewMode: "years",
+                            })
+                        }
+                    },
+                    error: function(e) {
+                        console.log(e)
+                    }
+                });
+            } else {
+                $('#ups_formonth').val('');
+                $('.ups_date').hide('slow');
+            }
+        });
+
+        $('body').on('change', '#ups_formonth', function() {
+            var form = $('#searchforUPSsite');
+            $.ajax({
+                url: form.attr('action'), // form action url
+                type: 'POST', // form submit method get/post
+                dataType: 'html', // request type html/json/xml
+                data: form.serialize(),
+                beforeSend: function() {
+                    var top = '200';
+                    $('.ups_div').html('<div style="text-align:center;width:100%;position:relative;top:' + top + 'px; min-height:300px;"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>'); // change submit button text
+                },
+                success: function(data) {
+                    //console.log(data);
+                    $('.ups_div').html(data);
+                },
+                error: function(e) {
+                    console.log(e)
+                }
+            });
+        })
+    <?php } ?>
+
     <?php if ($page == "Dashboard") { ?>
         $(document).ready(function() {
             // Javascript method's body can be found in assets/js/demos.js
@@ -216,7 +283,6 @@
                         } else {
                             $('#formonth').prop('disabled', false);
                             $("#formonth").datepicker({
-
                                 format: "yyyy/mm",
                                 startDate: obj.start_date,
                                 autoclose: true,
@@ -236,6 +302,7 @@
                 $('.date').hide('slow');
             }
         });
+
 
         /** js for dashboard Timer START */
         var timer = setInterval(function() {
@@ -277,7 +344,6 @@
                 success: function(data) {
                     //console.log(data);
                     $('.chart_div').html(data);
-
                 },
                 error: function(e) {
                     console.log(e)

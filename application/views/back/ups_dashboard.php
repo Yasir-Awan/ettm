@@ -3,7 +3,7 @@
 <?php include('ups_dashboard/style.php'); ?>
 
 <br>
-<div class="chart_div" style="margin-top: -10px !important;">
+<div class="ups_div" style="margin-top: -10px !important;">
 
     <?php include('ups_dashboard/upper_card.php'); ?>
 

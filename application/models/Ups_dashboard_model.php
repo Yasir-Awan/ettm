@@ -1012,99 +1012,97 @@ class Ups_dashboard_model extends CI_MODEL
     }
 
 
-    function get_chartdata($tollplaza = '', $month = '')
+    function get_filtered_UPS_data($ups = '', $month = '')
     {
-        $chart = array();
-        $revenue = array();
-        $chart['class1']['data'] = 0;
-        $chart['class2']['data'] = 0;
-        $chart['class3']['data'] = 0;
-        $chart['class4']['data'] = 0;
-        $chart['class5']['data'] = 0;
-        $chart['total']['traffic'] = 0;
-        $revenue['class1']['data'] = 0;
-        $revenue['class2']['data'] = 0;
-        $revenue['class3']['data'] = 0;
-        $revenue['class4']['data'] = 0;
-        $revenue['class5']['data'] = 0;
-        $revenue['total']['revenue'] = 0;
-
         $month = str_replace('/', '-', $month);
         $month = $month . "-01";
-        $data = $this->db->get_where('mtr', array('for_month' => $month, 'toolplaza' => $tollplaza))->result_array();
+        $incrementedDateStamp = strtotime(date("Y-m-d", strtotime($month)) . "+ 1 month");
+        $incrementedDay = date("Y-m-d", $incrementedDateStamp);
 
-        if (empty($data)) {
-            $data = $this->db->select('*')->where('toolplaza', $tollplaza)->order_by('id', 'desc')->limit(1)->get('mtr')->result_array();
-        }
-        if (empty($data)) {
-            $data = $this->db->select('*')->order_by('id', 'desc')->limit(1)->get('mtr')->result_array();
-        }
-        foreach ($data as $key => $value) {
-            //	echo "<pre>";
-            //	print_r($value); 
-            $month_year = explode('-', $data[0]['for_month']);
-            $start_date = $month_year[0] . '-' . $month_year[1] . '-' . $data[0]['start_date'];
-            $end_date = $month_year[0] . '-' . $month_year[1] . '-' . $data[0]['end_date'];
-            $sql = "Select * From terrif Where FIND_IN_SET (" . $data[0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
-            $tarrif =  $this->db->query($sql)->result_array();
+        $data = $this->db->select('*')->where('system_id', $ups)->where('date>=', $month)->where('date <', $incrementedDay)->get('ups_data')->result_array();
+        // $data = $this->db->get_where('ups_data', array('date' => $month, 'system_id' => $ups))->result_array();
 
-            $mtr_id =  $data[0]['id'];
-            $chart['class1']['data'] = $chart['class1']['data'] + $value['class1'];
-            $chart['class2']['data'] = $chart['class2']['data'] + $value['class2'];
-            $chart['class3']['data'] = $chart['class3']['data'] + $value['class3'] + $value['class5'] + $value['class6'];
-            $chart['class4']['data'] = $chart['class4']['data'] + $value['class4'];
-            $chart['class5']['data'] = $chart['class5']['data'] + $value['class7'] + $value['class8'] + $value['class9'] + $value['class10'];
-            $chart['total']['traffic'] = $chart['total']['traffic'] + $value['class1'] + $value['class2'] + $value['class3'] + $value['class4'] + $value['class5'] + $value['class6'] + $value['class7'] + $value['class8'] + $value['class9'] + $value['class10'];
-            if ($tarrif) {
-                $revenue['special_message'] = " ";
-                $revenue['month']          = $value['for_month'];
-                $revenue['class1']['data'] = $revenue['class1']['data'] + $value['class1'] * $tarrif[0]['class_1_value'];
-                $revenue['class2']['data'] = $revenue['class2']['data'] + $value['class2'] * $tarrif[0]['class_2_value'];
-                $revenue['class3']['data'] = $revenue['class3']['data'] + ($value['class3'] *  $tarrif[0]['class_3_value']) + ($value['class5'] * $tarrif[0]['class_5_value']) + ($value['class6'] * $tarrif[0]['class_6_value']);
-                $revenue['class4']['data'] = $revenue['class4']['data'] + $data[0]['class4'] * $tarrif[0]['class_4_value'];
-                $revenue['class5']['data'] = $revenue['class5']['data'] + ($value['class7']  * $tarrif[0]['class_7_value']) + ($value['class8'] *  $tarrif[0]['class_8_value']) + ($value['class9'] * $tarrif[0]['class_9_value']) + ($value['class10'] * $tarrif[0]['class_10_value']);
-                $revenue['total']['revenue'] = $revenue['total']['revenue'] + ($value['class1'] * $tarrif[0]['class_1_value']) + ($value['class2'] * $tarrif[0]['class_2_value']) +
-                    ($value['class3'] * $tarrif[0]['class_3_value']) + ($value['class4'] * $tarrif[0]['class_4_value']) +
-                    ($value['class5'] * $tarrif[0]['class_5_value']) + ($value['class6'] * $tarrif[0]['class_6_value']) +
-                    ($value['class7'] * $tarrif[0]['class_7_value']) + ($value['class8'] *  $tarrif[0]['class_8_value']) +
-                    ($value['class9'] * $tarrif[0]['class_9_value']) + ($value['class10'] * $tarrif[0]['class_10_value']);
-            }
-        }
+        // echo "<pre>";
+        // print_r($data);
+        // exit;
+        // if (empty($data)) {
+        //     $data = $this->db->select('*')->where('toolplaza', $tollplaza)->order_by('id', 'desc')->limit(1)->get('mtr')->result_array();
+        // }
+        // if (empty($data)) {
+        //     $data = $this->db->select('*')->order_by('id', 'desc')->limit(1)->get('mtr')->result_array();
+        // }
+        // foreach ($data as $key => $value) {
+        //     //	echo "<pre>";
+        //     //	print_r($value); 
+        //     $month_year = explode('-', $data[0]['for_month']);
+        //     $start_date = $month_year[0] . '-' . $month_year[1] . '-' . $data[0]['start_date'];
+        //     $end_date = $month_year[0] . '-' . $month_year[1] . '-' . $data[0]['end_date'];
+        //     $sql = "Select * From terrif Where FIND_IN_SET (" . $data[0]['toolplaza'] . " ,toolplaza) AND (start_date <= '" . $start_date . "' AND end_date >= '" . $end_date . "')";
+        //     $tarrif =  $this->db->query($sql)->result_array();
+
+        //     $mtr_id =  $data[0]['id'];
+        //     $chart['class1']['data'] = $chart['class1']['data'] + $value['class1'];
+        //     $chart['class2']['data'] = $chart['class2']['data'] + $value['class2'];
+        //     $chart['class3']['data'] = $chart['class3']['data'] + $value['class3'] + $value['class5'] + $value['class6'];
+        //     $chart['class4']['data'] = $chart['class4']['data'] + $value['class4'];
+        //     $chart['class5']['data'] = $chart['class5']['data'] + $value['class7'] + $value['class8'] + $value['class9'] + $value['class10'];
+        //     $chart['total']['traffic'] = $chart['total']['traffic'] + $value['class1'] + $value['class2'] + $value['class3'] + $value['class4'] + $value['class5'] + $value['class6'] + $value['class7'] + $value['class8'] + $value['class9'] + $value['class10'];
+        //     if ($tarrif) {
+        //         $revenue['special_message'] = " ";
+        //         $revenue['month']          = $value['for_month'];
+        //         $revenue['class1']['data'] = $revenue['class1']['data'] + $value['class1'] * $tarrif[0]['class_1_value'];
+        //         $revenue['class2']['data'] = $revenue['class2']['data'] + $value['class2'] * $tarrif[0]['class_2_value'];
+        //         $revenue['class3']['data'] = $revenue['class3']['data'] + ($value['class3'] *  $tarrif[0]['class_3_value']) + ($value['class5'] * $tarrif[0]['class_5_value']) + ($value['class6'] * $tarrif[0]['class_6_value']);
+        //         $revenue['class4']['data'] = $revenue['class4']['data'] + $data[0]['class4'] * $tarrif[0]['class_4_value'];
+        //         $revenue['class5']['data'] = $revenue['class5']['data'] + ($value['class7']  * $tarrif[0]['class_7_value']) + ($value['class8'] *  $tarrif[0]['class_8_value']) + ($value['class9'] * $tarrif[0]['class_9_value']) + ($value['class10'] * $tarrif[0]['class_10_value']);
+        //         $revenue['total']['revenue'] = $revenue['total']['revenue'] + ($value['class1'] * $tarrif[0]['class_1_value']) + ($value['class2'] * $tarrif[0]['class_2_value']) +
+        //             ($value['class3'] * $tarrif[0]['class_3_value']) + ($value['class4'] * $tarrif[0]['class_4_value']) +
+        //             ($value['class5'] * $tarrif[0]['class_5_value']) + ($value['class6'] * $tarrif[0]['class_6_value']) +
+        //             ($value['class7'] * $tarrif[0]['class_7_value']) + ($value['class8'] *  $tarrif[0]['class_8_value']) +
+        //             ($value['class9'] * $tarrif[0]['class_9_value']) + ($value['class10'] * $tarrif[0]['class_10_value']);
+        //     }
+        // }
         //	exit;
-        $chart['month']           = $data[0]['for_month'];
-        $chart['class1']['label'] = "Car";
-        $chart['class2']['label'] = "Wagon";
-        $chart['class3']['label'] = "Truck";
-        $chart['class4']['label'] = "Bus";
-        $chart['class5']['label'] = "AT Truck";
+        // $chart['month']           = $data[0]['for_month'];
+        // $chart['class1']['label'] = "Car";
+        // $chart['class2']['label'] = "Wagon";
+        // $chart['class3']['label'] = "Truck";
+        // $chart['class4']['label'] = "Bus";
+        // $chart['class5']['label'] = "AT Truck";
 
-        $revenue['month']          = $data[0]['for_month'];
-        $revenue['class1']['label'] = "Car";
-        $revenue['class2']['label'] = "Wagon";
-        $revenue['class3']['label'] = "Truck";
-        $revenue['class4']['label'] = "Bus";
-        $revenue['class5']['label'] = "AT Truck";
-        $chart['tollplaza'] = $this->db->get_where('toolplaza', array('id' => $data[0]['toolplaza']))->row()->name;
-        $chart['toolplaza_id'] = $data[0]['toolplaza'];
-        return array('mtr_id' => $mtr_id, 'chart' => $chart, 'revenue' => $revenue);
+        // $revenue['month']          = $data[0]['for_month'];
+        // $revenue['class1']['label'] = "Car";
+        // $revenue['class2']['label'] = "Wagon";
+        // $revenue['class3']['label'] = "Truck";
+        // $revenue['class4']['label'] = "Bus";
+        // $revenue['class5']['label'] = "AT Truck";
+        // $chart['tollplaza'] = $this->db->get_where('toolplaza', array('id' => $data[0]['toolplaza']))->row()->name;
+        // $chart['toolplaza_id'] = $data[0]['toolplaza'];
+        return $data;
     }
 
-    function get_tollplaza_dates($tollplaza = '')
+    function get_upsSites_dates($tollplaza = '')
     {
-        $data = $this->db->select('*')->where('toolplaza', $tollplaza)->order_by('for_month', 'desc')->limit(1)->get('mtr')->result_array();
-        $data_min = $this->db->select('*')->where('toolplaza', $tollplaza)->order_by('for_month', 'asc')->limit(1)->get('mtr')->result_array();
+        $data = $this->db->select('*')->where('system_id', $tollplaza)->order_by('date', 'desc')->limit(1)->get('ups_data')->result_array();
+        $data_min = $this->db->select('*')->where('system_id', $tollplaza)->order_by('date', 'asc')->limit(1)->get('ups_data')->result_array();
 
         if ($data && $data_min) {
-            $data1 = explode('-', $data[0]['for_month']);
-            $data2 = explode('-', $data_min[0]['for_month']);
+            $data1 = explode('-', $data[0]['date']);
+            $data2 = explode('-', $data_min[0]['date']);
+            // echo "<pre>";
+            // print_r($data1);
+            // echo "<pre>";
+            // print_r($data2);
+            // exit;
             $start_date = implode('/', array($data2[0], $data2[1]));
             $end_date = implode('/', array($data1[0], $data1[1]));
         } else {
             $start_date = '';
             $end_date = '';
         }
-
-
+        // echo $start_date . "<br>";
+        // echo $end_date;
+        // exit;
         return array('start_date' => $start_date, 'end_date' => $end_date);
     }
 
@@ -1116,7 +1114,6 @@ class Ups_dashboard_model extends CI_MODEL
         $data = $this->db->select('*')->where('toolplaza', $tollplaza)->order_by('for_date', 'desc')->limit(1)->get('dtr')->result_array();
         $data_min = $this->db->select('*')->where('toolplaza', $tollplaza)->order_by('for_date', 'asc')->limit(1)->get('dtr')->result_array();
 
-
         if ($data && $data_min) {
             $data1 = explode('-', $data[0]['for_date']);
             $data2 = explode('-', $data_min[0]['for_date']);
@@ -1126,7 +1123,6 @@ class Ups_dashboard_model extends CI_MODEL
             $start_date = '';
             $end_date = '';
         }
-
 
         return array('start_date' => $start_date, 'end_date' => $end_date);
     }
