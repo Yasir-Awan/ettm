@@ -77,3 +77,7 @@ $route['api/item_retire/(:any)'] = 'api/ApiItemRetireController/index/$1';
 $route['api/upsdata_list'] = 'upsapi/ApiUpsDataListController/index';
 $route['api/adminlogin'] = 'upsapi/ApiAdminLoginController/index';
 /** UPS API END*/
+
+/** API to write json data in file START */
+$route['api/write_file'] = 'file_api/WriteDataToFileController/index';
+/** API to write json data in file END */

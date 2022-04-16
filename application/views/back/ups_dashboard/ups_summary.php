@@ -20,25 +20,53 @@
             <th>Vmin</th>
             <th>Vmax</th>
             <th>Vbp</th>
+            <th>Iin</th>
             <th>Vout</th>
-            <th>Iout</th>
             <th>Wout</th>
             <th>Vbat</th>
             <th>Temp</th>
+            <th>Hours</th>
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($ups_data as $row) { ?>
+          <?php
+          $hCount = 0;
+          foreach ($ups_data as $row) { ?>
             <tr>
-              <td><?php echo date("F, j/Y", strtotime($row['date'])); ?></td>
-              <td><?php echo ceil($row['avg_Vmin']); ?></td>
-              <td><?php echo ceil($row['avg_Vmax']); ?></td>
-              <td><?php echo ceil($row['avg_Vbp1']); ?></td>
-              <td><?php echo ceil($row['avg_Iin1']); ?></td>
-              <td><?php echo ceil($row['avg_Vout1']); ?></td>
-              <td><?php echo ceil($row['avg_Wout1']); ?></td>
-              <td><?php echo ceil($row['avg_Vbat']); ?></td>
-              <td><?php echo ceil($row['avg_Temp']); ?></td>
+              <td style="padding-top:2em;"><?php echo date("F, j/Y", strtotime($row['date'])); ?></td>
+              <td style="padding-top:2em;"><?php echo ceil($row['avg_Vmin']); ?></td>
+              <td style="padding-top:2em;"><?php echo ceil($row['avg_Vmax']); ?></td>
+              <td style="padding-top:2em;"><?php echo ceil($row['avg_Vbp1']); ?></td>
+              <td style="padding-top:2em;"><?php echo ceil($row['avg_Iin1']); ?></td>
+              <td style="padding-top:2em;"><?php echo ceil($row['avg_Vout1']); ?></td>
+              <td style="padding-top:2em;"><?php echo ceil($row['avg_Wout1']); ?></td>
+              <td style="padding-top:2em;"><?php echo ceil($row['avg_Vbat']); ?></td>
+              <td style="padding-top:2em;"><?php echo ceil($row['avg_Temp']); ?></td>
+              <td>
+                <?php
+                $vals = "";
+                if (empty($row['hours'])) {
+                  $vals = "Not Shutdown";
+                } else {
+                  $vals = implode('  &  ', $row['hours']);
+                  // $vals = implode('')
+                }
+                if ($vals == "Not Shutdown") {
+                ?>
+                  <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="left" title="<?php echo $vals; ?>">
+                    <?php echo $row['hourCount']; ?>
+                  </button>
+                <?php
+                } else {
+                ?>
+                  <button type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="left" title="<?php echo $vals; ?>">
+                    <?php echo $row['hourCount']; ?>
+                  </button>
+                <?php
+                }
+                ?>
+
+              </td>
             </tr>
           <?php } ?>
         </tbody>
@@ -48,3 +76,9 @@
   </div>
 </div>
 </div>
+<script>
+  $(function() {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+  $('#example').tooltip(options)
+</script>

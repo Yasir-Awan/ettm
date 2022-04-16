@@ -12,7 +12,6 @@
     <!-- Hidden Form END -->
 
     <?php if ($page == "UPS Dashboard") { ?>
-
       <?php echo form_open_multipart(base_url() . 'ups_dashboard/searchforUPS', array('id' => 'searchforUPSsite', 'method' => 'post')); ?>
       <select class="form-control required text-primary mb-1" name="ups_site" id="ups_site" class="card border-left-primary shadow h-100 py-2" style="height: 35px !important; padding-bottom: 6px; padding-left: 5px; border-left: .25rem solid #4e73df!important;">
         <option value="">Select UPS</option>
