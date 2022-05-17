@@ -59,6 +59,10 @@ $route['api/filtered_site_inventory/(:any)/(:any)'] = 'api/ApiFilteredSiteInvent
 $route['api/item_detail/(:any)'] = 'api/ApiItemDetailController/index/$1';
 $route['api/item_faulty/(:any)'] = 'api/ApiItemFaultyController/index/$1';
 /** Routes for repairing items START */
+
+/** Api for getting site related locations Start*/
+$route['api/site_locations/(:any)'] = 'api/ApiSiteLocations/index/$1';
+/** Api for getting site related locations Start*/
 $route['api/item_repair_warranty'] = 'api/ApiItemRepairWarrantyController/index';
 $route['api/item_repair_standard/(:any)'] = 'api/ApiItemRepairStandardController/index/$1';
 $route['api/admin_details/(:any)'] = 'api/ApiAdminDetailsController/index/$1';
@@ -75,6 +79,7 @@ $route['api/item_retire/(:any)'] = 'api/ApiItemRetireController/index/$1';
 
 /** UPS API START */
 $route['api/upsdata_list'] = 'upsapi/ApiUpsDataListController/index';
+$route['api/specific_ups/(:any)'] = 'upsapi/ApiUpsDataListController/searchforUPS/$1';
 $route['api/adminlogin'] = 'upsapi/ApiAdminLoginController/index';
 /** UPS API END*/
 
