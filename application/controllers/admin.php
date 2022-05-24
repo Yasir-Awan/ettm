@@ -3511,7 +3511,6 @@ class Admin extends CI_Controller
 														public function view_supporting($para1 = '')
 														{
 															if (!$this->session->userdata('adminid')) {
-
 																return redirect('admin/login');
 															}
 															$this->page_data['support'] = $this->db->get_where('supporting_document', array('mtr_id' => $para1))->result_array();

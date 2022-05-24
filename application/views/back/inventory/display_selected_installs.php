@@ -3,7 +3,10 @@
     <thead>
       <?php foreach ($selected_assets as $asset) {
         $site = $this->db->get_where('sites', array('id' => $asset['site']))->result_array();
-        $assetName = $this->db->get_where('items', array('id' => $asset['name']))->result_array(); ?>
+        $assetName = $this->db->get_where('items', array('id' => $asset['name']))->result_array();
+        // echo "<pre>";
+        // print_r($assetName);
+      ?>
         <span align='center'>
           <h1 style="color: #030a10;font-family: cursive;" class='mb-3 mt-3'><?php echo $site[0]['name']; ?></h1>
         </span>
@@ -64,77 +67,81 @@
         } ?>
         <br><br>
         <div class"row">
-
           <span align='center'>
             <h5 style="color: #030a10;font-family:'lato', sans-serif;"><?php echo $assetName[0]['name']; ?></h5>
           </span>
-          <div class="row">
-            <div class="col-md-6">
-            </div>
-            <div class="col-md-2">
-              <!-- <span class="btn btn-success pull-right btn-xs btn-labeled " id="cancel_reason" name="asset_edit" onclick="ajax_html('<?php echo base_url() . 'inventory/asset_edit/' . $asset['id']; ?>','edit_asset_contents');" data-toggle="modal" data-target="#assets-edit" style='margin-right:-260px;'> <i class="fa fa-edit"> </i> &nbsp; Edit</span> -->
-            </div>
-            <div class="col-md-2">
-              <!-- <span class="btn btn-danger btn-md  fas fa-trash-alt" style="margin-left:18rem;margin-top:-50px;" onclick="delete_confirm_tab('Really want to delete This','<?php echo base_url() . 'inventory/installed_inventory/delete/' . $asset['identification_no']; ?>')">
+        </div>
+        <div class="row" align='center' style="padding-left:35%;">
+          <img src="<?php echo base_url() ?>uploads/inventory_item_pics/<?php echo $assetName[0]['img']; ?>" alt=" Cinque Terre" width="400" height="250">
+        </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+  </div>
+  <div class="col-md-2">
+    <!-- <span class="btn btn-success pull-right btn-xs btn-labeled " id="cancel_reason" name="asset_edit" onclick="ajax_html('<?php echo base_url() . 'inventory/asset_edit/' . $asset['id']; ?>','edit_asset_contents');" data-toggle="modal" data-target="#assets-edit" style='margin-right:-260px;'> <i class="fa fa-edit"> </i> &nbsp; Edit</span> -->
+  </div>
+  <div class="col-md-2">
+    <!-- <span class="btn btn-danger btn-md  fas fa-trash-alt" style="margin-left:18rem;margin-top:-50px;" onclick="delete_confirm_tab('Really want to delete This','<?php echo base_url() . 'inventory/installed_inventory/delete/' . $asset['identification_no']; ?>')">
                 Delete</span> -->
-            </div>
-          </div>
-    </thead>
-    <tbody>
-      <tr>
-        <th scope="row"><span class="text-left" style=" color:#08842c;float:left;">Description:</span></th>
-        <td><span style="color:#030a10;font-weight:750;font-family:'lato', sans-serif;"><?php echo $assetName[0]['description']; ?></span></td>
-        <th scope="row"><span class="text-left" style="color: #08842c;float: left;">Name:</span></th>
-        <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $assetName[0]['name']; ?></span></td>
-        <th><span style="color:#08842c;">Purchase Cost:</span></th>
-        <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['cost_price']; ?></span></td>
-        <th scope="row"><span style="color:#08842c;float:left;">Purchase On:</span></th>
-        <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo date("F j, Y", strtotime($asset['purchased_on'])) ?></span></td>
-      </tr>
-      <tr>
-        <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Serial:</span></th>
-        <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['serial_no']; ?></span></td>
-        <th><span class="text-left" style="color:#08842c;float:left;">Model:</span></th>
-        <td><span style="margin-left:-15px;font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['product_model_no']; ?></span></td>
-        <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Supplier:</span></th>
-        <?php $supplierName = $this->db->get_where('suppliers', array('id' => $asset['supplier']))->result_array(); ?>
-        <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $supplierName[0]['name']; ?></span></td>
-        <th><span class="text-left" style="color:#08842c;float:left;">Manufecturer:</span></th>
-        <?php $manufacturer = $this->db->get_where('manufacturers', array('id' => $asset['manufacturer']))->result_array(); ?>
-        <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $manufacturer[0]['name']; ?></span></td>
-      </tr>
-      <tr>
-        <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Site:</span></th>
-        <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $site[0]['name']; ?></span></td>
-        <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Warranty Type:</span></th>&nbsp
-        <?php $supplierName = $this->db->get_where('suppliers', array('id' => $asset['supplier']))->result_array(); ?>
-        <td> <span style="font-weight:750;font-family:'lato', sans-serif;"> <?php if ($asset['warranty_type'] == 0) {
-                                                                              echo " Have no Warranty.";
-                                                                            }
-                                                                            if ($asset['warranty_type'] == 1) {
-                                                                              echo " Replacement Warranty.";
-                                                                            }
-                                                                            if ($asset['warranty_type'] == 2) {
-                                                                              echo " Repairing Warranty.";
-                                                                            } ?></span> </td>
-        <th><span class="text-left" style="color:#08842c;float: left;">Warranty Duration:</span></th>
-        <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['warranty_duration']; ?></span></td>
-        <th scope="row"><span class="text-left" style="color:#08842c;float:left;">This asset Added on:</span></th>
-        <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo date('F j, Y, g:i a', $asset['add_date']); ?></span></td>
-      </tr>
-      <tr>
-        <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Added by User Type:</span></th>
-        <td><span style="font-weight:750;font-family:'lato', sans-serif;"> <?php if ($asset['user_type'] == 1) {
-                                                                              echo "Admin";
-                                                                            }
-                                                                            if ($asset['user_type'] == 2) {
-                                                                              echo "Supervisor";
-                                                                            }
-                                                                            if ($asset['user_type'] == 3) {
-                                                                              echo "Member";
-                                                                            } ?></span> </td>
-        <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Added by User Name:</span></th>
-        <?php
+  </div>
+</div>
+</thead>
+<tbody>
+  <tr>
+    <th scope="row"><span class="text-left" style=" color:#08842c;float:left;">Description:</span></th>
+    <td><span style="color:#030a10;font-weight:750;font-family:'lato', sans-serif;"><?php echo $assetName[0]['description']; ?></span></td>
+    <th scope="row"><span class="text-left" style="color: #08842c;float: left;">Name:</span></th>
+    <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $assetName[0]['name']; ?></span></td>
+    <th><span style="color:#08842c;">Purchase Cost:</span></th>
+    <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['cost_price']; ?></span></td>
+    <th scope="row"><span style="color:#08842c;float:left;">Purchase On:</span></th>
+    <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo date("F j, Y", strtotime($asset['purchased_on'])) ?></span></td>
+  </tr>
+  <tr>
+    <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Serial:</span></th>
+    <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['serial_no']; ?></span></td>
+    <th><span class="text-left" style="color:#08842c;float:left;">Model:</span></th>
+    <td><span style="margin-left:-15px;font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['product_model_no']; ?></span></td>
+    <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Supplier:</span></th>
+    <?php $supplierName = $this->db->get_where('suppliers', array('id' => $asset['supplier']))->result_array(); ?>
+    <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $supplierName[0]['name']; ?></span></td>
+    <th><span class="text-left" style="color:#08842c;float:left;">Manufecturer:</span></th>
+    <?php $manufacturer = $this->db->get_where('manufacturers', array('id' => $asset['manufacturer']))->result_array(); ?>
+    <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $manufacturer[0]['name']; ?></span></td>
+  </tr>
+  <tr>
+    <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Site:</span></th>
+    <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $site[0]['name']; ?></span></td>
+    <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Warranty Type:</span></th>&nbsp
+    <?php $supplierName = $this->db->get_where('suppliers', array('id' => $asset['supplier']))->result_array(); ?>
+    <td> <span style="font-weight:750;font-family:'lato', sans-serif;"> <?php if ($asset['warranty_type'] == 0) {
+                                                                          echo " Have no Warranty.";
+                                                                        }
+                                                                        if ($asset['warranty_type'] == 1) {
+                                                                          echo " Replacement Warranty.";
+                                                                        }
+                                                                        if ($asset['warranty_type'] == 2) {
+                                                                          echo " Repairing Warranty.";
+                                                                        } ?></span> </td>
+    <th><span class="text-left" style="color:#08842c;float: left;">Warranty Duration:</span></th>
+    <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['warranty_duration']; ?></span></td>
+    <th scope="row"><span class="text-left" style="color:#08842c;float:left;">This asset Added on:</span></th>
+    <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo date('F j, Y, g:i a', $asset['add_date']); ?></span></td>
+  </tr>
+  <tr>
+    <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Added by User Type:</span></th>
+    <td><span style="font-weight:750;font-family:'lato', sans-serif;"> <?php if ($asset['user_type'] == 1) {
+                                                                          echo "Admin";
+                                                                        }
+                                                                        if ($asset['user_type'] == 2) {
+                                                                          echo "Supervisor";
+                                                                        }
+                                                                        if ($asset['user_type'] == 3) {
+                                                                          echo "Member";
+                                                                        } ?></span> </td>
+    <th scope="row"><span class="text-left" style="color:#08842c;float:left;">Added by User Name:</span></th>
+    <?php
         if ($asset['user_type'] == 1) {
           $userName = $this->db->get_where('admin', array('id' => $asset['checkin_by']))->result_array();
         }
@@ -144,15 +151,15 @@
         if ($asset['user_type'] == 3) {
           $userName = $this->db->get_where('member', array('id' => $asset['checkin_by']))->result_array();
         }
-        ?>
-        <td><span style="font-weight:750;font-family:'lato', sans-serif;"> <?php echo $userName[0]['fname'] . " " . $userName[0]['lname'];  ?></span> </td>
-        <th><span style="color:#08842c;">Asset Ratting:</span></th>
-        <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['asset_comment']; ?></span></td>
-        <th><span style="color:#08842c;">Id No:</span></th>
-        <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['identification_no']; ?></span></td>
-      </tr>
-    </tbody>
-  </table>
+    ?>
+    <td><span style="font-weight:750;font-family:'lato', sans-serif;"> <?php echo $userName[0]['fname'] . " " . $userName[0]['lname'];  ?></span> </td>
+    <th><span style="color:#08842c;">Asset Ratting:</span></th>
+    <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['asset_comment']; ?></span></td>
+    <th><span style="color:#08842c;">Id No:</span></th>
+    <td><span style="font-weight:750;font-family:'lato', sans-serif;"><?php echo $asset['identification_no']; ?></span></td>
+  </tr>
+</tbody>
+</table>
 <?php } ?>
 </row>
 </div>

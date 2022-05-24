@@ -283,7 +283,6 @@ class Toolplaza extends CI_Controller
 				exit;
 			} else {
 				foreach ($_FILES['supporting_file']['name'] as $key => $value) {
-
 					if (!empty($value)) {
 						if (!empty($_POST['suppporting_document_name'][$key])) {
 							$_FILES['images[]']['name']		= $_FILES['supporting_file']['name'][$key];
@@ -411,7 +410,6 @@ class Toolplaza extends CI_Controller
 					echo json_encode(array('response' => FALSE, 'message' => $this->upload->display_errors()));
 					exit;
 				} else {
-
 					$update['file'] = $file_new_name;
 					$this->db->where('id', $insert_id);
 					$this->db->update('mtr', $update);
@@ -696,8 +694,6 @@ class Toolplaza extends CI_Controller
 					}
 					echo json_encode(array('response' => TRUE, 'message' => 'Updated Successfully', 'is_redirect' => TRUE, 'redirect_url' => base_url() . 'toolplaza/mtr'));
 				} // else end
-
-
 			} else {
 				echo json_encode(array('response' => FALSE, 'message' => "Invalid Request"));
 				exit;

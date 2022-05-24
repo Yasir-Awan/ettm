@@ -70,6 +70,9 @@ class Inventory extends CI_Controller
 		}
 		if ($para1 == 'list') {
 			$this->page_data['items'] = $this->Inventory_model->get_Items();
+			// echo "<pre>";
+			// print_r($this->page_data['items']);
+			// exit;
 			$this->load->view('back/inventory/display_items', $this->page_data);
 		} elseif ($para1 == 'delete') {
 
@@ -123,6 +126,12 @@ class Inventory extends CI_Controller
 
 	public function add_item_do()
 	{
+
+		// echo "<pre>";
+		// print_r($_FILES);
+		// exit;
+		$randomNo = $this->Inventory_model->generate_id();
+
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('item_name', ' ITEM Name', 'required|trim');
 		$this->form_validation->set_rules('item_type', ' ITEM Type', 'required|trim');
@@ -139,6 +148,28 @@ class Inventory extends CI_Controller
 				'user'		  => $this->session->userdata('adminid'),
 			);
 			$this->db->insert('items', $data);
+			$insert_id = $this->db->insert_id();
+
+			$filename = $_FILES["item_img"]["name"];
+
+			$ext = @end((explode(".", $filename)));
+			$file_new_name = 'item_img' . $randomNo . '.' . $ext;
+			// echo $file_new_name;
+			// exit;
+			$config1['upload_path'] = './uploads/inventory_item_pics';
+			$config1['allowed_types'] = 'jpeg|jpg|png|csv|pdf|xls|xlsx|xl';
+			$config1['overwrite'] = TRUE;
+			$config1['file_name']	=	$file_new_name;
+			$this->load->library('upload', $config1);
+			$this->upload->initialize($config1);
+			if (!$this->upload->do_upload('item_img')) {
+				echo json_encode(array('response' => FALSE, 'message' => $this->upload->display_errors()));
+				exit;
+			} else {
+				$update['img'] = $file_new_name;
+				$this->db->where('id', $insert_id);
+				$this->db->update('items', $update);
+			}
 			echo json_encode(array('response' => true, 'message' => 'Item Added Successfully', 'is_redirect' => True, 'redirect_url' => base_url() . 'inventory/first_page'));
 			exit;
 		} else {
@@ -166,12 +197,17 @@ class Inventory extends CI_Controller
 			echo json_encode(array('response' => TRUE, 'message' => 'Invalid Request'));
 			exit;
 		}
+		$randomNo = $this->Inventory_model->generate_id();
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('item-name', ' ITEM Name', 'required|trim');
 		$this->form_validation->set_rules('item_type', ' ITEM Type', 'required|trim');
 		$this->form_validation->set_rules('subitems', ' Have Sub Items', 'required|trim');
 		$this->form_validation->set_rules('item-[description]', ' ITEM Description', 'required|trim');
 		if ($this->form_validation->run() == TRUE) {
+
+			$item_detail = $this->db->get_where('items', array('id' => $item_id))->result_array();
+			$item_img = $item_detail[0]['img'];
+			unlink('./uploads/inventory_item_pics/' . $item_img);
 			$data = array(
 				'item_type' => $this->input->post('item_type'),
 				'name' => $this->input->post('item-name'),
@@ -183,6 +219,27 @@ class Inventory extends CI_Controller
 			);
 			$this->db->where('id', $item_id);
 			$this->db->update('items', $data);
+
+			$filename = $_FILES["item_img"]["name"];
+
+			$ext = @end((explode(".", $filename)));
+			$file_new_name = 'item_img' . $randomNo . '.' . $ext;
+			// echo $file_new_name;
+			// exit;
+			$config1['upload_path'] = './uploads/inventory_item_pics';
+			$config1['allowed_types'] = 'jpeg|jpg|png|csv|pdf|xls|xlsx|xl';
+			$config1['overwrite'] = TRUE;
+			$config1['file_name']	=	$file_new_name;
+			$this->load->library('upload', $config1);
+			$this->upload->initialize($config1);
+			if (!$this->upload->do_upload('item_img')) {
+				echo json_encode(array('response' => FALSE, 'message' => $this->upload->display_errors()));
+				exit;
+			} else {
+				$update['img'] = $file_new_name;
+				$this->db->where('id', $item_id);
+				$this->db->update('items', $update);
+			}
 			echo json_encode(array('response' => true, 'message' => 'Item updated successfully', 'is_redirect' => True, 'redirect_url' => base_url() . 'inventory/first_page/'));
 			exit;
 		} else {
